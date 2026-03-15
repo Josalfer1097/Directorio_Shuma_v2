@@ -87,69 +87,67 @@ export function FeaturedEmployees({
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.4, delay: index * 0.1 }}
             >
-              <Link href={`/directorio/${employee.id}`}>
-                <div className="group relative overflow-hidden rounded-xl border border-border bg-card p-6 transition-all duration-300 hover:shadow-lg hover:border-primary/30">
-                  {/* Top gradient line */}
-                  <div
-                    className="absolute top-0 left-0 right-0 h-1"
-                    style={{ backgroundColor: companyColor }}
-                  />
+              <div className="group relative overflow-hidden rounded-xl border border-border bg-card p-6 transition-all duration-300 hover:shadow-lg hover:border-primary/30">
+                {/* Top gradient line */}
+                <div
+                  className="absolute top-0 left-0 right-0 h-1"
+                  style={{ backgroundColor: companyColor }}
+                />
 
-                  <div className="flex flex-col items-center text-center">
-                    <Avatar className="w-20 h-20 mb-4 border-2 border-border group-hover:border-primary/50 transition-colors">
-                      <AvatarFallback
-                        className="text-lg font-semibold"
-                        style={{
-                          backgroundColor: `${companyColor}20`,
-                          color: companyColor,
-                        }}
-                      >
-                        {getInitials(employee.name)}
-                      </AvatarFallback>
-                    </Avatar>
-
-                    <h3 className="font-semibold text-foreground group-hover:text-primary transition-colors line-clamp-1">
-                      {employee.name}
-                    </h3>
-                    <p className="text-sm text-muted-foreground mb-2 line-clamp-1">
-                      {employee.position}
-                    </p>
-
-                    <span
-                      className="text-xs font-medium px-2 py-1 rounded-full mb-4"
+                <Link href={`/directorio/${employee.id}`} className="flex flex-col items-center text-center">
+                  <Avatar className="w-20 h-20 mb-4 border-2 border-border group-hover:border-primary/50 transition-colors">
+                    <AvatarFallback
+                      className="text-lg font-semibold"
                       style={{
-                        backgroundColor: `${companyColor}15`,
+                        backgroundColor: `${companyColor}20`,
                         color: companyColor,
                       }}
                     >
-                      {getCompanyName(employee.company)}
-                    </span>
+                      {getInitials(employee.name)}
+                    </AvatarFallback>
+                  </Avatar>
 
-                    <div className="flex items-center gap-2">
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        className="w-8 h-8"
-                        asChild
-                      >
-                        <a href={`mailto:${employee.email}`}>
-                          <Mail className="w-4 h-4" />
-                        </a>
-                      </Button>
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        className="w-8 h-8"
-                        asChild
-                      >
-                        <a href={`tel:${employee.phone}`}>
-                          <Phone className="w-4 h-4" />
-                        </a>
-                      </Button>
-                    </div>
-                  </div>
+                  <h3 className="font-semibold text-foreground group-hover:text-primary transition-colors line-clamp-1">
+                    {employee.name}
+                  </h3>
+                  <p className="text-sm text-muted-foreground mb-2 line-clamp-1">
+                    {employee.position}
+                  </p>
+
+                  <span
+                    className="text-xs font-medium px-2 py-1 rounded-full mb-4"
+                    style={{
+                      backgroundColor: `${companyColor}15`,
+                      color: companyColor,
+                    }}
+                  >
+                    {getCompanyName(employee.company)}
+                  </span>
+                </Link>
+
+                <div className="flex items-center justify-center gap-2">
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="w-8 h-8"
+                    asChild
+                  >
+                    <a href={`mailto:${employee.email}`}>
+                      <Mail className="w-4 h-4" />
+                    </a>
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="w-8 h-8"
+                    asChild
+                  >
+                    <a href={`tel:${employee.phone}`}>
+                      <Phone className="w-4 h-4" />
+                    </a>
+                  </Button>
                 </div>
-              </Link>
+              </div>
             </motion.div>
           );
         })}
