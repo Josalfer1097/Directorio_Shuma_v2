@@ -4,7 +4,7 @@ import { motion } from "framer-motion";
 import type { MouseEvent } from "react";
 import { ChevronLeft, ChevronRight, Mail, Phone } from "lucide-react";
 import { useState } from "react";
-import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import type { Employee, Company } from "@/types";
@@ -18,6 +18,7 @@ export function FeaturedEmployees({
   employees,
   companies,
 }: FeaturedEmployeesProps) {
+  const router = useRouter();
   const [currentIndex, setCurrentIndex] = useState(0);
   const itemsPerPage = 4;
   const totalPages = Math.ceil(employees.length / itemsPerPage);
@@ -43,6 +44,10 @@ export function FeaturedEmployees({
       .slice(0, 2)
       .join("")
       .toUpperCase();
+  };
+
+  const handleCardClick = (employeeId: string) => {
+    router.push(`/directorio/${employeeId}`);
   };
 
   return (
@@ -88,7 +93,10 @@ export function FeaturedEmployees({
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.4, delay: index * 0.1 }}
             >
-              <div className="group relative overflow-hidden rounded-xl border border-border bg-card p-6 transition-all duration-300 hover:shadow-lg hover:border-primary/30">
+              <div
+                onClick={() => handleCardClick(employee.id)}
+                className="group relative overflow-hidden rounded-xl border border-border bg-card p-6 transition-all duration-300 hover:shadow-lg hover:border-primary/30 cursor-pointer"
+              >
                 {/* Top gradient line */}
                 <div
                   className="absolute top-0 left-0 right-0 h-1"
@@ -96,25 +104,21 @@ export function FeaturedEmployees({
                 />
 
                 <div className="flex flex-col items-center text-center">
-                  <Link href={`/directorio/${employee.id}`}>
-                    <Avatar className="w-20 h-20 mb-4 border-2 border-border group-hover:border-primary/50 transition-colors cursor-pointer">
-                      <AvatarFallback
-                        className="text-lg font-semibold"
-                        style={{
-                          backgroundColor: `${companyColor}20`,
-                          color: companyColor,
-                        }}
-                      >
-                        {getInitials(employee.name)}
-                      </AvatarFallback>
-                    </Avatar>
-                  </Link>
+                  <Avatar className="w-20 h-20 mb-4 border-2 border-border group-hover:border-primary/50 transition-colors">
+                    <AvatarFallback
+                      className="text-lg font-semibold"
+                      style={{
+                        backgroundColor: `${companyColor}20`,
+                        color: companyColor,
+                      }}
+                    >
+                      {getInitials(employee.name)}
+                    </AvatarFallback>
+                  </Avatar>
 
-                  <Link href={`/directorio/${employee.id}`} className="hover:text-primary transition-colors">
-                    <h3 className="font-semibold text-foreground group-hover:text-primary transition-colors line-clamp-1">
-                      {employee.name}
-                    </h3>
-                  </Link>
+                  <h3 className="font-semibold text-foreground group-hover:text-primary transition-colors line-clamp-1">
+                    {employee.name}
+                  </h3>
                   <p className="text-sm text-muted-foreground mb-2 line-clamp-1">
                     {employee.position}
                   </p>
