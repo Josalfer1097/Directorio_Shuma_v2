@@ -108,5 +108,337 @@
   }
   body {
     @apply bg-background text-foreground;
+    scroll-behavior: smooth;
+  }
+  
+  /* Responsive typography with clamp */
+  h1 {
+    font-size: clamp(1.5rem, 4vw, 3rem);
+    font-weight: 700;
+  }
+  
+  h2 {
+    font-size: clamp(1.25rem, 3vw, 2rem);
+    font-weight: 600;
+  }
+  
+  h3 {
+    font-size: clamp(1.1rem, 2.5vw, 1.5rem);
+    font-weight: 600;
+  }
+  
+  h4, h5, h6 {
+    font-size: clamp(0.95rem, 2vw, 1.25rem);
+    font-weight: 600;
+  }
+  
+  p, body {
+    font-size: clamp(0.875rem, 2vw, 1rem);
+  }
+  
+  /* Typography enhancements for headings */
+  h1, h2, h3, h4, h5, h6 {
+    font-feature-settings: "ss01", "cv01";
+    letter-spacing: -0.02em;
+  }
+}
+
+/* Safe area insets for notched devices */
+:root {
+  --safe-top: env(safe-area-inset-top, 0);
+  --safe-right: env(safe-area-inset-right, 0);
+  --safe-bottom: env(safe-area-inset-bottom, 0);
+  --safe-left: env(safe-area-inset-left, 0);
+}
+
+/* Respect reduced motion preference */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* Premium easing curve */
+:root {
+  --ease-premium: cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+/* Geometric diamond pattern background */
+.geometric-pattern {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  opacity: 0.05;
+  background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' stroke='%237C3AED' stroke-width='0.5'%3E%3Cpath d='M30 0L60 30L30 60L0 30Z'/%3E%3Cpath d='M30 10L50 30L30 50L10 30Z'/%3E%3C/g%3E%3C/svg%3E");
+  background-size: 60px 60px;
+}
+
+.dark .geometric-pattern {
+  opacity: 0.03;
+}
+
+/* Card shimmer effect on hover */
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+.card-shimmer {
+  position: relative;
+  overflow: hidden;
+}
+
+.card-shimmer::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    var(--shimmer-color, var(--primary)) 50%,
+    transparent 100%
+  );
+  background-size: 200% 100%;
+  opacity: 0;
+  transition: opacity 0.18s var(--ease-premium);
+}
+
+.card-shimmer:hover::before {
+  opacity: 1;
+  animation: shimmer 2s linear infinite;
+}
+
+/* Gradient section divider */
+.gradient-divider {
+  height: 1px;
+  background: linear-gradient(90deg, #7C3AED 0%, transparent 100%);
+  border: none;
+}
+
+/* L-shaped corner bracket decoration */
+.corner-bracket {
+  position: relative;
+}
+
+.corner-bracket::before,
+.corner-bracket::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  pointer-events: none;
+}
+
+.corner-bracket::before {
+  width: 8px;
+  height: 2px;
+  background-color: var(--bracket-color, var(--primary));
+}
+
+.corner-bracket::after {
+  width: 2px;
+  height: 8px;
+  background-color: var(--bracket-color, var(--primary));
+}
+
+/* Animated underline for navbar logo */
+@keyframes draw-underline {
+  0% { stroke-dashoffset: 100; }
+  100% { stroke-dashoffset: 0; }
+}
+
+.logo-underline {
+  stroke-dasharray: 100;
+  stroke-dashoffset: 100;
+  animation: draw-underline 0.8s var(--ease-premium) 0.3s forwards;
+}
+
+/* Performance optimization classes */
+.will-change-transform {
+  will-change: transform;
+}
+
+.gpu-accelerated {
+  transform: translateZ(0);
+  backface-visibility: hidden;
+}
+
+/* Tooltip for email truncation */
+.truncate-tooltip {
+  position: relative;
+}
+
+.truncate-tooltip::after {
+  content: attr(data-full-text);
+  position: absolute;
+  bottom: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 4px 8px;
+  background: var(--popover);
+  color: var(--popover-foreground);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  font-size: 12px;
+  white-space: nowrap;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.15s, visibility 0.15s;
+  z-index: 50;
+}
+
+.truncate-tooltip:hover::after {
+  opacity: 1;
+  visibility: visible;
+}
+
+/* Blur backdrop for modals */
+.backdrop-blur-premium {
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+
+/* Mobile-specific utility classes */
+.bottom-tab-safe {
+  padding-bottom: calc(64px + var(--safe-bottom));
+}
+
+.bottom-tab-bar-safe {
+  padding-bottom: var(--safe-bottom);
+  height: calc(64px + var(--safe-bottom));
+}
+
+/* Touch-friendly minimum size 44x44px */
+.touch-target {
+  min-width: 44px;
+  min-height: 44px;
+}
+
+/* Responsive corner bracket - scales down on mobile */
+@media (max-width: 640px) {
+  .corner-bracket::before {
+    width: 6px;
+    height: 1.5px;
+  }
+
+  .corner-bracket::after {
+    width: 1.5px;
+    height: 6px;
+  }
+}
+
+/* Mobile sheet drag handle */
+.sheet-drag-handle {
+  height: 4px;
+  width: 32px;
+  background-color: var(--muted-foreground);
+  border-radius: 2px;
+  margin: 8px auto;
+}
+
+/* Horizontal scroll container for mobile */
+.horizontal-scroll {
+  display: flex;
+  gap: 12px;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  -webkit-overflow-scrolling: touch;
+  padding: 0 16px;
+}
+
+.horizontal-scroll > * {
+  scroll-snap-align: start;
+  scroll-snap-stop: always;
+  flex-shrink: 0;
+}
+
+/* Hide scrollbar while keeping functionality */
+.horizontal-scroll::-webkit-scrollbar {
+  display: none;
+}
+
+/* MOBILE EXPERIENCE FIXES */
+
+/* Remove tap highlight on interactive elements */
+button, a, input, select, textarea, [role="button"] {
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* Prevent body scroll when mobile sheets/modals are open */
+body.modal-open {
+  overflow: hidden;
+  -webkit-overflow-scrolling: auto;
+}
+
+/* Smooth overscroll feel on scrollable areas */
+.overflow-y-auto, .overflow-x-auto {
+  -webkit-overflow-scrolling: touch;
+}
+
+/* Focus visible only on keyboard navigation */
+*:focus {
+  outline: none;
+}
+
+*:focus-visible {
+  outline: 2px solid var(--ring);
+  outline-offset: 2px;
+}
+
+/* Fix text overflow on 375px width */
+@media (max-width: 425px) {
+  body {
+    font-size: clamp(0.8rem, 2vw, 1rem);
+    word-break: break-word;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+  }
+
+  h1 {
+    font-size: clamp(1.25rem, 3vw, 1.75rem);
+  }
+
+  h2 {
+    font-size: clamp(1.1rem, 2.5vw, 1.5rem);
+  }
+
+  input, button, textarea {
+    font-size: 16px;
+  }
+}
+
+/* Prevent horizontal scroll except on intentional carousels */
+html, body {
+  overflow-x: hidden;
+  max-width: 100%;
+}
+
+/* Safe area padding for notched devices */
+@supports (padding: max(0px)) {
+  body {
+    padding-left: max(0, env(safe-area-inset-left));
+    padding-right: max(0, env(safe-area-inset-right));
+  }
+
+  .safe-area-top {
+    padding-top: max(0, env(safe-area-inset-top));
+  }
+
+  .safe-area-bottom {
+    padding-bottom: max(0, env(safe-area-inset-bottom));
+  }
+}
+
+/* Mobile sheet/modal prevent scroll */
+@media (max-width: 768px) {
+  .sheet-overlay, .modal-overlay {
+    -webkit-user-select: none;
+    user-select: none;
   }
 }

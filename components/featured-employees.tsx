@@ -1,13 +1,59 @@
 "use client";
 
+import React from "react";
 import { motion } from "framer-motion";
 import type { MouseEvent } from "react";
-import { ChevronLeft, ChevronRight, Mail, Phone } from "lucide-react";
+import { ChevronLeft, ChevronRight, Mail, Phone, Copy, Check, MessageSquare } from "lucide-react";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import type { Employee, Company } from "@/types";
+
+// Premium easing curve
+const premiumEase = [0.25, 0.46, 0.45, 0.94];
+
+// Stagger animation container
+const containerVariants = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: {
+      staggerChildren: 0.04,
+    },
+  },
+};
+
+const itemVariants = {
+  hidden: { opacity: 0, y: 20 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: {
+      duration: 0.18,
+      ease: premiumEase,
+    },
+  },
+};
+
+// Format phone number for display
+const formatPhone = (phone: string) => {
+  const digits = phone.replace(/\D/g, "");
+  if (digits.length === 10) {
+    return `+52 ${digits.slice(0, 2)} ${digits.slice(2, 6)} ${digits.slice(6)}`;
+  }
+  return phone;
+};
+
+// Truncate email for display
+const truncateEmail = (email: string, maxLength = 18) => {
+  if (email.length <= maxLength) return email;
+  const [user, domain] = email.split("@");
+  const truncatedUser = user.slice(0, Math.max(5, maxLength - domain.length - 4));
+  return `${truncatedUser}...@${domain}`;
+};
 
 interface FeaturedEmployeesProps {
   employees: Employee[];
@@ -20,7 +66,24 @@ export function FeaturedEmployees({
 }: FeaturedEmployeesProps) {
   const router = useRouter();
   const [currentIndex, setCurrentIndex] = useState(0);
-  const itemsPerPage = 4;
+  
+  // Responsive items per page: 1 on mobile, 2 on tablet, 3 on desktop
+  const getItemsPerPage = () => {
+    if (typeof window === "undefined") return 4;
+    if (window.innerWidth < 768) return 1;      // Mobile
+    if (window.innerWidth < 1024) return 2;     // Tablet
+    return 4;                                     // Desktop
+  };
+  
+  const [itemsPerPage, setItemsPerPage] = useState(4);
+  
+  React.useEffect(() => {
+    setItemsPerPage(getItemsPerPage());
+    const handleResize = () => setItemsPerPage(getItemsPerPage());
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
+  
   const totalPages = Math.ceil(employees.length / itemsPerPage);
 
   const currentEmployees = employees.slice(
@@ -46,8 +109,23 @@ export function FeaturedEmployees({
       .toUpperCase();
   };
 
+  const [copiedField, setCopiedField] = useState<string | null>(null);
+
   const handleCardClick = (employeeId: string) => {
     router.push(`/directorio/${employeeId}`);
+  };
+
+  const copyToClipboard = (e: MouseEvent, text: string, field: string) => {
+    e.stopPropagation();
+    navigator.clipboard.writeText(text);
+    setCopiedField(field);
+    toast.success("Copiado al portapapeles", { duration: 2000 });
+    setTimeout(() => setCopiedField(null), 2000);
+  };
+
+  const openTeamsChat = (e: MouseEvent, email: string) => {
+    e.stopPropagation();
+    window.open(`https://teams.microsoft.com/l/chat/0/0?users=${email}`, "_blank");
   };
 
   return (
@@ -67,6 +145,7 @@ export function FeaturedEmployees({
             size="icon"
             onClick={() => setCurrentIndex(Math.max(0, currentIndex - 1))}
             disabled={currentIndex === 0}
+            className="transition-all duration-[180ms]"
           >
             <ChevronLeft className="w-4 h-4" />
           </Button>
@@ -77,36 +156,50 @@ export function FeaturedEmployees({
               setCurrentIndex(Math.min(totalPages - 1, currentIndex + 1))
             }
             disabled={currentIndex >= totalPages - 1}
+            className="transition-all duration-[180ms]"
           >
             <ChevronRight className="w-4 h-4" />
           </Button>
         </div>
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        {currentEmployees.map((employee, index) => {
+      <motion.div
+        key={currentIndex}
+        variants={containerVariants}
+        initial="hidden"
+        animate="visible"
+        className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4"
+      >
+        {currentEmployees.map((employee) => {
           const companyColor = getCompanyColor(employee.company);
           return (
             <motion.div
               key={employee.id}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.4, delay: index * 0.1 }}
+              variants={itemVariants}
+              className="will-change-transform gpu-accelerated"
             >
               <div
                 onClick={() => handleCardClick(employee.id)}
-                className="group relative overflow-hidden rounded-xl border border-border bg-card p-6 transition-all duration-300 hover:shadow-lg hover:border-primary/30 cursor-pointer"
+                className="card-shimmer corner-bracket group relative overflow-hidden rounded-xl border border-border bg-card p-4 h-[220px] flex flex-col cursor-pointer transition-all duration-[180ms] hover:scale-[1.02]"
+                style={{
+                  ["--shimmer-color" as string]: companyColor,
+                  ["--bracket-color" as string]: companyColor,
+                  transitionTimingFunction: "cubic-bezier(0.25, 0.46, 0.45, 0.94)"
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.boxShadow = `0 8px 30px -10px ${companyColor}40`;
+                  e.currentTarget.style.borderColor = `${companyColor}50`;
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.boxShadow = "";
+                  e.currentTarget.style.borderColor = "";
+                }}
               >
-                {/* Top gradient line */}
-                <div
-                  className="absolute top-0 left-0 right-0 h-1"
-                  style={{ backgroundColor: companyColor }}
-                />
-
-                <div className="flex flex-col items-center text-center">
-                  <Avatar className="w-20 h-20 mb-4 border-2 border-border group-hover:border-primary/50 transition-colors">
+                {/* Top section */}
+                <div className="flex items-start gap-3 flex-1">
+                  <Avatar className="w-14 h-14 border-2 border-border group-hover:border-primary/50 transition-colors duration-[180ms] shrink-0">
                     <AvatarFallback
-                      className="text-lg font-semibold"
+                      className="text-sm font-semibold"
                       style={{
                         backgroundColor: `${companyColor}20`,
                         color: companyColor,
@@ -116,53 +209,100 @@ export function FeaturedEmployees({
                     </AvatarFallback>
                   </Avatar>
 
-                  <h3 className="font-semibold text-foreground group-hover:text-primary transition-colors line-clamp-1">
-                    {employee.name}
-                  </h3>
-                  <p className="text-sm text-muted-foreground mb-2 line-clamp-1">
-                    {employee.position}
-                  </p>
-
-                  <span
-                    className="text-xs font-medium px-2 py-1 rounded-full mb-4"
-                    style={{
-                      backgroundColor: `${companyColor}15`,
-                      color: companyColor,
-                    }}
-                  >
-                    {getCompanyName(employee.company)}
-                  </span>
+                  <div className="flex-1 min-w-0">
+                    <h3 className="font-semibold text-foreground group-hover:text-primary transition-colors duration-[180ms] line-clamp-1 text-sm">
+                      {employee.name}
+                    </h3>
+                    <p className="text-xs text-muted-foreground line-clamp-1">
+                      {employee.position}
+                    </p>
+                    <span
+                      className="inline-block text-[10px] font-medium px-1.5 py-0.5 rounded-full mt-1"
+                      style={{
+                        backgroundColor: `${companyColor}15`,
+                        color: companyColor,
+                      }}
+                    >
+                      {getCompanyName(employee.company)}
+                    </span>
+                  </div>
                 </div>
 
-                <div className="flex items-center justify-center gap-2">
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    className="w-8 h-8"
-                    onClick={(e: MouseEvent) => {
-                      e.stopPropagation();
-                      window.location.href = `mailto:${employee.email}`;
-                    }}
-                  >
-                    <Mail className="w-4 h-4" />
-                  </Button>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    className="w-8 h-8"
-                    onClick={(e: MouseEvent) => {
-                      e.stopPropagation();
-                      window.location.href = `tel:${employee.phone}`;
-                    }}
-                  >
-                    <Phone className="w-4 h-4" />
-                  </Button>
+                {/* Divider */}
+                <div className="gradient-divider my-2" />
+
+                {/* Contact info */}
+                <div className="space-y-1.5 text-[12px]">
+                  {/* Email row */}
+                  <div className="flex items-center gap-1">
+                    <button
+                      onClick={(e: MouseEvent) => {
+                        e.stopPropagation();
+                        window.location.href = `mailto:${employee.email}`;
+                      }}
+                      className="flex items-center gap-1.5 text-muted-foreground hover:text-foreground transition-colors flex-1 min-w-0"
+                    >
+                      <Mail className="w-3.5 h-3.5 shrink-0" />
+                      <TooltipProvider>
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <span className="truncate">{truncateEmail(employee.email)}</span>
+                          </TooltipTrigger>
+                          <TooltipContent>{employee.email}</TooltipContent>
+                        </Tooltip>
+                      </TooltipProvider>
+                    </button>
+                    <button
+                      onClick={(e: MouseEvent) => copyToClipboard(e, employee.email, `featured-email-${employee.id}`)}
+                      className="p-1 rounded hover:bg-muted transition-colors shrink-0"
+                    >
+                      {copiedField === `featured-email-${employee.id}` ? (
+                        <Check className="w-3 h-3 text-green-500" />
+                      ) : (
+                        <Copy className="w-3 h-3 text-muted-foreground" />
+                      )}
+                    </button>
+                    <button
+                      onClick={(e: MouseEvent) => openTeamsChat(e, employee.email)}
+                      className="p-1 rounded hover:bg-muted transition-colors shrink-0"
+                      title="Abrir chat en Teams"
+                    >
+                      <MessageSquare className="w-3 h-3 text-muted-foreground hover:text-[#6264A7]" />
+                    </button>
+                  </div>
+
+                  {/* Phone row */}
+                  <div className="flex items-center gap-1">
+                    <button
+                      onClick={(e: MouseEvent) => {
+                        e.stopPropagation();
+                        window.location.href = `tel:${employee.phone}`;
+                      }}
+                      className="flex items-center gap-1.5 text-muted-foreground hover:text-foreground transition-colors"
+                    >
+                      <Phone className="w-3.5 h-3.5 shrink-0" />
+                      <span>{formatPhone(employee.phone)}</span>
+                    </button>
+                    <span className="px-1.5 py-0.5 rounded bg-muted text-[10px] font-medium shrink-0">
+                      Ext. {employee.extension}
+                    </span>
+                    <button
+                      onClick={(e: MouseEvent) => copyToClipboard(e, employee.phone, `featured-phone-${employee.id}`)}
+                      className="p-1 rounded hover:bg-muted transition-colors shrink-0 ml-auto"
+                    >
+                      {copiedField === `featured-phone-${employee.id}` ? (
+                        <Check className="w-3 h-3 text-green-500" />
+                      ) : (
+                        <Copy className="w-3 h-3 text-muted-foreground" />
+                      )}
+                    </button>
+                  </div>
                 </div>
               </div>
             </motion.div>
           );
         })}
-      </div>
+      </motion.div>
 
       {/* Pagination indicators */}
       {totalPages > 1 && (
@@ -171,7 +311,7 @@ export function FeaturedEmployees({
             <button
               key={i}
               onClick={() => setCurrentIndex(i)}
-              className={`w-2 h-2 rounded-full transition-all ${
+              className={`w-2 h-2 rounded-full transition-all duration-[180ms] ${
                 i === currentIndex
                   ? "w-6 bg-primary"
                   : "bg-muted-foreground/30 hover:bg-muted-foreground/50"

@@ -72,18 +72,21 @@ export default function EmployeeDetailPage({ params }: Props) {
     <div className="min-h-screen bg-background">
       <Navbar />
 
-      <main className="pt-24 pb-16 px-4">
+      <main className="md:pt-24 pt-16 pb-24 md:pb-16 px-4 relative z-10">
         <div className="container mx-auto max-w-4xl">
-          {/* Back button */}
+          {/* Mobile Back button - fixed at top */}
           <motion.div
             initial={{ opacity: 0, x: -20 }}
             animate={{ opacity: 1, x: 0 }}
             className="mb-6"
           >
             <Link href="/directorio">
-              <Button variant="ghost" className="gap-2">
+              <Button
+                variant="ghost"
+                className="gap-2 md:relative fixed md:static left-4 top-20 z-20 touch-target"
+              >
                 <ArrowLeft className="w-4 h-4" />
-                Volver al directorio
+                <span className="hidden sm:inline">Volver</span>
               </Button>
             </Link>
           </motion.div>
@@ -96,7 +99,7 @@ export default function EmployeeDetailPage({ params }: Props) {
           >
             {/* Header gradient */}
             <div
-              className="h-32 relative"
+              className="h-24 md:h-32 relative"
               style={{
                 background: `linear-gradient(135deg, ${company?.color}40 0%, ${company?.color}10 100%)`,
               }}
@@ -109,12 +112,12 @@ export default function EmployeeDetailPage({ params }: Props) {
               />
             </div>
 
-            <div className="px-8 pb-8">
-              {/* Avatar - positioned to overlap the header */}
-              <div className="-mt-16 mb-6 flex items-end justify-between">
-                <Avatar className="w-32 h-32 border-4 border-card shadow-xl">
+            <div className="px-4 md:px-8 pb-8">
+              {/* Avatar - larger on mobile, centered */}
+              <div className="-mt-12 md:-mt-16 mb-6 flex flex-col items-center md:flex-row md:items-end md:justify-between">
+                <Avatar className="w-24 md:w-32 h-24 md:h-32 border-4 border-card shadow-xl">
                   <AvatarFallback
-                    className="text-4xl font-bold"
+                    className="text-2xl md:text-4xl font-bold"
                     style={{
                       backgroundColor: `${company?.color}20`,
                       color: company?.color,
@@ -126,7 +129,7 @@ export default function EmployeeDetailPage({ params }: Props) {
 
                 {company && (
                   <span
-                    className="px-4 py-2 rounded-full text-sm font-medium"
+                    className="px-3 md:px-4 py-1 md:py-2 rounded-full text-xs md:text-sm font-medium mt-4 md:mt-0"
                     style={{
                       backgroundColor: `${company.color}15`,
                       color: company.color,
@@ -137,75 +140,85 @@ export default function EmployeeDetailPage({ params }: Props) {
                 )}
               </div>
 
-              {/* Name and position */}
-              <div className="mb-6">
-                <h1 className="text-3xl font-bold text-foreground mb-2">
+              {/* Name and position - centered on mobile */}
+              <div className="mb-6 text-center md:text-left">
+                <h1 className="font-bold mb-2 text-foreground">
                   {employee.name}
                 </h1>
-                <p className="text-xl text-muted-foreground">
+                <p className="font-semibold text-muted-foreground mb-1">
                   {employee.position}
+                </p>
+                <p className="text-sm text-muted-foreground">
+                  {employee.department}
                 </p>
               </div>
 
-              {/* Contact info grid */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+              {/* Contact info - large tappable rows on mobile */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-4 mb-6">
+                {/* Email */}
                 <button
-                  onClick={() => copyToClipboard(employee.email, "email")}
-                  className="flex items-center gap-4 p-4 rounded-xl bg-muted/50 hover:bg-muted transition-colors text-left group"
+                  onClick={() => (window.location.href = `mailto:${employee.email}`)}
+                  className="flex items-center gap-4 p-4 md:p-4 rounded-xl bg-muted/50 hover:bg-muted transition-colors text-left group h-14 md:h-auto md:py-4"
                 >
-                  <div className="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center">
+                  <div className="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center shrink-0">
                     <Mail className="w-6 h-6 text-primary" />
                   </div>
                   <div className="flex-1 min-w-0">
-                    <p className="text-sm text-muted-foreground">Email</p>
-                    <p className="text-foreground truncate">{employee.email}</p>
+                    <p className="text-xs md:text-sm text-muted-foreground">
+                      Email
+                    </p>
+                    <p className="text-sm md:text-base text-foreground truncate font-medium">
+                      {employee.email}
+                    </p>
                   </div>
-                  {copiedField === "email" ? (
-                    <Check className="w-5 h-5 text-green-500" />
-                  ) : (
-                    <Copy className="w-5 h-5 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity" />
-                  )}
+                  <Copy className="w-5 h-5 text-muted-foreground shrink-0" />
                 </button>
 
+                {/* Phone */}
                 <button
-                  onClick={() => copyToClipboard(employee.phone, "phone")}
-                  className="flex items-center gap-4 p-4 rounded-xl bg-muted/50 hover:bg-muted transition-colors text-left group"
+                  onClick={() => (window.location.href = `tel:${employee.phone}`)}
+                  className="flex items-center gap-4 p-4 md:p-4 rounded-xl bg-muted/50 hover:bg-muted transition-colors text-left group h-14 md:h-auto md:py-4"
                 >
-                  <div className="w-12 h-12 rounded-lg bg-accent/10 flex items-center justify-center">
+                  <div className="w-12 h-12 rounded-lg bg-accent/10 flex items-center justify-center shrink-0">
                     <Phone className="w-6 h-6 text-accent" />
                   </div>
                   <div className="flex-1 min-w-0">
-                    <p className="text-sm text-muted-foreground">Teléfono</p>
-                    <p className="text-foreground">
-                      {employee.phone} ext. {employee.extension}
+                    <p className="text-xs md:text-sm text-muted-foreground">
+                      Teléfono
+                    </p>
+                    <p className="text-sm md:text-base text-foreground font-medium">
+                      {employee.phone}{" "}
+                      <span className="text-xs">ext. {employee.extension}</span>
                     </p>
                   </div>
-                  {copiedField === "phone" ? (
-                    <Check className="w-5 h-5 text-green-500" />
-                  ) : (
-                    <Copy className="w-5 h-5 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity" />
-                  )}
+                  <Copy className="w-5 h-5 text-muted-foreground shrink-0" />
                 </button>
 
-                <div className="flex items-center gap-4 p-4 rounded-xl bg-muted/50">
-                  <div className="w-12 h-12 rounded-lg bg-green-500/10 flex items-center justify-center">
+                {/* Department */}
+                <div className="flex items-center gap-4 p-4 md:p-4 rounded-xl bg-muted/50 h-14 md:h-auto md:py-4">
+                  <div className="w-12 h-12 rounded-lg bg-green-500/10 flex items-center justify-center shrink-0">
                     <Building2 className="w-6 h-6 text-green-500" />
                   </div>
-                  <div>
-                    <p className="text-sm text-muted-foreground">Departamento</p>
-                    <p className="text-foreground">{employee.department}</p>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-xs md:text-sm text-muted-foreground">
+                      Departamento
+                    </p>
+                    <p className="text-sm md:text-base text-foreground font-medium">
+                      {employee.department}
+                    </p>
                   </div>
                 </div>
 
-                <div className="flex items-center gap-4 p-4 rounded-xl bg-muted/50">
-                  <div className="w-12 h-12 rounded-lg bg-amber-500/10 flex items-center justify-center">
+                {/* Start Date */}
+                <div className="flex items-center gap-4 p-4 md:p-4 rounded-xl bg-muted/50 h-14 md:h-auto md:py-4">
+                  <div className="w-12 h-12 rounded-lg bg-amber-500/10 flex items-center justify-center shrink-0">
                     <Calendar className="w-6 h-6 text-amber-500" />
                   </div>
-                  <div>
-                    <p className="text-sm text-muted-foreground">
-                      Fecha de ingreso
+                  <div className="flex-1 min-w-0">
+                    <p className="text-xs md:text-sm text-muted-foreground">
+                      Ingreso
                     </p>
-                    <p className="text-foreground">
+                    <p className="text-sm md:text-base text-foreground font-medium">
                       {formatDate(employee.startDate)}
                     </p>
                   </div>
@@ -225,88 +238,90 @@ export default function EmployeeDetailPage({ params }: Props) {
             </div>
           </motion.div>
 
-          {/* Reporting Chain */}
+            {/* Reporting Chain - horizontal scrollable chips */}
           {reportingChain.length > 0 && (
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.1 }}
-              className="rounded-xl border border-border bg-card p-6 mb-8"
+              className="rounded-xl border border-border bg-card p-4 md:p-6 mb-8"
             >
-              <h2 className="text-lg font-semibold text-foreground mb-4">
+              <h2 className="font-semibold text-foreground mb-4">
                 Cadena de Reporte
               </h2>
-              <div className="flex items-center flex-wrap gap-2">
-                {reportingChain.map((manager, index) => {
-                  const managerCompany = getCompanyById(manager.company);
-                  return (
-                    <div key={manager.id} className="flex items-center gap-2">
-                      <Link href={`/directorio/${manager.id}`}>
-                        <div className="flex items-center gap-2 px-3 py-2 rounded-lg bg-muted/50 hover:bg-muted transition-colors">
-                          <Avatar className="w-6 h-6">
-                            <AvatarFallback
-                              className="text-[10px]"
-                              style={{
-                                backgroundColor: `${managerCompany?.color}20`,
-                                color: managerCompany?.color,
-                              }}
-                            >
-                              {getInitials(manager.name)}
-                            </AvatarFallback>
-                          </Avatar>
-                          <span className="text-sm text-foreground">
-                            {manager.name}
-                          </span>
-                        </div>
-                      </Link>
-                      {index < reportingChain.length - 1 && (
-                        <ChevronRight className="w-4 h-4 text-muted-foreground" />
-                      )}
-                    </div>
-                  );
-                })}
-                <ChevronRight className="w-4 h-4 text-muted-foreground" />
-                <div className="flex items-center gap-2 px-3 py-2 rounded-lg bg-primary/10">
-                  <Avatar className="w-6 h-6">
-                    <AvatarFallback
-                      className="text-[10px]"
-                      style={{
-                        backgroundColor: `${company?.color}20`,
-                        color: company?.color,
-                      }}
-                    >
-                      {getInitials(employee.name)}
-                    </AvatarFallback>
-                  </Avatar>
-                  <span className="text-sm font-medium text-primary">
-                    {employee.name}
-                  </span>
+              <div className="overflow-x-auto -mx-4 md:-mx-6 px-4 md:px-6">
+                <div className="flex items-center gap-2 w-max">
+                  {reportingChain.map((manager, index) => {
+                    const managerCompany = getCompanyById(manager.company);
+                    return (
+                      <div key={manager.id} className="flex items-center gap-2">
+                        <Link href={`/directorio/${manager.id}`}>
+                          <div className="flex items-center gap-2 px-3 py-2 rounded-lg bg-muted/50 hover:bg-muted transition-colors whitespace-nowrap">
+                            <Avatar className="w-6 h-6">
+                              <AvatarFallback
+                                className="text-[10px]"
+                                style={{
+                                  backgroundColor: `${managerCompany?.color}20`,
+                                  color: managerCompany?.color,
+                                }}
+                              >
+                                {getInitials(manager.name)}
+                              </AvatarFallback>
+                            </Avatar>
+                            <span className="text-sm text-foreground">
+                              {manager.name}
+                            </span>
+                          </div>
+                        </Link>
+                        {index < reportingChain.length - 1 && (
+                          <ChevronRight className="w-4 h-4 text-muted-foreground shrink-0" />
+                        )}
+                      </div>
+                    );
+                  })}
+                  <ChevronRight className="w-4 h-4 text-muted-foreground shrink-0" />
+                  <div className="flex items-center gap-2 px-3 py-2 rounded-lg bg-primary/10 whitespace-nowrap">
+                    <Avatar className="w-6 h-6">
+                      <AvatarFallback
+                        className="text-[10px]"
+                        style={{
+                          backgroundColor: `${company?.color}20`,
+                          color: company?.color,
+                        }}
+                      >
+                        {getInitials(employee.name)}
+                      </AvatarFallback>
+                    </Avatar>
+                    <span className="text-sm font-medium text-primary">
+                      {employee.name}
+                    </span>
+                  </div>
                 </div>
               </div>
             </motion.div>
           )}
 
-          {/* Direct Reports */}
+            {/* Direct Reports - compact vertical list */}
           {directReports.length > 0 && (
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.2 }}
-              className="rounded-xl border border-border bg-card p-6"
+              className="rounded-xl border border-border bg-card p-4 md:p-6"
             >
               <div className="flex items-center gap-2 mb-4">
                 <Users className="w-5 h-5 text-muted-foreground" />
-                <h2 className="text-lg font-semibold text-foreground">
+                <h2 className="font-semibold text-foreground">
                   Reportes Directos ({directReports.length})
                 </h2>
               </div>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-2 md:gap-3">
                 {directReports.map((report) => {
                   const reportCompany = getCompanyById(report.company);
                   return (
                     <Link key={report.id} href={`/directorio/${report.id}`}>
-                      <div className="flex items-center gap-3 p-3 rounded-lg bg-muted/50 hover:bg-muted transition-colors group">
-                        <Avatar className="w-10 h-10 border border-border">
+                      <div className="flex items-center gap-3 p-3 md:p-3 rounded-lg bg-muted/50 hover:bg-muted transition-colors group min-h-16 md:min-h-auto">
+                        <Avatar className="w-10 h-10 border border-border shrink-0">
                           <AvatarFallback
                             style={{
                               backgroundColor: `${reportCompany?.color}20`,
@@ -317,14 +332,14 @@ export default function EmployeeDetailPage({ params }: Props) {
                           </AvatarFallback>
                         </Avatar>
                         <div className="flex-1 min-w-0">
-                          <p className="font-medium text-foreground group-hover:text-primary transition-colors truncate">
+                          <p className="font-medium text-foreground group-hover:text-primary transition-colors truncate text-sm md:text-base">
                             {report.name}
                           </p>
-                          <p className="text-sm text-muted-foreground truncate">
+                          <p className="text-xs md:text-sm text-muted-foreground truncate">
                             {report.position}
                           </p>
                         </div>
-                        <ChevronRight className="w-4 h-4 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity" />
+                        <ChevronRight className="w-4 h-4 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity shrink-0" />
                       </div>
                     </Link>
                   );
