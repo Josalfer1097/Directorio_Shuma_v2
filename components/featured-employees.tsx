@@ -95,22 +95,26 @@ export function FeaturedEmployees({
                   style={{ backgroundColor: companyColor }}
                 />
 
-                <Link href={`/directorio/${employee.id}`} className="flex flex-col items-center text-center">
-                  <Avatar className="w-20 h-20 mb-4 border-2 border-border group-hover:border-primary/50 transition-colors">
-                    <AvatarFallback
-                      className="text-lg font-semibold"
-                      style={{
-                        backgroundColor: `${companyColor}20`,
-                        color: companyColor,
-                      }}
-                    >
-                      {getInitials(employee.name)}
-                    </AvatarFallback>
-                  </Avatar>
+                <div className="flex flex-col items-center text-center">
+                  <Link href={`/directorio/${employee.id}`}>
+                    <Avatar className="w-20 h-20 mb-4 border-2 border-border group-hover:border-primary/50 transition-colors cursor-pointer">
+                      <AvatarFallback
+                        className="text-lg font-semibold"
+                        style={{
+                          backgroundColor: `${companyColor}20`,
+                          color: companyColor,
+                        }}
+                      >
+                        {getInitials(employee.name)}
+                      </AvatarFallback>
+                    </Avatar>
+                  </Link>
 
-                  <h3 className="font-semibold text-foreground group-hover:text-primary transition-colors line-clamp-1">
-                    {employee.name}
-                  </h3>
+                  <Link href={`/directorio/${employee.id}`} className="hover:text-primary transition-colors">
+                    <h3 className="font-semibold text-foreground group-hover:text-primary transition-colors line-clamp-1">
+                      {employee.name}
+                    </h3>
+                  </Link>
                   <p className="text-sm text-muted-foreground mb-2 line-clamp-1">
                     {employee.position}
                   </p>
@@ -124,7 +128,7 @@ export function FeaturedEmployees({
                   >
                     {getCompanyName(employee.company)}
                   </span>
-                </Link>
+                </div>
 
                 <div className="flex items-center justify-center gap-2">
                   <Button

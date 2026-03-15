@@ -1,7 +1,7 @@
 "use client";
 
 import { memo } from "react";
-import { Handle, Position, type NodeProps } from "@xyflow/react";
+import { Handle, Position } from "@xyflow/react";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import type { Employee, Company } from "@/types";
 
@@ -14,8 +14,12 @@ interface OrgNodeData {
   onSelect?: () => void;
 }
 
-function OrgChartNodeComponent({ data }: NodeProps<OrgNodeData>) {
-  const { employee, company, hasChildren, onSelect } = data as OrgNodeData;
+interface OrgChartNodeProps {
+  data: OrgNodeData;
+}
+
+function OrgChartNodeComponent({ data }: OrgChartNodeProps) {
+  const { employee, company, hasChildren, onSelect } = data;
 
   const getInitials = (name: string) => {
     return name

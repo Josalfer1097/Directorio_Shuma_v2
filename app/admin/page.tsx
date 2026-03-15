@@ -53,15 +53,31 @@ export default function AdminPage() {
   const [jsonError, setJsonError] = useState<string | null>(null);
   const [dragOver, setDragOver] = useState(false);
 
-  const handleLogin = (e: React.FormEvent) => {
+  const [isLoading, setIsLoading] = useState(false);
+
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
-    // Check against environment variable or default password
-    const adminPassword = process.env.NEXT_PUBLIC_ADMIN_PASSWORD || "shuma2024";
-    if (password === adminPassword) {
-      setIsAuthenticated(true);
-      toast.success("Acceso concedido");
-    } else {
-      toast.error("Contraseña incorrecta");
+    setIsLoading(true);
+    
+    try {
+      const response = await fetch("/api/admin/auth", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ password }),
+      });
+      
+      const data = await response.json();
+      
+      if (data.success) {
+        setIsAuthenticated(true);
+        toast.success("Acceso concedido");
+      } else {
+        toast.error(data.error || "Contraseña incorrecta");
+      }
+    } catch (error) {
+      toast.error("Error de conexión");
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -212,9 +228,9 @@ export default function AdminPage() {
                         onChange={(e) => setPassword(e.target.value)}
                       />
                     </div>
-                    <Button type="submit" className="w-full gap-2">
+                    <Button type="submit" className="w-full gap-2" disabled={isLoading}>
                       <LogIn className="w-4 h-4" />
-                      Iniciar Sesión
+                      {isLoading ? "Verificando..." : "Iniciar Sesión"}
                     </Button>
                   </form>
                 </CardContent>
