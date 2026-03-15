@@ -29,7 +29,7 @@ export default function OrganigramaPage() {
       
       <Navbar />
 
-      <main className="pt-24 pb-8 px-4 relative z-10">
+      <main className="md:pt-24 pt-20 pb-24 md:pb-8 px-4 relative z-10 bottom-tab-safe">
         <div className="container mx-auto">
           {/* Header */}
           <motion.div
@@ -38,7 +38,7 @@ export default function OrganigramaPage() {
             transition={{ duration: 0.25, ease: premiumEase }}
             className="mb-6"
           >
-            <h1 className="text-3xl font-bold text-foreground mb-2">
+            <h1 className="font-bold text-foreground mb-2">
               Organigrama
             </h1>
             <p className="text-muted-foreground">

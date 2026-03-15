@@ -120,7 +120,7 @@ function DirectoryContent() {
       
       <Navbar />
 
-      <main className="pt-24 pb-16 px-4 relative z-10">
+      <main className="md:pt-24 pt-20 pb-24 md:pb-16 px-4 relative z-10 bottom-tab-safe">
         <div className="container mx-auto">
           {/* Header */}
           <motion.div
@@ -153,7 +153,7 @@ function DirectoryContent() {
               filteredEmployees={filteredEmployees}
             />
 
-            {/* Main Content */}
+          {/* Main Content */}
             <div className="flex-1 min-w-0">
               {/* Search and View Toggle */}
               <div className="flex flex-col sm:flex-row gap-4 mb-6">
@@ -191,12 +191,12 @@ function DirectoryContent() {
                 {filteredEmployees.length} empleados
               </p>
 
-              {/* Employee Grid/List */}
+              {/* Employee Grid/List - Responsive columns */}
               {paginatedEmployees.length > 0 ? (
                 <div
                   className={
                     viewMode === "grid"
-                      ? "grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4"
+                      ? "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-3 gap-4"
                       : "flex flex-col gap-3"
                   }
                 >

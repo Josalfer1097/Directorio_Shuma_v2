@@ -1,5 +1,6 @@
 "use client";
 
+import React from "react";
 import { motion } from "framer-motion";
 import type { MouseEvent } from "react";
 import { ChevronLeft, ChevronRight, Mail, Phone, Copy, Check, MessageSquare } from "lucide-react";
@@ -65,7 +66,24 @@ export function FeaturedEmployees({
 }: FeaturedEmployeesProps) {
   const router = useRouter();
   const [currentIndex, setCurrentIndex] = useState(0);
-  const itemsPerPage = 4;
+  
+  // Responsive items per page: 1 on mobile, 2 on tablet, 3 on desktop
+  const getItemsPerPage = () => {
+    if (typeof window === "undefined") return 4;
+    if (window.innerWidth < 768) return 1;      // Mobile
+    if (window.innerWidth < 1024) return 2;     // Tablet
+    return 4;                                     // Desktop
+  };
+  
+  const [itemsPerPage, setItemsPerPage] = useState(4);
+  
+  React.useEffect(() => {
+    setItemsPerPage(getItemsPerPage());
+    const handleResize = () => setItemsPerPage(getItemsPerPage());
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
+  
   const totalPages = Math.ceil(employees.length / itemsPerPage);
 
   const currentEmployees = employees.slice(
@@ -150,7 +168,7 @@ export function FeaturedEmployees({
         variants={containerVariants}
         initial="hidden"
         animate="visible"
-        className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4"
+        className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4"
       >
         {currentEmployees.map((employee) => {
           const companyColor = getCompanyColor(employee.company);

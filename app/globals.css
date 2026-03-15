@@ -108,6 +108,32 @@
   }
   body {
     @apply bg-background text-foreground;
+    scroll-behavior: smooth;
+  }
+  
+  /* Responsive typography with clamp */
+  h1 {
+    font-size: clamp(1.5rem, 4vw, 3rem);
+    font-weight: 700;
+  }
+  
+  h2 {
+    font-size: clamp(1.25rem, 3vw, 2rem);
+    font-weight: 600;
+  }
+  
+  h3 {
+    font-size: clamp(1.1rem, 2.5vw, 1.5rem);
+    font-weight: 600;
+  }
+  
+  h4, h5, h6 {
+    font-size: clamp(0.95rem, 2vw, 1.25rem);
+    font-weight: 600;
+  }
+  
+  p, body {
+    font-size: clamp(0.875rem, 2vw, 1rem);
   }
   
   /* Typography enhancements for headings */
@@ -115,6 +141,14 @@
     font-feature-settings: "ss01", "cv01";
     letter-spacing: -0.02em;
   }
+}
+
+/* Safe area insets for notched devices */
+:root {
+  --safe-top: env(safe-area-inset-top, 0);
+  --safe-right: env(safe-area-inset-right, 0);
+  --safe-bottom: env(safe-area-inset-bottom, 0);
+  --safe-left: env(safe-area-inset-left, 0);
 }
 
 /* Respect reduced motion preference */
@@ -268,4 +302,68 @@
 .backdrop-blur-premium {
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
+}
+
+/* Mobile-specific utility classes */
+.bottom-tab-safe {
+  padding-bottom: calc(64px + var(--safe-bottom));
+}
+
+.bottom-tab-bar-safe {
+  padding-bottom: var(--safe-bottom);
+  height: calc(64px + var(--safe-bottom));
+}
+
+/* Touch-friendly minimum size 44x44px */
+.touch-target {
+  min-width: 44px;
+  min-height: 44px;
+}
+
+/* Responsive corner bracket - scales down on mobile */
+@media (max-width: 640px) {
+  .corner-bracket::before {
+    width: 6px;
+    height: 1.5px;
+  }
+
+  .corner-bracket::after {
+    width: 1.5px;
+    height: 6px;
+  }
+}
+
+/* Mobile sheet drag handle */
+.sheet-drag-handle {
+  height: 4px;
+  width: 32px;
+  background-color: var(--muted-foreground);
+  border-radius: 2px;
+  margin: 8px auto;
+}
+
+/* Horizontal scroll container for mobile */
+.horizontal-scroll {
+  display: flex;
+  gap: 12px;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  -webkit-overflow-scrolling: touch;
+  padding: 0 16px;
+}
+
+.horizontal-scroll > * {
+  scroll-snap-align: start;
+  scroll-snap-stop: always;
+  flex-shrink: 0;
+}
+
+/* Hide scrollbar while keeping functionality */
+.horizontal-scroll::-webkit-scrollbar {
+  display: none;
+}
+
+.horizontal-scroll {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
 }

@@ -32,7 +32,7 @@ export default function HomePage() {
       <Navbar />
 
       {/* Hero Section */}
-      <section className="relative pt-32 pb-20 px-4 overflow-hidden">
+      <section className="relative md:pt-32 pt-20 pb-20 px-4 overflow-hidden">
         {/* Background gradient */}
         <div className="absolute inset-0 bg-gradient-to-b from-primary/5 via-transparent to-transparent" />
         <div className="absolute top-20 left-1/4 w-96 h-96 bg-primary/10 rounded-full blur-3xl" />
@@ -45,13 +45,13 @@ export default function HomePage() {
             transition={{ duration: 0.6 }}
             className="text-center max-w-3xl mx-auto mb-12"
           >
-            <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold mb-6 text-balance">
+            <h1 className="font-bold mb-6 text-balance">
               <span className="text-foreground">Directorio </span>
               <span className="bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
                 Corporativo
               </span>
             </h1>
-            <p className="text-lg text-muted-foreground mb-8 text-pretty">
+            <p className="text-muted-foreground mb-8 text-pretty">
               Encuentra rápidamente la información de contacto de todos los
               colaboradores de Grupo Shuma y sus empresas subsidiarias.
             </p>
@@ -63,16 +63,16 @@ export default function HomePage() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ duration: 0.6, delay: 0.4 }}
-            className="flex justify-center gap-4 mt-8"
+            className="flex flex-col sm:flex-row justify-center gap-4 mt-8"
           >
             <Link href="/directorio">
-              <Button size="lg" className="gap-2">
+              <Button size="lg" className="gap-2 w-full sm:w-auto">
                 Ver Directorio
                 <ArrowRight className="w-4 h-4" />
               </Button>
             </Link>
             <Link href="/organigrama">
-              <Button size="lg" variant="outline">
+              <Button size="lg" variant="outline" className="w-full sm:w-auto">
                 Ver Organigrama
               </Button>
             </Link>
@@ -108,7 +108,7 @@ export default function HomePage() {
             </p>
           </motion.div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4 horizontal-scroll md:horizontal-scroll-none">
             {companyStats.map((company, index) => (
               <CompanyCard key={company.id} company={company} index={index} />
             ))}
@@ -124,7 +124,7 @@ export default function HomePage() {
       </section>
 
       {/* Footer */}
-      <footer className="py-8 px-4 border-t border-border">
+      <footer className="py-8 px-4 border-t border-border bottom-tab-safe">
         <div className="container mx-auto">
           <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
             <p className="text-sm text-muted-foreground">
