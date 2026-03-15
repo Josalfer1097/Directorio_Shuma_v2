@@ -67,6 +67,8 @@ export function DirectoryFilters({
     selectedCompanies.length +
     (selectedDepartment !== "all" ? 1 : 0) +
     selectedTags.length;
+
+  const toggleCompany = (companyId: string) => {
     if (selectedCompanies.includes(companyId)) {
       onCompanyChange(selectedCompanies.filter((c) => c !== companyId));
     } else {
