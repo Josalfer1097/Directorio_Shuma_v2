@@ -1,0 +1,112 @@
+@import 'tailwindcss';
+@import 'tw-animate-css';
+
+@custom-variant dark (&:is(.dark *));
+
+/* Light Mode - Grupo Shuma */
+:root {
+  --background: #F8F8FC;
+  --foreground: #1A1A24;
+  --card: #FFFFFF;
+  --card-foreground: #1A1A24;
+  --popover: #FFFFFF;
+  --popover-foreground: #1A1A24;
+  --primary: #7C3AED;
+  --primary-foreground: #FFFFFF;
+  --secondary: #F1F1F5;
+  --secondary-foreground: #1A1A24;
+  --muted: #F1F1F5;
+  --muted-foreground: #8B8B9E;
+  --accent: #06B6D4;
+  --accent-foreground: #FFFFFF;
+  --destructive: #DC2626;
+  --destructive-foreground: #FFFFFF;
+  --border: #E4E4EB;
+  --input: #E4E4EB;
+  --ring: #7C3AED;
+  --radius: 0.625rem;
+  
+  /* Company Colors */
+  --shuma-holding: #7C3AED;
+  --shuma-comercializadora: #2563EB;
+  --shuma-acabados: #D97706;
+  --shuma-ferrecapital: #DC2626;
+  --shuma-arkiramica: #16A34A;
+  
+  /* Surface variants */
+  --surface: #FFFFFF;
+  --surface-hover: #F8F8FC;
+}
+
+/* Dark Mode - Grupo Shuma (Default) */
+.dark {
+  --background: #0A0A0F;
+  --foreground: #F1F1F5;
+  --card: #1A1A24;
+  --card-foreground: #F1F1F5;
+  --popover: #1A1A24;
+  --popover-foreground: #F1F1F5;
+  --primary: #7C3AED;
+  --primary-foreground: #FFFFFF;
+  --secondary: #111118;
+  --secondary-foreground: #F1F1F5;
+  --muted: #2A2A38;
+  --muted-foreground: #8B8B9E;
+  --accent: #06B6D4;
+  --accent-foreground: #FFFFFF;
+  --destructive: #DC2626;
+  --destructive-foreground: #FFFFFF;
+  --border: #2A2A38;
+  --input: #2A2A38;
+  --ring: #7C3AED;
+  
+  /* Surface variants */
+  --surface: #111118;
+  --surface-hover: #1A1A24;
+}
+
+@theme inline {
+  --font-sans: 'Geist', 'Geist Fallback';
+  --font-mono: 'Geist Mono', 'Geist Mono Fallback';
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+  --color-surface: var(--surface);
+  --color-surface-hover: var(--surface-hover);
+  
+  /* Company colors */
+  --color-shuma-holding: var(--shuma-holding);
+  --color-shuma-comercializadora: var(--shuma-comercializadora);
+  --color-shuma-acabados: var(--shuma-acabados);
+  --color-shuma-ferrecapital: var(--shuma-ferrecapital);
+  --color-shuma-arkiramica: var(--shuma-arkiramica);
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
+}
