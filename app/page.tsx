@@ -25,7 +25,10 @@ export default function HomePage() {
   );
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background relative">
+      {/* Geometric pattern background */}
+      <div className="geometric-pattern" />
+      
       <Navbar />
 
       {/* Hero Section */}

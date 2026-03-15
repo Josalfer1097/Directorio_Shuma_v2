@@ -22,6 +22,9 @@ import type { ViewMode, Employee } from "@/types";
 
 const ITEMS_PER_PAGE = 12;
 
+// Premium easing curve
+const premiumEase = [0.25, 0.46, 0.45, 0.94];
+
 function DirectoryContent() {
   const searchParams = useSearchParams();
   const initialQuery = searchParams.get("q") || "";
@@ -111,15 +114,19 @@ function DirectoryContent() {
   };
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background relative">
+      {/* Geometric pattern background */}
+      <div className="geometric-pattern" />
+      
       <Navbar />
 
-      <main className="pt-24 pb-16 px-4">
+      <main className="pt-24 pb-16 px-4 relative z-10">
         <div className="container mx-auto">
           {/* Header */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.25, ease: premiumEase }}
             className="mb-8"
           >
             <h1 className="text-3xl font-bold text-foreground mb-2">

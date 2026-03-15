@@ -1,5 +1,6 @@
 "use client";
 
+import { motion, AnimatePresence } from "framer-motion";
 import { X, Filter, Download } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -18,6 +19,13 @@ import {
   SheetTrigger,
 } from "@/components/ui/sheet";
 import type { Company, Employee } from "@/types";
+
+// Spring animation for filter panel
+const springTransition = {
+  type: "spring",
+  stiffness: 400,
+  damping: 30,
+};
 
 interface DirectoryFiltersProps {
   companies: Company[];
