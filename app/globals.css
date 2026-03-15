@@ -363,7 +363,82 @@
   display: none;
 }
 
-.horizontal-scroll {
-  -ms-overflow-style: none;
-  scrollbar-width: none;
+/* MOBILE EXPERIENCE FIXES */
+
+/* Remove tap highlight on interactive elements */
+button, a, input, select, textarea, [role="button"] {
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* Prevent body scroll when mobile sheets/modals are open */
+body.modal-open {
+  overflow: hidden;
+  -webkit-overflow-scrolling: auto;
+}
+
+/* Smooth overscroll feel on scrollable areas */
+.overflow-y-auto, .overflow-x-auto {
+  -webkit-overflow-scrolling: touch;
+}
+
+/* Focus visible only on keyboard navigation */
+*:focus {
+  outline: none;
+}
+
+*:focus-visible {
+  outline: 2px solid var(--ring);
+  outline-offset: 2px;
+}
+
+/* Fix text overflow on 375px width */
+@media (max-width: 425px) {
+  body {
+    font-size: clamp(0.8rem, 2vw, 1rem);
+    word-break: break-word;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+  }
+
+  h1 {
+    font-size: clamp(1.25rem, 3vw, 1.75rem);
+  }
+
+  h2 {
+    font-size: clamp(1.1rem, 2.5vw, 1.5rem);
+  }
+
+  input, button, textarea {
+    font-size: 16px;
+  }
+}
+
+/* Prevent horizontal scroll except on intentional carousels */
+html, body {
+  overflow-x: hidden;
+  max-width: 100%;
+}
+
+/* Safe area padding for notched devices */
+@supports (padding: max(0px)) {
+  body {
+    padding-left: max(0, env(safe-area-inset-left));
+    padding-right: max(0, env(safe-area-inset-right));
+  }
+
+  .safe-area-top {
+    padding-top: max(0, env(safe-area-inset-top));
+  }
+
+  .safe-area-bottom {
+    padding-bottom: max(0, env(safe-area-inset-bottom));
+  }
+}
+
+/* Mobile sheet/modal prevent scroll */
+@media (max-width: 768px) {
+  .sheet-overlay, .modal-overlay {
+    -webkit-user-select: none;
+    user-select: none;
+  }
 }

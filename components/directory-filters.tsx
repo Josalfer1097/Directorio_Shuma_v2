@@ -2,6 +2,7 @@
 
 import { motion, AnimatePresence } from "framer-motion";
 import { X, Filter, Download } from "lucide-react";
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import {
@@ -18,6 +19,7 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet";
+import { MobileFiltersBottomSheet } from "./mobile-filters-bottom-sheet";
 import type { Company, Employee } from "@/types";
 
 // Spring animation for filter panel
@@ -54,12 +56,17 @@ export function DirectoryFilters({
   onClearFilters,
   filteredEmployees,
 }: DirectoryFiltersProps) {
+  const [mobileSheetOpen, setMobileSheetOpen] = useState(false);
+  
   const hasActiveFilters =
     selectedCompanies.length > 0 ||
     selectedDepartment !== "all" ||
     selectedTags.length > 0;
 
-  const toggleCompany = (companyId: string) => {
+  const activeFilterCount =
+    selectedCompanies.length +
+    (selectedDepartment !== "all" ? 1 : 0) +
+    selectedTags.length;
     if (selectedCompanies.includes(companyId)) {
       onCompanyChange(selectedCompanies.filter((c) => c !== companyId));
     } else {
@@ -215,17 +222,47 @@ export function DirectoryFilters({
         </div>
       </aside>
 
-      {/* Mobile Filters */}
+      {/* Mobile Filters Button */}
+      <Button
+        onClick={() => setMobileSheetOpen(true)}
+        variant="outline"
+        className="lg:hidden gap-2 touch-target"
+      >
+        <Filter className="w-4 h-4" />
+        Filtros
+        {activeFilterCount > 0 && (
+          <span className="w-5 h-5 rounded-full bg-primary text-primary-foreground text-xs flex items-center justify-center text-xs font-semibold">
+            {activeFilterCount}
+          </span>
+        )}
+      </Button>
+
+      {/* Mobile Filters Bottom Sheet */}
+      <MobileFiltersBottomSheet
+        isOpen={mobileSheetOpen}
+        onClose={() => setMobileSheetOpen(false)}
+        companies={companies}
+        departments={departments}
+        tags={tags}
+        selectedCompanies={selectedCompanies}
+        selectedDepartment={selectedDepartment}
+        selectedTags={selectedTags}
+        onCompanyChange={onCompanyChange}
+        onDepartmentChange={onDepartmentChange}
+        onTagChange={onTagChange}
+        onClearFilters={onClearFilters}
+        onApply={() => {}}
+      />
+
+      {/* Desktop Sheet (legacy - kept for non-mobile) */}
       <Sheet>
         <SheetTrigger asChild>
-          <Button variant="outline" className="lg:hidden gap-2">
+          <Button variant="outline" className="hidden lg:hidden gap-2">
             <Filter className="w-4 h-4" />
             Filtros
             {hasActiveFilters && (
               <span className="w-5 h-5 rounded-full bg-primary text-primary-foreground text-xs flex items-center justify-center">
-                {selectedCompanies.length +
-                  (selectedDepartment !== "all" ? 1 : 0) +
-                  selectedTags.length}
+                {activeFilterCount}
               </span>
             )}
           </Button>
