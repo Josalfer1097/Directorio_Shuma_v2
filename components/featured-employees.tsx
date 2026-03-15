@@ -1,6 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
+import type { MouseEvent } from "react";
 import { ChevronLeft, ChevronRight, Mail, Phone } from "lucide-react";
 import { useState } from "react";
 import Link from "next/link";
@@ -130,21 +131,23 @@ export function FeaturedEmployees({
                     variant="ghost"
                     size="icon"
                     className="w-8 h-8"
-                    asChild
+                    onClick={(e: MouseEvent) => {
+                      e.stopPropagation();
+                      window.location.href = `mailto:${employee.email}`;
+                    }}
                   >
-                    <a href={`mailto:${employee.email}`}>
-                      <Mail className="w-4 h-4" />
-                    </a>
+                    <Mail className="w-4 h-4" />
                   </Button>
                   <Button
                     variant="ghost"
                     size="icon"
                     className="w-8 h-8"
-                    asChild
+                    onClick={(e: MouseEvent) => {
+                      e.stopPropagation();
+                      window.location.href = `tel:${employee.phone}`;
+                    }}
                   >
-                    <a href={`tel:${employee.phone}`}>
-                      <Phone className="w-4 h-4" />
-                    </a>
+                    <Phone className="w-4 h-4" />
                   </Button>
                 </div>
               </div>
