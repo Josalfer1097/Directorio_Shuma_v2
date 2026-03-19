@@ -23,7 +23,7 @@ export function CompanyCard({ company, index }: CompanyCardProps) {
     >
       <Link href={`/directorio?empresa=${company.id}`}>
         <div
-          className="card-shimmer corner-bracket group relative overflow-hidden rounded-xl border border-border bg-card p-6 transition-all duration-[180ms] hover:scale-[1.02] hover:shadow-lg"
+          className="card-shimmer corner-bracket group relative overflow-hidden rounded-xl border border-border bg-card p-6 transition-all duration-[180ms] hover:scale-[1.02] hover:shadow-lg h-full min-h-[200px] flex flex-col"
           style={{
             ["--shimmer-color" as string]: company.color,
             ["--bracket-color" as string]: company.color,
@@ -45,7 +45,7 @@ export function CompanyCard({ company, index }: CompanyCardProps) {
             style={{ backgroundColor: company.color }}
           />
 
-          <div className="relative">
+          <div className="relative flex flex-col flex-1">
             {/* Icon and Type */}
             <div className="flex items-start justify-between mb-4">
               <div
@@ -72,12 +72,12 @@ export function CompanyCard({ company, index }: CompanyCardProps) {
             <h3 className="font-semibold text-foreground mb-1 group-hover:text-primary transition-colors duration-[180ms] line-clamp-2">
               {company.shortName || company.name}
             </h3>
-            <p className="text-sm text-muted-foreground mb-4 line-clamp-2">
+            <p className="text-sm text-muted-foreground mb-4 line-clamp-2 flex-1">
               {company.description}
             </p>
 
             {/* Employee Count */}
-            <div className="flex items-center gap-2 text-muted-foreground">
+            <div className="flex items-center gap-2 text-muted-foreground mt-auto">
               <Users className="w-4 h-4" />
               <span className="text-sm">
                 {company.employeeCount}{" "}

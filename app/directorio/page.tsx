@@ -44,11 +44,19 @@ function DirectoryContent() {
   const departments = getDepartments();
   const tags = getAllTags();
 
-  // Fuse.js setup for fuzzy search
+  // Fuse.js setup for fuzzy search - includes extension and phone for searching by number
   const fuse = useMemo(
     () =>
       new Fuse(employees, {
-        keys: ["name", "position", "department", "email", "tags"],
+        keys: [
+          "name", 
+          "position", 
+          "department", 
+          "email", 
+          "tags",
+          "extension",
+          "phone"
+        ],
         threshold: 0.3,
         includeScore: true,
       }),
@@ -82,6 +90,12 @@ function DirectoryContent() {
       results = results.filter((emp) =>
         selectedTags.some((tag) => emp.tags.includes(tag))
       );
+    }
+
+    // Sort results alphabetically by name for consistent ordering
+    // Only sort when not searching (search results maintain relevance order)
+    if (!searchQuery.trim()) {
+      results = [...results].sort((a, b) => a.name.localeCompare(b.name, 'es'));
     }
 
     return results;
@@ -161,7 +175,7 @@ function DirectoryContent() {
                   <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
                   <Input
                     type="text"
-                    placeholder="Buscar por nombre, puesto, departamento..."
+                    placeholder="Buscar por nombre, puesto, extensión..."
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
                     className="pl-10"
@@ -203,6 +217,8 @@ function DirectoryContent() {
                   {paginatedEmployees.map((employee, index) => {
                     const company = getCompanyById(employee.company);
                     if (!company) return null;
+                    // Hide company badge when filtering by a single company
+                    const hideCompanyBadge = selectedCompanies.length === 1 && selectedCompanies.includes(employee.company);
                     return (
                       <EmployeeCard
                         key={employee.id}
@@ -210,6 +226,7 @@ function DirectoryContent() {
                         company={company}
                         view={viewMode}
                         index={index}
+                        hideCompanyBadge={hideCompanyBadge}
                       />
                     );
                   })}

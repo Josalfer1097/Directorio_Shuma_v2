@@ -16,6 +16,7 @@ interface EmployeeCardProps {
   company: Company;
   view: "grid" | "list";
   index: number;
+  hideCompanyBadge?: boolean;
 }
 
 // Premium easing curve
@@ -43,6 +44,7 @@ export function EmployeeCard({
   company,
   view,
   index,
+  hideCompanyBadge = false,
 }: EmployeeCardProps) {
   const [copiedField, setCopiedField] = useState<string | null>(null);
 
@@ -116,15 +118,17 @@ export function EmployeeCard({
                 <h3 className="font-medium text-foreground group-hover:text-primary transition-colors duration-[180ms] truncate">
                   {employee.name}
                 </h3>
-                <span
-                  className="text-xs font-medium px-2 py-0.5 rounded-full shrink-0"
-                  style={{
-                    backgroundColor: `${company.color}15`,
-                    color: company.color,
-                  }}
-                >
-                  {company.shortName || company.name}
-                </span>
+                {!hideCompanyBadge && (
+                  <span
+                    className="text-xs font-medium px-2 py-0.5 rounded-full shrink-0"
+                    style={{
+                      backgroundColor: `${company.color}15`,
+                      color: company.color,
+                    }}
+                  >
+                    {company.shortName || company.name}
+                  </span>
+                )}
               </div>
               <p className="text-sm text-muted-foreground truncate">
                 {employee.position} · {employee.department}
@@ -158,13 +162,19 @@ export function EmployeeCard({
                       <Copy className="w-3 h-3 text-muted-foreground" />
                     )}
                   </button>
-                  <button
-                    onClick={openTeamsChat}
-                    className="p-1 rounded hover:bg-muted transition-colors"
-                    title="Abrir chat en Teams"
-                  >
-                    <MessageSquare className="w-3 h-3 text-muted-foreground hover:text-[#6264A7]" />
-                  </button>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <button
+                        onClick={openTeamsChat}
+                        className="p-1 rounded hover:bg-[#6264A7]/10 transition-colors group/teams"
+                      >
+                        <MessageSquare className="w-3 h-3 text-muted-foreground group-hover/teams:text-[#6264A7]" />
+                      </button>
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      <p>Enviar mensaje en Teams</p>
+                    </TooltipContent>
+                  </Tooltip>
                 </div>
 
                 {/* Phone */}
@@ -251,15 +261,17 @@ export function EmployeeCard({
               <p className="text-[11px] text-muted-foreground/70 line-clamp-1">
                 {employee.department}
               </p>
-              <span
-                className="inline-block text-[10px] font-medium px-1.5 py-0.5 rounded-full mt-1"
-                style={{
-                  backgroundColor: `${company.color}15`,
-                  color: company.color,
-                }}
-              >
-                {company.shortName || company.name}
-              </span>
+              {!hideCompanyBadge && (
+                <span
+                  className="inline-block text-[10px] font-medium px-1.5 py-0.5 rounded-full mt-1"
+                  style={{
+                    backgroundColor: `${company.color}15`,
+                    color: company.color,
+                  }}
+                >
+                  {company.shortName || company.name}
+                </span>
+              )}
             </div>
           </div>
 
@@ -294,13 +306,21 @@ export function EmployeeCard({
                   <Copy className="w-3 h-3 text-muted-foreground" />
                 )}
               </button>
-              <button
-                onClick={openTeamsChat}
-                className="p-1 rounded hover:bg-muted transition-colors shrink-0"
-                title="Abrir chat en Teams"
-              >
-                <MessageSquare className="w-3 h-3 text-muted-foreground hover:text-[#6264A7]" />
-              </button>
+              <TooltipProvider>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <button
+                      onClick={openTeamsChat}
+                      className="p-1 rounded hover:bg-[#6264A7]/10 transition-colors shrink-0 group/teams"
+                    >
+                      <MessageSquare className="w-3 h-3 text-muted-foreground group-hover/teams:text-[#6264A7]" />
+                    </button>
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p>Enviar mensaje en Teams</p>
+                  </TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
             </div>
 
             {/* Phone row */}
