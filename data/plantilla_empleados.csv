@@ -1,0 +1,19 @@
+id,name,position,department,company,email,phone,extension,reportsTo,avatar,tags,startDate
+emp001,Roberto Martínez Hernández,Director General,Dirección General,grupo-shuma,roberto.martinez@gruposhuma.mx,+52 55 1234 5678,101,,,"directivo,liderazgo,estrategia",2010-03-15
+emp002,María Fernanda López García,Directora de Finanzas,Finanzas,grupo-shuma,maria.lopez@gruposhuma.mx,+52 55 1234 5679,102,emp001,,"directivo,finanzas,contabilidad",2012-06-01
+emp003,Carlos Eduardo Ramírez Soto,Director de Recursos Humanos,Recursos Humanos,grupo-shuma,carlos.ramirez@gruposhuma.mx,+52 55 1234 5680,103,emp001,,"directivo,rrhh,talento",2014-01-10
+emp004,Ana Patricia Vega Morales,Gerente General,Dirección General,comercializadora-shuma,ana.vega@comercializadorashuma.mx,+52 55 2345 6789,201,emp001,,"gerencia,ventas,ferretería",2015-04-20
+emp005,Jorge Luis Mendoza Cruz,Jefe de Ventas,Ventas,comercializadora-shuma,jorge.mendoza@comercializadorashuma.mx,+52 55 2345 6790,202,emp004,,"ventas,comercial,clientes",2016-08-15
+emp006,Laura Beatriz Torres Díaz,Coordinadora de Logística,Logística,comercializadora-shuma,laura.torres@comercializadorashuma.mx,+52 55 2345 6791,203,emp004,,"logística,almacén,distribución",2017-02-28
+emp007,Francisco Javier Ruiz Castillo,Gerente General,Dirección General,acabados-shuma,francisco.ruiz@acabadosshuma.mx,+52 55 3456 7890,301,emp001,,"gerencia,construcción,acabados",2013-09-01
+emp008,Gabriela Sánchez Flores,Jefa de Operaciones,Operaciones,acabados-shuma,gabriela.sanchez@acabadosshuma.mx,+52 55 3456 7891,302,emp007,,"operaciones,producción,calidad",2018-03-12
+emp009,Miguel Ángel Herrera Jiménez,Coordinador de Compras,Compras,acabados-shuma,miguel.herrera@acabadosshuma.mx,+52 55 3456 7892,303,emp007,,"compras,proveedores,negociación",2019-07-22
+emp010,Patricia Elena Navarro Luna,Gerente General,Dirección General,ferrecapital,patricia.navarro@ferrecapital.mx,+52 55 4567 8901,401,emp001,,"gerencia,finanzas,crédito",2016-11-05
+emp011,Ricardo Daniel Ortega Vargas,Analista de Crédito Senior,Finanzas,ferrecapital,ricardo.ortega@ferrecapital.mx,+52 55 4567 8902,402,emp010,,"crédito,análisis,riesgo",2017-05-18
+emp012,Sofía Alejandra Guzmán Reyes,Ejecutiva de Cobranza,Finanzas,ferrecapital,sofia.guzman@ferrecapital.mx,+52 55 4567 8903,403,emp010,,"cobranza,atención,clientes",2020-01-08
+emp013,Andrés Felipe Castro Medina,Gerente General,Dirección General,arkiramica,andres.castro@arkiramica.mx,+52 55 5678 9012,501,emp001,,"gerencia,cerámica,diseño",2014-08-25
+emp014,Valentina Rojas Espinoza,Diseñadora de Interiores,Marketing,arkiramica,valentina.rojas@arkiramica.mx,+52 55 5678 9013,502,emp013,,"diseño,interiores,showroom",2019-04-14
+emp015,Diego Alejandro Moreno Ríos,Jefe de Almacén,Logística,arkiramica,diego.moreno@arkiramica.mx,+52 55 5678 9014,503,emp013,,"almacén,inventario,logística",2018-10-30
+emp016,Isabel Cristina Peña Aguilar,Directora de Tecnología,Tecnología,grupo-shuma,isabel.pena@gruposhuma.mx,+52 55 1234 5681,104,emp001,,"directivo,tecnología,sistemas",2019-02-01
+emp017,Alejandro José Delgado Núñez,Contador General,Finanzas,grupo-shuma,alejandro.delgado@gruposhuma.mx,+52 55 1234 5682,105,emp002,,"contabilidad,impuestos,finanzas",2015-09-14
+emp018,Carmen Lucía Varela Domínguez,Asistente de Dirección,Dirección General,grupo-shuma,carmen.varela@gruposhuma.mx,+52 55 1234 5683,106,emp001,,"asistencia,coordinación,agenda",2016-03-21
