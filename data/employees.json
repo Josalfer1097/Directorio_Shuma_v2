@@ -61,9 +61,7 @@
       "phone": "+52 55 1234 5678",
       "extension": "101",
       "reportsTo": null,
-      "avatar": null,
-      "tags": ["directivo", "liderazgo", "estrategia"],
-      "startDate": "2010-03-15"
+      "avatar": null
     },
     {
       "id": "emp002",
@@ -75,9 +73,7 @@
       "phone": "+52 55 1234 5679",
       "extension": "102",
       "reportsTo": "emp001",
-      "avatar": null,
-      "tags": ["directivo", "finanzas", "contabilidad"],
-      "startDate": "2012-06-01"
+      "avatar": null
     },
     {
       "id": "emp003",
@@ -89,9 +85,7 @@
       "phone": "+52 55 1234 5680",
       "extension": "103",
       "reportsTo": "emp001",
-      "avatar": null,
-      "tags": ["directivo", "rrhh", "talento"],
-      "startDate": "2014-01-10"
+      "avatar": null
     },
     {
       "id": "emp004",
@@ -103,9 +97,7 @@
       "phone": "+52 55 2345 6789",
       "extension": "201",
       "reportsTo": "emp001",
-      "avatar": null,
-      "tags": ["gerencia", "ventas", "ferretería"],
-      "startDate": "2015-04-20"
+      "avatar": null
     },
     {
       "id": "emp005",
@@ -117,9 +109,7 @@
       "phone": "+52 55 2345 6790",
       "extension": "202",
       "reportsTo": "emp004",
-      "avatar": null,
-      "tags": ["ventas", "comercial", "clientes"],
-      "startDate": "2016-08-15"
+      "avatar": null
     },
     {
       "id": "emp006",
@@ -131,9 +121,7 @@
       "phone": "+52 55 2345 6791",
       "extension": "203",
       "reportsTo": "emp004",
-      "avatar": null,
-      "tags": ["logística", "almacén", "distribución"],
-      "startDate": "2017-02-28"
+      "avatar": null
     },
     {
       "id": "emp007",
@@ -145,9 +133,7 @@
       "phone": "+52 55 3456 7890",
       "extension": "301",
       "reportsTo": "emp001",
-      "avatar": null,
-      "tags": ["gerencia", "construcción", "acabados"],
-      "startDate": "2013-09-01"
+      "avatar": null
     },
     {
       "id": "emp008",
@@ -159,9 +145,7 @@
       "phone": "+52 55 3456 7891",
       "extension": "302",
       "reportsTo": "emp007",
-      "avatar": null,
-      "tags": ["operaciones", "producción", "calidad"],
-      "startDate": "2018-03-12"
+      "avatar": null
     },
     {
       "id": "emp009",
@@ -173,9 +157,7 @@
       "phone": "+52 55 3456 7892",
       "extension": "303",
       "reportsTo": "emp007",
-      "avatar": null,
-      "tags": ["compras", "proveedores", "negociación"],
-      "startDate": "2019-07-22"
+      "avatar": null
     },
     {
       "id": "emp010",
@@ -187,9 +169,7 @@
       "phone": "+52 55 4567 8901",
       "extension": "401",
       "reportsTo": "emp001",
-      "avatar": null,
-      "tags": ["gerencia", "finanzas", "crédito"],
-      "startDate": "2016-11-05"
+      "avatar": null
     },
     {
       "id": "emp011",
@@ -201,9 +181,7 @@
       "phone": "+52 55 4567 8902",
       "extension": "402",
       "reportsTo": "emp010",
-      "avatar": null,
-      "tags": ["crédito", "análisis", "riesgo"],
-      "startDate": "2017-05-18"
+      "avatar": null
     },
     {
       "id": "emp012",
@@ -215,9 +193,7 @@
       "phone": "+52 55 4567 8903",
       "extension": "403",
       "reportsTo": "emp010",
-      "avatar": null,
-      "tags": ["cobranza", "atención", "clientes"],
-      "startDate": "2020-01-08"
+      "avatar": null
     },
     {
       "id": "emp013",
@@ -229,9 +205,7 @@
       "phone": "+52 55 5678 9012",
       "extension": "501",
       "reportsTo": "emp001",
-      "avatar": null,
-      "tags": ["gerencia", "cerámica", "diseño"],
-      "startDate": "2014-08-25"
+      "avatar": null
     },
     {
       "id": "emp014",
@@ -243,9 +217,7 @@
       "phone": "+52 55 5678 9013",
       "extension": "502",
       "reportsTo": "emp013",
-      "avatar": null,
-      "tags": ["diseño", "interiores", "showroom"],
-      "startDate": "2019-04-14"
+      "avatar": null
     },
     {
       "id": "emp015",
@@ -257,9 +229,7 @@
       "phone": "+52 55 5678 9014",
       "extension": "503",
       "reportsTo": "emp013",
-      "avatar": null,
-      "tags": ["almacén", "inventario", "logística"],
-      "startDate": "2018-10-30"
+      "avatar": null
     },
     {
       "id": "emp016",
@@ -271,9 +241,7 @@
       "phone": "+52 55 1234 5681",
       "extension": "104",
       "reportsTo": "emp001",
-      "avatar": null,
-      "tags": ["directivo", "tecnología", "sistemas"],
-      "startDate": "2019-02-01"
+      "avatar": null
     },
     {
       "id": "emp017",
@@ -285,9 +253,7 @@
       "phone": "+52 55 1234 5682",
       "extension": "105",
       "reportsTo": "emp002",
-      "avatar": null,
-      "tags": ["contabilidad", "impuestos", "finanzas"],
-      "startDate": "2015-09-14"
+      "avatar": null
     },
     {
       "id": "emp018",
@@ -299,9 +265,7 @@
       "phone": "+52 55 1234 5683",
       "extension": "106",
       "reportsTo": "emp001",
-      "avatar": null,
-      "tags": ["asistencia", "coordinación", "agenda"],
-      "startDate": "2016-03-21"
+      "avatar": null
     }
   ]
 }
