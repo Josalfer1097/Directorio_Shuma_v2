@@ -32,13 +32,10 @@ const springTransition = {
 interface DirectoryFiltersProps {
   companies: Company[];
   departments: string[];
-  tags: string[];
   selectedCompanies: string[];
   selectedDepartment: string;
-  selectedTags: string[];
   onCompanyChange: (companies: string[]) => void;
   onDepartmentChange: (department: string) => void;
-  onTagChange: (tags: string[]) => void;
   onClearFilters: () => void;
   filteredEmployees: Employee[];
 }
@@ -46,13 +43,10 @@ interface DirectoryFiltersProps {
 export function DirectoryFilters({
   companies,
   departments,
-  tags,
   selectedCompanies,
   selectedDepartment,
-  selectedTags,
   onCompanyChange,
   onDepartmentChange,
-  onTagChange,
   onClearFilters,
   filteredEmployees,
 }: DirectoryFiltersProps) {
@@ -60,27 +54,17 @@ export function DirectoryFilters({
   
   const hasActiveFilters =
     selectedCompanies.length > 0 ||
-    selectedDepartment !== "all" ||
-    selectedTags.length > 0;
+    selectedDepartment !== "all";
 
   const activeFilterCount =
     selectedCompanies.length +
-    (selectedDepartment !== "all" ? 1 : 0) +
-    selectedTags.length;
+    (selectedDepartment !== "all" ? 1 : 0);
 
   const toggleCompany = (companyId: string) => {
     if (selectedCompanies.includes(companyId)) {
       onCompanyChange(selectedCompanies.filter((c) => c !== companyId));
     } else {
       onCompanyChange([...selectedCompanies, companyId]);
-    }
-  };
-
-  const toggleTag = (tag: string) => {
-    if (selectedTags.includes(tag)) {
-      onTagChange(selectedTags.filter((t) => t !== tag));
-    } else {
-      onTagChange([...selectedTags, tag]);
     }
   };
 
@@ -166,26 +150,6 @@ export function DirectoryFilters({
         </Select>
       </div>
 
-      {/* Tags */}
-      <div>
-        <h4 className="font-medium text-foreground mb-3">Etiquetas</h4>
-        <div className="flex flex-wrap gap-2">
-          {tags.map((tag) => (
-            <button
-              key={tag}
-              onClick={() => toggleTag(tag)}
-              className={`px-3 py-1 text-xs rounded-full border transition-colors ${
-                selectedTags.includes(tag)
-                  ? "bg-primary text-primary-foreground border-primary"
-                  : "bg-card text-muted-foreground border-border hover:border-primary/50"
-              }`}
-            >
-              {tag}
-            </button>
-          ))}
-        </div>
-      </div>
-
       {/* Clear and Export */}
       <div className="flex flex-col gap-2 pt-4 border-t border-border">
         {hasActiveFilters && (
@@ -245,13 +209,10 @@ export function DirectoryFilters({
         onClose={() => setMobileSheetOpen(false)}
         companies={companies}
         departments={departments}
-        tags={tags}
         selectedCompanies={selectedCompanies}
         selectedDepartment={selectedDepartment}
-        selectedTags={selectedTags}
         onCompanyChange={onCompanyChange}
         onDepartmentChange={onDepartmentChange}
-        onTagChange={onTagChange}
         onClearFilters={onClearFilters}
         onApply={() => {}}
       />

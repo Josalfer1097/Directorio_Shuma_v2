@@ -1,8 +1,8 @@
 "use client";
 
-import { use, useState } from "react";
+import { use, useState, Component, ReactNode } from "react";
 import { motion } from "framer-motion";
-import { notFound } from "next/navigation";
+import { notFound, useRouter } from "next/navigation";
 import Link from "next/link";
 import { toast } from "sonner";
 import {
@@ -14,11 +14,11 @@ import {
   Calendar,
   ChevronRight,
   Users,
-  ArrowLeft,
+  X,
+  MessageSquare,
+  AlertTriangle,
 } from "lucide-react";
-import { Navbar } from "@/components/navbar";
 import { Button } from "@/components/ui/button";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import {
   getEmployeeById,
@@ -26,13 +26,62 @@ import {
   getDirectReports,
   getReportingChain,
 } from "@/lib/data";
+import { cn } from "@/lib/utils";
 
 interface Props {
   params: Promise<{ id: string }>;
 }
 
-export default function EmployeeDetailPage({ params }: Props) {
-  const { id } = use(params);
+// Error Boundary for the modal
+interface ErrorBoundaryState {
+  hasError: boolean;
+  error: Error | null;
+}
+
+interface ErrorBoundaryProps {
+  children: ReactNode;
+  fallback: ReactNode;
+}
+
+class EmployeeDetailErrorBoundary extends Component<
+  ErrorBoundaryProps,
+  ErrorBoundaryState
+> {
+  constructor(props: ErrorBoundaryProps) {
+    super(props);
+    this.state = { hasError: false, error: null };
+  }
+
+  static getDerivedStateFromError(error: Error): ErrorBoundaryState {
+    return { hasError: true, error };
+  }
+
+  componentDidCatch(error: Error, errorInfo: React.ErrorInfo) {
+    console.error("[v0] Employee detail error:", error, errorInfo);
+  }
+
+  render() {
+    if (this.state.hasError) {
+      return this.props.fallback;
+    }
+
+    return this.props.children;
+  }
+}
+
+// Get monogram class based on company
+const getMonogramClass = (companyId: string) => {
+  const classMap: Record<string, string> = {
+    "comercializadora-shuma": "monogram-comercializadora",
+    "acabados-shuma": "monogram-acabados",
+    ferrecapital: "monogram-ferrecapital",
+    arkiramica: "monogram-arkiramica",
+  };
+  return classMap[companyId] || "monogram-comercializadora";
+};
+
+function EmployeeDetailContent({ id }: { id: string }) {
+  const router = useRouter();
   const [copiedField, setCopiedField] = useState<string | null>(null);
 
   const employee = getEmployeeById(id);
@@ -44,7 +93,10 @@ export default function EmployeeDetailPage({ params }: Props) {
   const reportingChain = getReportingChain(employee.id);
   const directReports = getDirectReports(employee.id);
 
-  const getInitials = (name: string) => {
+  const primaryColor = company?.colors?.primary || "#C9A84C";
+
+  const getInitials = (name?: string) => {
+    if (!name) return "??";
     return name
       .split(" ")
       .map((n) => n[0])
@@ -53,14 +105,16 @@ export default function EmployeeDetailPage({ params }: Props) {
       .toUpperCase();
   };
 
-  const copyToClipboard = (text: string, field: string) => {
+  const copyToClipboard = (text: string | undefined, field: string) => {
+    if (!text) return;
     navigator.clipboard.writeText(text);
     setCopiedField(field);
     toast.success("Copiado al portapapeles");
     setTimeout(() => setCopiedField(null), 2000);
   };
 
-  const formatDate = (dateString: string) => {
+  const formatDate = (dateString?: string) => {
+    if (!dateString) return "—";
     return new Date(dateString).toLocaleDateString("es-MX", {
       year: "numeric",
       month: "long",
@@ -68,287 +122,387 @@ export default function EmployeeDetailPage({ params }: Props) {
     });
   };
 
+  const formatPhone = (phone?: string) => {
+    if (!phone) return "—";
+    const digits = phone.replace(/\D/g, "");
+    if (digits.length === 10) {
+      return `+52 ${digits.slice(0, 2)} ${digits.slice(2, 6)} ${digits.slice(6)}`;
+    }
+    return phone;
+  };
+
+  const handleClose = () => {
+    router.push("/directorio");
+  };
+
+  const openTeamsChat = () => {
+    if (!employee.email) return;
+    window.open(
+      `https://teams.microsoft.com/l/chat/0/0?users=${employee.email}`,
+      "_blank"
+    );
+  };
+
   return (
-    <div className="min-h-screen bg-background">
-      <Navbar />
+    <div className="min-h-screen bg-[--bg-base] relative">
+      {/* Background effects */}
+      <div className="dot-grid" />
+      <div className="noise-overlay" />
 
-      <main className="md:pt-24 pt-16 pb-24 md:pb-16 px-4 relative z-10">
-        <div className="container mx-auto max-w-4xl">
-          {/* Mobile Back button - fixed at top */}
-          <motion.div
-            initial={{ opacity: 0, x: -20 }}
-            animate={{ opacity: 1, x: 0 }}
-            className="mb-6"
-          >
-            <Link href="/directorio">
-              <Button
-                variant="ghost"
-                className="gap-2 md:relative fixed md:static left-4 top-20 z-20 touch-target"
-              >
-                <ArrowLeft className="w-4 h-4" />
-                <span className="hidden sm:inline">Volver</span>
-              </Button>
-            </Link>
-          </motion.div>
+      {/* Ambient glow */}
+      <div
+        className="ambient-glow ambient-glow-top"
+        style={{ background: primaryColor }}
+      />
 
-          {/* Main Profile Card */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="relative overflow-hidden rounded-2xl border border-border bg-card mb-8"
+      {/* Backdrop for modal */}
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        exit={{ opacity: 0 }}
+        className="modal-backdrop"
+        onClick={handleClose}
+      />
+
+      {/* Modal Content */}
+      <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+        <motion.div
+          initial={{ opacity: 0, scale: 0.95, y: 20 }}
+          animate={{ opacity: 1, scale: 1, y: 0 }}
+          exit={{ opacity: 0, scale: 0.95, y: 20 }}
+          transition={{ type: "spring", damping: 25, stiffness: 300 }}
+          className="modal-content w-full max-w-lg max-h-[90vh] overflow-y-auto"
+          style={
+            { "--modal-color": primaryColor } as React.CSSProperties
+          }
+          onClick={(e) => e.stopPropagation()}
+        >
+          {/* Sheet drag handle for mobile */}
+          <div className="sm:hidden sheet-drag-handle" />
+
+          {/* Close button */}
+          <button
+            onClick={handleClose}
+            className="absolute top-4 right-4 p-2 rounded-full text-[--text-muted] hover:text-[--text-primary] hover:bg-[--bg-elevated] transition-colors tap-target z-10"
           >
-            {/* Header gradient */}
-            <div
-              className="h-24 md:h-32 relative"
-              style={{
-                background: `linear-gradient(135deg, ${company?.color}40 0%, ${company?.color}10 100%)`,
-              }}
-            >
+            <X className="w-5 h-5" />
+          </button>
+
+          {/* Header with monogram */}
+          <div className="p-6 pb-4">
+            <div className="flex items-start gap-4">
+              {/* Large monogram */}
               <div
-                className="absolute inset-0"
-                style={{
-                  background: `radial-gradient(circle at 30% 50%, ${company?.color}30, transparent 50%)`,
-                }}
-              />
-            </div>
-
-            <div className="px-4 md:px-8 pb-8">
-              {/* Avatar - larger on mobile, centered */}
-              <div className="-mt-12 md:-mt-16 mb-6 flex flex-col items-center md:flex-row md:items-end md:justify-between">
-                <Avatar className="w-24 md:w-32 h-24 md:h-32 border-4 border-card shadow-xl">
-                  <AvatarFallback
-                    className="text-2xl md:text-4xl font-bold"
-                    style={{
-                      backgroundColor: `${company?.color}20`,
-                      color: company?.color,
-                    }}
-                  >
-                    {getInitials(employee.name)}
-                  </AvatarFallback>
-                </Avatar>
-
-                {company && (
-                  <span
-                    className="px-3 md:px-4 py-1 md:py-2 rounded-full text-xs md:text-sm font-medium mt-4 md:mt-0"
-                    style={{
-                      backgroundColor: `${company.color}15`,
-                      color: company.color,
-                    }}
-                  >
-                    {company.shortName || company.name}
-                  </span>
+                className={cn(
+                  "monogram monogram-2xl shrink-0",
+                  getMonogramClass(employee.company)
                 )}
+              >
+                {getInitials(employee.name)}
               </div>
 
-              {/* Name and position - centered on mobile */}
-              <div className="mb-6 text-center md:text-left">
-                <h1 className="font-bold mb-2 text-foreground">
-                  {employee.name}
+              <div className="flex-1 min-w-0 pt-2">
+                {/* Name */}
+                <h1 className="text-display-lg text-[--text-primary] mb-1">
+                  {employee.name || "Sin nombre"}
                 </h1>
-                <p className="font-semibold text-muted-foreground mb-1">
-                  {employee.position}
+
+                {/* Position */}
+                <p className="text-[15px] text-[--text-muted] italic mb-2">
+                  {employee.position || "—"}
                 </p>
-                <p className="text-sm text-muted-foreground">
-                  {employee.department}
-                </p>
-              </div>
 
-              {/* Contact info - large tappable rows on mobile */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-4 mb-6">
-                {/* Email */}
-                <button
-                  onClick={() => (window.location.href = `mailto:${employee.email}`)}
-                  className="flex items-center gap-4 p-4 md:p-4 rounded-xl bg-muted/50 hover:bg-muted transition-colors text-left group h-14 md:h-auto md:py-4"
+                {/* Department badge */}
+                <span
+                  className="inline-block text-display-xs px-3 py-1 rounded"
+                  style={{
+                    backgroundColor: `${primaryColor}20`,
+                    color: primaryColor,
+                  }}
                 >
-                  <div className="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center shrink-0">
-                    <Mail className="w-6 h-6 text-primary" />
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <p className="text-xs md:text-sm text-muted-foreground">
-                      Email
-                    </p>
-                    <p className="text-sm md:text-base text-foreground truncate font-medium">
-                      {employee.email}
-                    </p>
-                  </div>
-                  <Copy className="w-5 h-5 text-muted-foreground shrink-0" />
-                </button>
-
-                {/* Phone */}
-                <button
-                  onClick={() => (window.location.href = `tel:${employee.phone}`)}
-                  className="flex items-center gap-4 p-4 md:p-4 rounded-xl bg-muted/50 hover:bg-muted transition-colors text-left group h-14 md:h-auto md:py-4"
-                >
-                  <div className="w-12 h-12 rounded-lg bg-accent/10 flex items-center justify-center shrink-0">
-                    <Phone className="w-6 h-6 text-accent" />
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <p className="text-xs md:text-sm text-muted-foreground">
-                      Teléfono
-                    </p>
-                    <p className="text-sm md:text-base text-foreground font-medium">
-                      {employee.phone}{" "}
-                      <span className="text-xs">ext. {employee.extension}</span>
-                    </p>
-                  </div>
-                  <Copy className="w-5 h-5 text-muted-foreground shrink-0" />
-                </button>
-
-                {/* Department */}
-                <div className="flex items-center gap-4 p-4 md:p-4 rounded-xl bg-muted/50 h-14 md:h-auto md:py-4">
-                  <div className="w-12 h-12 rounded-lg bg-green-500/10 flex items-center justify-center shrink-0">
-                    <Building2 className="w-6 h-6 text-green-500" />
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <p className="text-xs md:text-sm text-muted-foreground">
-                      Departamento
-                    </p>
-                    <p className="text-sm md:text-base text-foreground font-medium">
-                      {employee.department}
-                    </p>
-                  </div>
-                </div>
-
-                {/* Start Date */}
-                <div className="flex items-center gap-4 p-4 md:p-4 rounded-xl bg-muted/50 h-14 md:h-auto md:py-4">
-                  <div className="w-12 h-12 rounded-lg bg-amber-500/10 flex items-center justify-center shrink-0">
-                    <Calendar className="w-6 h-6 text-amber-500" />
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <p className="text-xs md:text-sm text-muted-foreground">
-                      Ingreso
-                    </p>
-                    <p className="text-sm md:text-base text-foreground font-medium">
-                      {formatDate(employee.startDate)}
-                    </p>
-                  </div>
-                </div>
+                  {employee.department || "—"}
+                </span>
               </div>
-
-              {/* Tags */}
-              {employee.tags.length > 0 && (
-                <div className="flex flex-wrap gap-2">
-                  {employee.tags.map((tag) => (
-                    <Badge key={tag} variant="secondary">
-                      {tag}
-                    </Badge>
-                  ))}
-                </div>
-              )}
             </div>
-          </motion.div>
+          </div>
 
-            {/* Reporting Chain - horizontal scrollable chips */}
-          {reportingChain.length > 0 && (
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.1 }}
-              className="rounded-xl border border-border bg-card p-4 md:p-6 mb-8"
-            >
-              <h2 className="font-semibold text-foreground mb-4">
-                Cadena de Reporte
-              </h2>
-              <div className="overflow-x-auto -mx-4 md:-mx-6 px-4 md:px-6">
-                <div className="flex items-center gap-2 w-max">
-                  {reportingChain.map((manager, index) => {
-                    const managerCompany = getCompanyById(manager.company);
-                    return (
-                      <div key={manager.id} className="flex items-center gap-2">
-                        <Link href={`/directorio/${manager.id}`}>
-                          <div className="flex items-center gap-2 px-3 py-2 rounded-lg bg-muted/50 hover:bg-muted transition-colors whitespace-nowrap">
-                            <Avatar className="w-6 h-6">
-                              <AvatarFallback
-                                className="text-[10px]"
-                                style={{
-                                  backgroundColor: `${managerCompany?.color}20`,
-                                  color: managerCompany?.color,
-                                }}
-                              >
-                                {getInitials(manager.name)}
-                              </AvatarFallback>
-                            </Avatar>
-                            <span className="text-sm text-foreground">
-                              {manager.name}
-                            </span>
-                          </div>
-                        </Link>
-                        {index < reportingChain.length - 1 && (
-                          <ChevronRight className="w-4 h-4 text-muted-foreground shrink-0" />
-                        )}
-                      </div>
-                    );
-                  })}
-                  <ChevronRight className="w-4 h-4 text-muted-foreground shrink-0" />
-                  <div className="flex items-center gap-2 px-3 py-2 rounded-lg bg-primary/10 whitespace-nowrap">
-                    <Avatar className="w-6 h-6">
-                      <AvatarFallback
-                        className="text-[10px]"
-                        style={{
-                          backgroundColor: `${company?.color}20`,
-                          color: company?.color,
-                        }}
-                      >
-                        {getInitials(employee.name)}
-                      </AvatarFallback>
-                    </Avatar>
-                    <span className="text-sm font-medium text-primary">
-                      {employee.name}
-                    </span>
-                  </div>
+          {/* Divider */}
+          <div
+            className="h-px mx-6"
+            style={{
+              background: `linear-gradient(90deg, ${primaryColor}, transparent)`,
+              opacity: 0.3,
+            }}
+          />
+
+          {/* Contact Info */}
+          <div className="p-6 space-y-3">
+            {/* Email */}
+            {employee.email && (
+              <button
+                onClick={() =>
+                  (window.location.href = `mailto:${employee.email}`)
+                }
+                className="w-full flex items-center gap-4 p-4 rounded-xl bg-[--bg-elevated] hover:bg-[--border-subtle] transition-colors text-left group tap-target"
+              >
+                <div
+                  className="w-10 h-10 rounded-lg flex items-center justify-center shrink-0"
+                  style={{ backgroundColor: `${primaryColor}15` }}
+                >
+                  <Mail className="w-5 h-5" style={{ color: primaryColor }} />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="text-[11px] text-[--text-faint] uppercase tracking-wider">
+                    Email
+                  </p>
+                  <p className="text-sm text-[--text-primary] truncate">
+                    {employee.email}
+                  </p>
+                </div>
+                <div className="flex items-center gap-1">
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      copyToClipboard(employee.email, "email");
+                    }}
+                    className="p-2 rounded hover:bg-[--bg-surface] transition-colors"
+                  >
+                    {copiedField === "email" ? (
+                      <Check className="w-4 h-4 text-green-500" />
+                    ) : (
+                      <Copy className="w-4 h-4 text-[--text-faint]" />
+                    )}
+                  </button>
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      openTeamsChat();
+                    }}
+                    className="p-2 rounded hover:bg-[--bg-surface] transition-colors"
+                    title="Abrir chat en Teams"
+                  >
+                    <MessageSquare className="w-4 h-4 text-[--text-faint] hover:text-[#6264A7]" />
+                  </button>
+                </div>
+              </button>
+            )}
+
+            {/* Phone */}
+            {employee.phone && (
+              <button
+                onClick={() =>
+                  (window.location.href = `tel:${employee.phone}`)
+                }
+                className="w-full flex items-center gap-4 p-4 rounded-xl bg-[--bg-elevated] hover:bg-[--border-subtle] transition-colors text-left group tap-target"
+              >
+                <div
+                  className="w-10 h-10 rounded-lg flex items-center justify-center shrink-0"
+                  style={{ backgroundColor: `${primaryColor}15` }}
+                >
+                  <Phone className="w-5 h-5" style={{ color: primaryColor }} />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="text-[11px] text-[--text-faint] uppercase tracking-wider">
+                    Telefono
+                  </p>
+                  <p className="text-sm text-[--text-primary]">
+                    {formatPhone(employee.phone)}
+                    {employee.extension && (
+                      <span className="text-[--text-muted] ml-2">
+                        ext. {employee.extension}
+                      </span>
+                    )}
+                  </p>
+                </div>
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    copyToClipboard(employee.phone, "phone");
+                  }}
+                  className="p-2 rounded hover:bg-[--bg-surface] transition-colors"
+                >
+                  {copiedField === "phone" ? (
+                    <Check className="w-4 h-4 text-green-500" />
+                  ) : (
+                    <Copy className="w-4 h-4 text-[--text-faint]" />
+                  )}
+                </button>
+              </button>
+            )}
+
+            {/* Company and Start Date row */}
+            <div className="grid grid-cols-2 gap-3">
+              <div className="flex items-center gap-3 p-4 rounded-xl bg-[--bg-elevated]">
+                <Building2 className="w-5 h-5 text-[--text-faint]" />
+                <div>
+                  <p className="text-[11px] text-[--text-faint] uppercase tracking-wider">
+                    Empresa
+                  </p>
+                  <p className="text-sm text-[--text-primary]">
+                    {company?.shortName || company?.name || "—"}
+                  </p>
                 </div>
               </div>
-            </motion.div>
-          )}
 
-            {/* Direct Reports - compact vertical list */}
-          {directReports.length > 0 && (
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.2 }}
-              className="rounded-xl border border-border bg-card p-4 md:p-6"
-            >
-              <div className="flex items-center gap-2 mb-4">
-                <Users className="w-5 h-5 text-muted-foreground" />
-                <h2 className="font-semibold text-foreground">
-                  Reportes Directos ({directReports.length})
-                </h2>
+              <div className="flex items-center gap-3 p-4 rounded-xl bg-[--bg-elevated]">
+                <Calendar className="w-5 h-5 text-[--text-faint]" />
+                <div>
+                  <p className="text-[11px] text-[--text-faint] uppercase tracking-wider">
+                    Ingreso
+                  </p>
+                  <p className="text-sm text-[--text-primary]">
+                    {formatDate(employee.startDate)}
+                  </p>
+                </div>
               </div>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-2 md:gap-3">
-                {directReports.map((report) => {
-                  const reportCompany = getCompanyById(report.company);
-                  return (
-                    <Link key={report.id} href={`/directorio/${report.id}`}>
-                      <div className="flex items-center gap-3 p-3 md:p-3 rounded-lg bg-muted/50 hover:bg-muted transition-colors group min-h-16 md:min-h-auto">
-                        <Avatar className="w-10 h-10 border border-border shrink-0">
-                          <AvatarFallback
-                            style={{
-                              backgroundColor: `${reportCompany?.color}20`,
-                              color: reportCompany?.color,
-                            }}
-                          >
-                            {getInitials(report.name)}
-                          </AvatarFallback>
-                        </Avatar>
-                        <div className="flex-1 min-w-0">
-                          <p className="font-medium text-foreground group-hover:text-primary transition-colors truncate text-sm md:text-base">
-                            {report.name}
-                          </p>
-                          <p className="text-xs md:text-sm text-muted-foreground truncate">
-                            {report.position}
-                          </p>
+            </div>
+
+            {/* Tags */}
+            {employee.tags && employee.tags.length > 0 && (
+              <div className="flex flex-wrap gap-2 pt-2">
+                {employee.tags.map((tag) => (
+                  <Badge
+                    key={tag}
+                    variant="secondary"
+                    className="bg-[--bg-elevated] text-[--text-muted] border-[--border-subtle]"
+                  >
+                    {tag}
+                  </Badge>
+                ))}
+              </div>
+            )}
+          </div>
+
+          {/* Reporting Chain */}
+          {reportingChain.length > 0 && (
+            <div className="px-6 pb-4">
+              <h3 className="text-display-xs text-[--text-faint] mb-3">
+                CADENA DE REPORTE
+              </h3>
+              <div className="flex items-center gap-2 overflow-x-auto scrollbar-hide -mx-6 px-6 pb-2">
+                {reportingChain.map((manager, index) => (
+                  <div key={manager.id} className="flex items-center gap-2">
+                    <Link href={`/directorio/${manager.id}`}>
+                      <div className="flex items-center gap-2 px-3 py-2 rounded-lg bg-[--bg-elevated] hover:bg-[--border-subtle] transition-colors whitespace-nowrap">
+                        <div
+                          className={cn(
+                            "monogram monogram-sm",
+                            getMonogramClass(manager.company)
+                          )}
+                        >
+                          {getInitials(manager.name)}
                         </div>
-                        <ChevronRight className="w-4 h-4 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity shrink-0" />
+                        <span className="text-sm text-[--text-primary]">
+                          {manager.name}
+                        </span>
                       </div>
                     </Link>
-                  );
-                })}
+                    {index < reportingChain.length - 1 && (
+                      <ChevronRight className="w-4 h-4 text-[--text-faint] shrink-0" />
+                    )}
+                  </div>
+                ))}
+                <ChevronRight className="w-4 h-4 text-[--text-faint] shrink-0" />
+                <div
+                  className="flex items-center gap-2 px-3 py-2 rounded-lg whitespace-nowrap"
+                  style={{ backgroundColor: `${primaryColor}20` }}
+                >
+                  <div
+                    className={cn(
+                      "monogram monogram-sm",
+                      getMonogramClass(employee.company)
+                    )}
+                  >
+                    {getInitials(employee.name)}
+                  </div>
+                  <span
+                    className="text-sm font-medium"
+                    style={{ color: primaryColor }}
+                  >
+                    {employee.name}
+                  </span>
+                </div>
               </div>
-            </motion.div>
+            </div>
           )}
-        </div>
-      </main>
+
+          {/* Direct Reports */}
+          {directReports.length > 0 && (
+            <div className="px-6 pb-6">
+              <div className="flex items-center gap-2 mb-3">
+                <Users className="w-4 h-4 text-[--text-faint]" />
+                <h3 className="text-display-xs text-[--text-faint]">
+                  REPORTES DIRECTOS ({directReports.length})
+                </h3>
+              </div>
+              <div className="space-y-2">
+                {directReports.slice(0, 5).map((report) => (
+                  <Link key={report.id} href={`/directorio/${report.id}`}>
+                    <div className="flex items-center gap-3 p-3 rounded-lg bg-[--bg-elevated] hover:bg-[--border-subtle] transition-colors group tap-target">
+                      <div
+                        className={cn(
+                          "monogram monogram-sm",
+                          getMonogramClass(report.company)
+                        )}
+                      >
+                        {getInitials(report.name)}
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className="text-sm text-[--text-primary] group-hover:text-[--gold] transition-colors truncate">
+                          {report.name}
+                        </p>
+                        <p className="text-xs text-[--text-muted] truncate">
+                          {report.position}
+                        </p>
+                      </div>
+                      <ChevronRight className="w-4 h-4 text-[--text-faint] opacity-0 group-hover:opacity-100 transition-opacity shrink-0" />
+                    </div>
+                  </Link>
+                ))}
+                {directReports.length > 5 && (
+                  <p className="text-xs text-[--text-muted] text-center pt-2">
+                    +{directReports.length - 5} mas
+                  </p>
+                )}
+              </div>
+            </div>
+          )}
+        </motion.div>
+      </div>
     </div>
+  );
+}
+
+// Error fallback component
+function ErrorFallback() {
+  const router = useRouter();
+
+  return (
+    <div className="min-h-screen bg-[--bg-base] flex items-center justify-center p-4">
+      <div className="modal-content max-w-sm w-full p-6 text-center">
+        <div className="w-16 h-16 rounded-full bg-[--danger]/10 flex items-center justify-center mx-auto mb-4">
+          <AlertTriangle className="w-8 h-8 text-[--danger]" />
+        </div>
+        <h2 className="text-display-md text-[--text-primary] mb-2">
+          Error al cargar
+        </h2>
+        <p className="text-sm text-[--text-muted] mb-6">
+          No se pudo cargar la informacion del empleado.
+        </p>
+        <Button onClick={() => router.push("/directorio")} className="w-full">
+          Volver al directorio
+        </Button>
+      </div>
+    </div>
+  );
+}
+
+export default function EmployeeDetailPage({ params }: Props) {
+  const { id } = use(params);
+
+  return (
+    <EmployeeDetailErrorBoundary fallback={<ErrorFallback />}>
+      <EmployeeDetailContent id={id} />
+    </EmployeeDetailErrorBoundary>
   );
 }

@@ -26,8 +26,10 @@ export default function HomePage() {
 
   return (
     <div className="min-h-screen bg-background relative">
-      {/* Geometric pattern background */}
-      <div className="geometric-pattern" />
+      {/* Premium background effects */}
+      <div className="depth-gradient" />
+      <div className="grid-pattern" />
+      <div className="noise-overlay" />
       
       <Navbar />
 
@@ -53,7 +55,7 @@ export default function HomePage() {
             </h1>
             <p className="text-muted-foreground mb-8 text-pretty">
               Encuentra rápidamente la información de contacto de todos los
-              colaboradores de Grupo Shuma y sus empresas subsidiarias.
+              colaboradores de Shuma y sus Unidades de Negocio.
             </p>
           </motion.div>
 
@@ -104,7 +106,7 @@ export default function HomePage() {
               Nuestras Empresas
             </h2>
             <p className="text-muted-foreground">
-              Grupo Shuma y sus subsidiarias
+              Corporativo Shuma y Unidades de Negocio
             </p>
           </motion.div>
 
@@ -128,7 +130,7 @@ export default function HomePage() {
         <div className="container mx-auto">
           <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
             <p className="text-sm text-muted-foreground">
-              © {new Date().getFullYear()} Grupo Shuma. Todos los derechos
+              © {new Date().getFullYear()} Shuma. Todos los derechos
               reservados.
             </p>
             <div className="flex items-center gap-4">
@@ -143,12 +145,6 @@ export default function HomePage() {
                 className="text-sm text-muted-foreground hover:text-foreground transition-colors"
               >
                 Organigrama
-              </Link>
-              <Link
-                href="/admin"
-                className="text-sm text-muted-foreground hover:text-foreground transition-colors"
-              >
-                Admin
               </Link>
             </div>
           </div>

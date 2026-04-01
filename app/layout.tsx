@@ -1,19 +1,32 @@
 import type { Metadata, Viewport } from 'next'
-import { Geist, Geist_Mono } from 'next/font/google'
+import { DM_Sans, Orbitron } from 'next/font/google'
 import { Analytics } from '@vercel/analytics/next'
 import { ThemeProvider } from '@/components/theme-provider'
 import { Navbar } from '@/components/navbar'
 import { MobileTopNavbar } from '@/components/mobile-top-navbar'
 import { MobileBottomTabBar } from '@/components/mobile-bottom-tab-bar'
+import { AdminProvider } from '@/components/admin/admin-context'
+import { PinModal } from '@/components/admin/pin-modal'
+import { AdminTrigger } from '@/components/admin/admin-trigger'
+import { AdminToolbar } from '@/components/admin/admin-toolbar'
 import { Toaster } from 'sonner'
 import './globals.css'
 
-const _geist = Geist({ subsets: ["latin"] });
-const _geistMono = Geist_Mono({ subsets: ["latin"] });
+const dmSans = DM_Sans({ 
+  subsets: ["latin"],
+  variable: '--font-sans',
+  display: 'swap',
+});
+
+const orbitron = Orbitron({ 
+  subsets: ["latin"],
+  variable: '--font-display',
+  display: 'swap',
+});
 
 export const metadata: Metadata = {
-  title: 'Directorio Grupo Shuma',
-  description: 'Directorio corporativo y organigrama de Grupo Shuma y sus subsidiarias',
+  title: 'DIRECTORIO | Shuma',
+  description: 'Directorio corporativo de las empresas Shuma',
   generator: 'v0.app',
   icons: {
     icon: [
@@ -35,10 +48,7 @@ export const metadata: Metadata = {
 }
 
 export const viewport: Viewport = {
-  themeColor: [
-    { media: '(prefers-color-scheme: light)', color: '#F8F8FC' },
-    { media: '(prefers-color-scheme: dark)', color: '#0A0A0F' },
-  ],
+  themeColor: '#080810',
   viewportFit: 'cover',
 }
 
@@ -49,18 +59,23 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="es" suppressHydrationWarning>
-      <body className="font-sans antialiased">
+      <body className={`${dmSans.variable} ${orbitron.variable} font-sans antialiased`}>
         <ThemeProvider
           attribute="class"
           defaultTheme="dark"
           enableSystem
           disableTransitionOnChange
         >
-          <Navbar />
-          <MobileTopNavbar />
-          {children}
-          <MobileBottomTabBar />
-          <Toaster position="bottom-right" />
+          <AdminProvider>
+            <Navbar />
+            <MobileTopNavbar />
+            {children}
+            <MobileBottomTabBar />
+            <AdminTrigger />
+            <AdminToolbar />
+            <PinModal />
+            <Toaster position="bottom-right" />
+          </AdminProvider>
         </ThemeProvider>
         <Analytics />
       </body>

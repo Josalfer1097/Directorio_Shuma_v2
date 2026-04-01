@@ -2,16 +2,9 @@
 
 import { motion, AnimatePresence } from "framer-motion";
 import { X } from "lucide-react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import type { Company } from "@/types";
 
 // Spring animation for bottom sheet
@@ -26,13 +19,10 @@ interface MobileFiltersBottomSheetProps {
   onClose: () => void;
   companies: Company[];
   departments: string[];
-  tags: string[];
   selectedCompanies: string[];
   selectedDepartment: string;
-  selectedTags: string[];
   onCompanyChange: (companies: string[]) => void;
   onDepartmentChange: (department: string) => void;
-  onTagChange: (tags: string[]) => void;
   onClearFilters: () => void;
   onApply: () => void;
 }
@@ -42,24 +32,24 @@ export function MobileFiltersBottomSheet({
   onClose,
   companies,
   departments,
-  tags,
   selectedCompanies,
   selectedDepartment,
-  selectedTags,
   onCompanyChange,
   onDepartmentChange,
-  onTagChange,
   onClearFilters,
   onApply,
 }: MobileFiltersBottomSheetProps) {
   const [localCompanies, setLocalCompanies] = useState(selectedCompanies);
   const [localDepartment, setLocalDepartment] = useState(selectedDepartment);
-  const [localTags, setLocalTags] = useState(selectedTags);
+
+  useEffect(() => {
+    setLocalCompanies(selectedCompanies);
+    setLocalDepartment(selectedDepartment);
+  }, [selectedCompanies, selectedDepartment]);
 
   const activeFilterCount =
     localCompanies.length +
-    (localDepartment !== "all" ? 1 : 0) +
-    localTags.length;
+    (localDepartment !== "all" ? 1 : 0);
 
   const toggleCompany = (companyId: string) => {
     setLocalCompanies((prev) =>
@@ -69,16 +59,9 @@ export function MobileFiltersBottomSheet({
     );
   };
 
-  const toggleTag = (tag: string) => {
-    setLocalTags((prev) =>
-      prev.includes(tag) ? prev.filter((t) => t !== tag) : [...prev, tag]
-    );
-  };
-
   const handleApply = () => {
     onCompanyChange(localCompanies);
     onDepartmentChange(localDepartment);
-    onTagChange(localTags);
     onApply();
     onClose();
   };
@@ -86,7 +69,6 @@ export function MobileFiltersBottomSheet({
   const handleClearAll = () => {
     setLocalCompanies([]);
     setLocalDepartment("all");
-    setLocalTags([]);
   };
 
   return (
@@ -116,7 +98,7 @@ export function MobileFiltersBottomSheet({
               }
             }}
             className="fixed bottom-0 left-0 right-0 z-50 md:hidden bg-card rounded-t-2xl border-t border-border shadow-2xl"
-            style={{ height: "75vh", maxHeight: "75vh" }}
+            style={{ height: "65vh", maxHeight: "65vh" }}
           >
             {/* Header */}
             <div className="flex items-center justify-between p-4 border-b border-border sticky top-0 bg-card rounded-t-2xl">
@@ -202,28 +184,6 @@ export function MobileFiltersBottomSheet({
                       />
                       <span className="text-sm text-foreground">{dept}</span>
                     </label>
-                  ))}
-                </div>
-              </div>
-
-              {/* Etiquetas - Wrap layout */}
-              <div>
-                <h3 className="font-semibold text-foreground mb-3">
-                  Etiquetas
-                </h3>
-                <div className="flex flex-wrap gap-2">
-                  {tags.map((tag) => (
-                    <button
-                      key={tag}
-                      onClick={() => toggleTag(tag)}
-                      className={`px-3 py-1.5 text-xs rounded-full font-medium transition-all duration-150 ${
-                        localTags.includes(tag)
-                          ? "bg-primary text-primary-foreground"
-                          : "bg-muted text-muted-foreground"
-                      }`}
-                    >
-                      {tag}
-                    </button>
                   ))}
                 </div>
               </div>

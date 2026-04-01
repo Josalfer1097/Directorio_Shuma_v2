@@ -24,8 +24,10 @@ const premiumEase = [0.25, 0.46, 0.45, 0.94];
 export default function OrganigramaPage() {
   return (
     <div className="min-h-screen bg-background relative">
-      {/* Geometric pattern background */}
-      <div className="geometric-pattern" />
+      {/* Premium background effects */}
+      <div className="depth-gradient" />
+      <div className="grid-pattern" />
+      <div className="noise-overlay" />
       
       <Navbar />
 
@@ -42,7 +44,7 @@ export default function OrganigramaPage() {
               Organigrama
             </h1>
             <p className="text-muted-foreground">
-              Estructura organizacional de Grupo Shuma y sus subsidiarias
+              Estructura organizacional de Shuma y sus Unidades de Negocio
             </p>
           </motion.div>
 
