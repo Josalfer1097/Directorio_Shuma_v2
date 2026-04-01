@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { X, Delete } from "lucide-react";
+import { Delete } from "lucide-react";
 import { useAdmin } from "./admin-context";
 import { cn } from "@/lib/utils";
 
@@ -10,6 +10,7 @@ export function PinModal() {
   const { showPinModal, closePinModal, authenticate } = useAdmin();
   const [pin, setPin] = useState("");
   const [error, setError] = useState(false);
+  const [success, setSuccess] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   // Reset state when modal opens/closes
@@ -17,6 +18,7 @@ export function PinModal() {
     if (showPinModal) {
       setPin("");
       setError(false);
+      setSuccess(false);
     }
   }, [showPinModal]);
 
@@ -25,6 +27,7 @@ export function PinModal() {
     if (pin.length === 6 && !isSubmitting) {
       handleSubmit();
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [pin]);
 
   const handleSubmit = async () => {
@@ -37,22 +40,36 @@ export function PinModal() {
 
     if (!result.success) {
       setError(true);
-      setPin("");
-      setTimeout(() => setError(false), 500);
+      setTimeout(() => {
+        setError(false);
+        setPin("");
+      }, 500);
+    } else {
+      setSuccess(true);
+      // Modal will close via context
     }
 
     setIsSubmitting(false);
   };
 
-  const handleDigitPress = useCallback((digit: string) => {
-    if (pin.length < 6 && !isSubmitting) {
-      setPin((prev) => prev + digit);
-    }
-  }, [pin.length, isSubmitting]);
+  const handleDigitPress = useCallback(
+    (digit: string) => {
+      if (pin.length < 6 && !isSubmitting) {
+        setPin((prev) => prev + digit);
+      }
+    },
+    [pin.length, isSubmitting]
+  );
 
   const handleDelete = useCallback(() => {
     if (!isSubmitting) {
       setPin((prev) => prev.slice(0, -1));
+    }
+  }, [isSubmitting]);
+
+  const handleClear = useCallback(() => {
+    if (!isSubmitting) {
+      setPin("");
     }
   }, [isSubmitting]);
 
@@ -74,7 +91,7 @@ export function PinModal() {
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, [showPinModal, handleDigitPress, handleDelete, closePinModal]);
 
-  const digits = ["1", "2", "3", "4", "5", "6", "7", "8", "9", "", "0", "del"];
+  const digits = ["1", "2", "3", "4", "5", "6", "7", "8", "9", "clear", "0", "del"];
 
   return (
     <AnimatePresence>
@@ -83,59 +100,68 @@ export function PinModal() {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
-          className="fixed inset-0 z-50 flex items-center justify-center"
+          transition={{ duration: 0.3 }}
+          className="pin-overlay"
+          onClick={closePinModal}
         >
-          {/* Backdrop */}
+          {/* Content container - prevent click propagation */}
           <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            onClick={closePinModal}
-            className="absolute inset-0 bg-black/80 backdrop-blur-xl"
-          />
-
-          {/* Modal */}
-          <motion.div
-            initial={{ opacity: 0, scale: 0.9, y: 20 }}
-            animate={{ opacity: 1, scale: 1, y: 0 }}
-            exit={{ opacity: 0, scale: 0.9, y: 20 }}
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.9 }}
             transition={{ type: "spring", damping: 25, stiffness: 300 }}
-            className={cn(
-              "relative w-full max-w-sm mx-4 p-8 rounded-2xl",
-              "bg-gradient-to-b from-[#1A1A24] to-[#111118]",
-              "border border-primary/20 shadow-2xl shadow-black/50",
-              error && "shake"
-            )}
+            onClick={(e) => e.stopPropagation()}
+            className="flex flex-col items-center"
           >
-            {/* Close button */}
-            <button
-              onClick={closePinModal}
-              className="absolute top-4 right-4 p-2 rounded-full text-muted-foreground hover:text-foreground hover:bg-white/5 transition-colors"
+            {/* Glowing emblem */}
+            <motion.div
+              className="pin-emblem mb-8"
+              animate={
+                success
+                  ? { scale: [1, 1.2, 1], boxShadow: "0 0 60px var(--gold-glow)" }
+                  : {}
+              }
             >
-              <X className="w-5 h-5" />
-            </button>
+              <span className="font-display text-3xl text-[--bg-base]">S</span>
+            </motion.div>
 
             {/* PIN dots */}
-            <div className="flex justify-center gap-3 mb-10 mt-4">
+            <div className={cn("pin-dots", error && "shake")}>
               {Array.from({ length: 6 }).map((_, i) => (
                 <motion.div
                   key={i}
                   initial={false}
                   animate={{
-                    scale: i < pin.length ? 1.2 : 1,
-                    backgroundColor: i < pin.length ? "var(--primary)" : "transparent",
+                    scale: i < pin.length ? 1.15 : 1,
                   }}
                   transition={{ type: "spring", stiffness: 500, damping: 30 }}
-                  className="pin-dot"
+                  className={cn(
+                    "pin-dot",
+                    i < pin.length && !error && !success && "filled",
+                    error && i < pin.length && "error",
+                    success && "success"
+                  )}
                 />
               ))}
             </div>
 
-            {/* PIN pad */}
-            <div className="grid grid-cols-3 gap-3">
+            {/* PIN keypad */}
+            <div className="pin-keypad">
               {digits.map((digit, i) => {
-                if (digit === "") {
-                  return <div key={i} />;
+                if (digit === "clear") {
+                  return (
+                    <button
+                      key={i}
+                      onClick={handleClear}
+                      disabled={isSubmitting || pin.length === 0}
+                      className={cn(
+                        "pin-key text-sm",
+                        (isSubmitting || pin.length === 0) && "opacity-30"
+                      )}
+                    >
+                      C
+                    </button>
+                  );
                 }
 
                 if (digit === "del") {
@@ -144,7 +170,10 @@ export function PinModal() {
                       key={i}
                       onClick={handleDelete}
                       disabled={isSubmitting || pin.length === 0}
-                      className="pin-button disabled:opacity-30"
+                      className={cn(
+                        "pin-key",
+                        (isSubmitting || pin.length === 0) && "opacity-30"
+                      )}
                     >
                       <Delete className="w-6 h-6" />
                     </button>
@@ -156,7 +185,10 @@ export function PinModal() {
                     key={i}
                     onClick={() => handleDigitPress(digit)}
                     disabled={isSubmitting || pin.length >= 6}
-                    className="pin-button disabled:opacity-30"
+                    className={cn(
+                      "pin-key",
+                      (isSubmitting || pin.length >= 6) && "opacity-30"
+                    )}
                   >
                     {digit}
                   </button>
@@ -166,11 +198,20 @@ export function PinModal() {
 
             {/* Loading indicator */}
             {isSubmitting && (
-              <div className="absolute inset-0 flex items-center justify-center bg-black/50 rounded-2xl">
-                <div className="w-8 h-8 border-2 border-primary border-t-transparent rounded-full animate-spin" />
-              </div>
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                className="mt-8"
+              >
+                <div className="w-6 h-6 border-2 border-[--gold] border-t-transparent rounded-full animate-spin" />
+              </motion.div>
             )}
           </motion.div>
+
+          {/* Subtle watermark */}
+          <span className="pin-watermark font-display tracking-widest">
+            ·
+          </span>
         </motion.div>
       )}
     </AnimatePresence>

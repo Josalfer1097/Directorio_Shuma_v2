@@ -1,28 +1,80 @@
 "use client";
 
+import { useEffect, useRef, useCallback } from "react";
 import { useAdmin } from "./admin-context";
-import { cn } from "@/lib/utils";
 
 export function AdminTrigger() {
   const { openPinModal, isAuthenticated } = useAdmin();
+  const longPressTimer = useRef<NodeJS.Timeout | null>(null);
+  const longPressDuration = 1500; // 1.5 seconds
 
-  // Don't show if already authenticated
-  if (isAuthenticated) return null;
+  // Keyboard shortcut: Ctrl+Shift+A
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.ctrlKey && e.shiftKey && e.key === "A") {
+        e.preventDefault();
+        if (!isAuthenticated) {
+          openPinModal();
+        }
+      }
+    };
 
-  return (
-    <button
-      onClick={openPinModal}
-      className={cn(
-        "fixed bottom-20 right-4 z-30 md:hidden",
-        "w-10 h-10 rounded-full",
-        "bg-card/50 border border-border/30",
-        "flex items-center justify-center",
-        "opacity-20 hover:opacity-60 transition-opacity",
-        "touch-target"
-      )}
-      aria-label="Acceso administrativo"
-    >
-      <div className="w-1.5 h-1.5 rounded-full bg-primary/50" />
-    </button>
-  );
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [openPinModal, isAuthenticated]);
+
+  // Setup long-press on logo for mobile
+  const setupLongPress = useCallback(() => {
+    if (isAuthenticated) return;
+
+    // Find logo elements (header logo on desktop, mobile logo)
+    const logoElements = document.querySelectorAll('[data-logo-trigger]');
+    
+    const handleTouchStart = () => {
+      longPressTimer.current = setTimeout(() => {
+        openPinModal();
+      }, longPressDuration);
+    };
+
+    const handleTouchEnd = () => {
+      if (longPressTimer.current) {
+        clearTimeout(longPressTimer.current);
+        longPressTimer.current = null;
+      }
+    };
+
+    const handleTouchMove = () => {
+      // Cancel if user moves finger
+      if (longPressTimer.current) {
+        clearTimeout(longPressTimer.current);
+        longPressTimer.current = null;
+      }
+    };
+
+    logoElements.forEach((el) => {
+      el.addEventListener('touchstart', handleTouchStart, { passive: true });
+      el.addEventListener('touchend', handleTouchEnd);
+      el.addEventListener('touchmove', handleTouchMove);
+      el.addEventListener('touchcancel', handleTouchEnd);
+    });
+
+    return () => {
+      logoElements.forEach((el) => {
+        el.removeEventListener('touchstart', handleTouchStart);
+        el.removeEventListener('touchend', handleTouchEnd);
+        el.removeEventListener('touchmove', handleTouchMove);
+        el.removeEventListener('touchcancel', handleTouchEnd);
+      });
+    };
+  }, [openPinModal, isAuthenticated]);
+
+  useEffect(() => {
+    const cleanup = setupLongPress();
+    return cleanup;
+  }, [setupLongPress]);
+
+  // This component doesn't render anything visible
+  // The trigger is the logo itself with long-press on mobile
+  // and Ctrl+Shift+A on desktop
+  return null;
 }

@@ -1,39 +1,47 @@
 {
   "companies": [
     {
-      "id": "grupo-shuma",
-      "name": "Shuma",
-      "type": "corporativo",
-      "color": "#C9A84C",
-      "description": "Corporativo"
-    },
-    {
       "id": "comercializadora-shuma",
       "name": "Comercializadora y Ferretería Shuma",
-      "shortName": "Comercializadora Shuma",
-      "type": "unidad-negocio",
-      "color": "#2563EB",
+      "shortName": "Comercializadora",
+      "colors": {
+        "primary": "#0047AB",
+        "secondary": "#002D6E",
+        "accent": "#4D9FFF"
+      },
       "description": "Distribución y venta de productos ferreteros"
     },
     {
       "id": "acabados-shuma",
       "name": "Acabados Shuma",
-      "type": "unidad-negocio",
-      "color": "#D97706",
+      "shortName": "Acabados",
+      "colors": {
+        "primary": "#C0152A",
+        "secondary": "#8B0000",
+        "accent": "#FF4D5E"
+      },
       "description": "Acabados y materiales de construcción"
     },
     {
       "id": "ferrecapital",
       "name": "Ferrecapital",
-      "type": "unidad-negocio",
-      "color": "#DC2626",
+      "shortName": "Ferrecapital",
+      "colors": {
+        "primary": "#4A525A",
+        "secondary": "#1A1A1A",
+        "accent": "#CC0000"
+      },
       "description": "Servicios financieros y crédito"
     },
     {
       "id": "arkiramica",
       "name": "Arkirámica",
-      "type": "unidad-negocio",
-      "color": "#16A34A",
+      "shortName": "Arkirámica",
+      "colors": {
+        "primary": "#F5C400",
+        "secondary": "#C49A00",
+        "accent": "#FFE566"
+      },
       "description": "Pisos, azulejos y cerámica"
     }
   ],
@@ -48,42 +56,6 @@
   "employees": [
     {
       "id": "emp001",
-      "name": "Roberto Martínez Hernández",
-      "position": "Director General",
-      "department": "C&C",
-      "company": "grupo-shuma",
-      "email": "roberto.martinez@gruposhuma.mx",
-      "phone": "+52 55 1234 5678",
-      "extension": "101",
-      "reportsTo": null,
-      "avatar": null
-    },
-    {
-      "id": "emp002",
-      "name": "María Fernanda López García",
-      "position": "Directora de Finanzas",
-      "department": "Contabilidad",
-      "company": "grupo-shuma",
-      "email": "maria.lopez@gruposhuma.mx",
-      "phone": "+52 55 1234 5679",
-      "extension": "102",
-      "reportsTo": "emp001",
-      "avatar": null
-    },
-    {
-      "id": "emp003",
-      "name": "Carlos Eduardo Ramírez Soto",
-      "position": "Director de Recursos Humanos",
-      "department": "C&C",
-      "company": "grupo-shuma",
-      "email": "carlos.ramirez@gruposhuma.mx",
-      "phone": "+52 55 1234 5680",
-      "extension": "103",
-      "reportsTo": "emp001",
-      "avatar": null
-    },
-    {
-      "id": "emp004",
       "name": "Ana Patricia Vega Morales",
       "position": "Gerente General",
       "department": "C&C",
@@ -91,11 +63,11 @@
       "email": "ana.vega@comercializadorashuma.mx",
       "phone": "+52 55 2345 6789",
       "extension": "201",
-      "reportsTo": "emp001",
+      "reportsTo": null,
       "avatar": null
     },
     {
-      "id": "emp005",
+      "id": "emp002",
       "name": "Jorge Luis Mendoza Cruz",
       "position": "Jefe de Ventas",
       "department": "Ventas",
@@ -103,11 +75,11 @@
       "email": "jorge.mendoza@comercializadorashuma.mx",
       "phone": "+52 55 2345 6790",
       "extension": "202",
-      "reportsTo": "emp004",
+      "reportsTo": "emp001",
       "avatar": null
     },
     {
-      "id": "emp006",
+      "id": "emp003",
       "name": "Laura Beatriz Torres Díaz",
       "position": "Coordinadora de Almacén",
       "department": "Almacén",
@@ -115,11 +87,23 @@
       "email": "laura.torres@comercializadorashuma.mx",
       "phone": "+52 55 2345 6791",
       "extension": "203",
-      "reportsTo": "emp004",
+      "reportsTo": "emp001",
       "avatar": null
     },
     {
-      "id": "emp007",
+      "id": "emp004",
+      "name": "Isabel Cristina Peña Aguilar",
+      "position": "Coordinadora de Sistemas",
+      "department": "Sistemas IT",
+      "company": "comercializadora-shuma",
+      "email": "isabel.pena@comercializadorashuma.mx",
+      "phone": "+52 55 2345 6792",
+      "extension": "204",
+      "reportsTo": "emp001",
+      "avatar": null
+    },
+    {
+      "id": "emp005",
       "name": "Francisco Javier Ruiz Castillo",
       "position": "Gerente General",
       "department": "C&C",
@@ -127,11 +111,11 @@
       "email": "francisco.ruiz@acabadosshuma.mx",
       "phone": "+52 55 3456 7890",
       "extension": "301",
-      "reportsTo": "emp001",
+      "reportsTo": null,
       "avatar": null
     },
     {
-      "id": "emp008",
+      "id": "emp006",
       "name": "Gabriela Sánchez Flores",
       "position": "Jefa de Compras",
       "department": "Compras",
@@ -139,11 +123,11 @@
       "email": "gabriela.sanchez@acabadosshuma.mx",
       "phone": "+52 55 3456 7891",
       "extension": "302",
-      "reportsTo": "emp007",
+      "reportsTo": "emp005",
       "avatar": null
     },
     {
-      "id": "emp009",
+      "id": "emp007",
       "name": "Miguel Ángel Herrera Jiménez",
       "position": "Coordinador de Compras",
       "department": "Compras",
@@ -151,11 +135,11 @@
       "email": "miguel.herrera@acabadosshuma.mx",
       "phone": "+52 55 3456 7892",
       "extension": "303",
-      "reportsTo": "emp007",
+      "reportsTo": "emp005",
       "avatar": null
     },
     {
-      "id": "emp010",
+      "id": "emp008",
       "name": "Patricia Elena Navarro Luna",
       "position": "Gerente General",
       "department": "C&C",
@@ -163,11 +147,11 @@
       "email": "patricia.navarro@ferrecapital.mx",
       "phone": "+52 55 4567 8901",
       "extension": "401",
-      "reportsTo": "emp001",
+      "reportsTo": null,
       "avatar": null
     },
     {
-      "id": "emp011",
+      "id": "emp009",
       "name": "Ricardo Daniel Ortega Vargas",
       "position": "Analista de Crédito Senior",
       "department": "Contabilidad",
@@ -175,11 +159,11 @@
       "email": "ricardo.ortega@ferrecapital.mx",
       "phone": "+52 55 4567 8902",
       "extension": "402",
-      "reportsTo": "emp010",
+      "reportsTo": "emp008",
       "avatar": null
     },
     {
-      "id": "emp012",
+      "id": "emp010",
       "name": "Sofía Alejandra Guzmán Reyes",
       "position": "Ejecutiva de Cobranza",
       "department": "Contabilidad",
@@ -187,11 +171,11 @@
       "email": "sofia.guzman@ferrecapital.mx",
       "phone": "+52 55 4567 8903",
       "extension": "403",
-      "reportsTo": "emp010",
+      "reportsTo": "emp008",
       "avatar": null
     },
     {
-      "id": "emp013",
+      "id": "emp011",
       "name": "Andrés Felipe Castro Medina",
       "position": "Gerente General",
       "department": "C&C",
@@ -199,11 +183,11 @@
       "email": "andres.castro@arkiramica.mx",
       "phone": "+52 55 5678 9012",
       "extension": "501",
-      "reportsTo": "emp001",
+      "reportsTo": null,
       "avatar": null
     },
     {
-      "id": "emp014",
+      "id": "emp012",
       "name": "Valentina Rojas Espinoza",
       "position": "Coordinadora de Ventas",
       "department": "Ventas",
@@ -211,11 +195,11 @@
       "email": "valentina.rojas@arkiramica.mx",
       "phone": "+52 55 5678 9013",
       "extension": "502",
-      "reportsTo": "emp013",
+      "reportsTo": "emp011",
       "avatar": null
     },
     {
-      "id": "emp015",
+      "id": "emp013",
       "name": "Diego Alejandro Moreno Ríos",
       "position": "Jefe de Almacén",
       "department": "Almacén",
@@ -223,43 +207,19 @@
       "email": "diego.moreno@arkiramica.mx",
       "phone": "+52 55 5678 9014",
       "extension": "503",
-      "reportsTo": "emp013",
+      "reportsTo": "emp011",
       "avatar": null
     },
     {
-      "id": "emp016",
-      "name": "Isabel Cristina Peña Aguilar",
-      "position": "Directora de Sistemas",
-      "department": "Sistemas IT",
-      "company": "grupo-shuma",
-      "email": "isabel.pena@gruposhuma.mx",
-      "phone": "+52 55 1234 5681",
-      "extension": "104",
-      "reportsTo": "emp001",
-      "avatar": null
-    },
-    {
-      "id": "emp017",
-      "name": "Alejandro José Delgado Núñez",
-      "position": "Contador General",
-      "department": "Contabilidad",
-      "company": "grupo-shuma",
-      "email": "alejandro.delgado@gruposhuma.mx",
-      "phone": "+52 55 1234 5682",
-      "extension": "105",
-      "reportsTo": "emp002",
-      "avatar": null
-    },
-    {
-      "id": "emp018",
+      "id": "emp014",
       "name": "Carmen Lucía Varela Domínguez",
-      "position": "Asistente de Dirección",
+      "position": "Asistente Administrativa",
       "department": "C&C",
-      "company": "grupo-shuma",
-      "email": "carmen.varela@gruposhuma.mx",
-      "phone": "+52 55 1234 5683",
-      "extension": "106",
-      "reportsTo": "emp001",
+      "company": "arkiramica",
+      "email": "carmen.varela@arkiramica.mx",
+      "phone": "+52 55 5678 9015",
+      "extension": "504",
+      "reportsTo": "emp011",
       "avatar": null
     }
   ]

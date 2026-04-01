@@ -1,23 +1,28 @@
+export interface CompanyColors {
+  primary: string;
+  secondary: string;
+  accent: string;
+}
+
 export interface Company {
   id: string;
   name: string;
   shortName?: string;
-  type: "corporativo" | "unidad-negocio";
-  color: string;
+  colors: CompanyColors;
   description: string;
 }
 
 export interface Employee {
   id: string;
   name: string;
-  position: string;
+  position: string; // Free text role
   department: string;
   company: string;
-  email: string;
-  phone: string;
-  extension: string;
-  reportsTo: string | null;
-  avatar: string | null;
+  email?: string;
+  phone?: string;
+  extension?: string;
+  reportsTo?: string | null;
+  avatar?: string | null;
 }
 
 export interface EmployeeData {

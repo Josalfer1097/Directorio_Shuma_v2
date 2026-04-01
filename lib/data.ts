@@ -1,5 +1,5 @@
 import employeesData from "@/data/employees.json";
-import type { Company, Employee, EmployeeData } from "@/types";
+import type { Company, Employee, EmployeeData, CompanyColors } from "@/types";
 
 export function getEmployeeData(): EmployeeData {
   return employeesData as EmployeeData;
@@ -50,11 +50,20 @@ export function getReportingChain(employeeId: string): Employee[] {
   return chain;
 }
 
+const defaultColors: CompanyColors = {
+  primary: "#C9A84C",
+  secondary: "#A68A3A",
+  accent: "#E0C060"
+};
 
-
-export function getCompanyColor(companyId: string): string {
+export function getCompanyColors(companyId: string): CompanyColors {
   const company = getCompanyById(companyId);
-  return company?.color || "#7C3AED";
+  return company?.colors || defaultColors;
+}
+
+export function getCompanyPrimaryColor(companyId: string): string {
+  const colors = getCompanyColors(companyId);
+  return colors.primary;
 }
 
 export function getCompanyStats() {
