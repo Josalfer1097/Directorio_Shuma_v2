@@ -15,7 +15,6 @@ import {
   getEmployees,
   getCompanies,
   getDepartments,
-  getAllTags,
   getCompanyById,
 } from "@/lib/data";
 import type { ViewMode, Employee } from "@/types";
@@ -37,12 +36,10 @@ function DirectoryContent() {
     initialCompany ? [initialCompany] : []
   );
   const [selectedDepartment, setSelectedDepartment] = useState("all");
-  const [selectedTags, setSelectedTags] = useState<string[]>([]);
 
   const employees = getEmployees();
   const companies = getCompanies();
   const departments = getDepartments();
-  const tags = getAllTags();
 
   // Fuse.js setup for fuzzy search
   const fuse = useMemo(
@@ -77,20 +74,12 @@ function DirectoryContent() {
       results = results.filter((emp) => emp.department === selectedDepartment);
     }
 
-    // Apply tags filter
-    if (selectedTags.length > 0) {
-      results = results.filter((emp) =>
-        selectedTags.some((tag) => emp.tags.includes(tag))
-      );
-    }
-
     return results;
   }, [
     employees,
     searchQuery,
     selectedCompanies,
     selectedDepartment,
-    selectedTags,
     fuse,
   ]);
 
@@ -104,19 +93,20 @@ function DirectoryContent() {
   // Reset page when filters change
   useEffect(() => {
     setCurrentPage(1);
-  }, [searchQuery, selectedCompanies, selectedDepartment, selectedTags]);
+  }, [searchQuery, selectedCompanies, selectedDepartment]);
 
   const clearFilters = () => {
     setSearchQuery("");
     setSelectedCompanies([]);
     setSelectedDepartment("all");
-    setSelectedTags([]);
   };
 
   return (
     <div className="min-h-screen bg-background relative">
-      {/* Geometric pattern background */}
-      <div className="geometric-pattern" />
+      {/* Premium background effects */}
+      <div className="depth-gradient" />
+      <div className="grid-pattern" />
+      <div className="noise-overlay" />
       
       <Navbar />
 
@@ -133,7 +123,7 @@ function DirectoryContent() {
               Directorio de Empleados
             </h1>
             <p className="text-muted-foreground">
-              Encuentra y contacta a los colaboradores de Grupo Shuma
+              Encuentra y contacta a los colaboradores de Shuma
             </p>
           </motion.div>
 
@@ -142,13 +132,10 @@ function DirectoryContent() {
             <DirectoryFilters
               companies={companies}
               departments={departments}
-              tags={tags}
               selectedCompanies={selectedCompanies}
               selectedDepartment={selectedDepartment}
-              selectedTags={selectedTags}
               onCompanyChange={setSelectedCompanies}
               onDepartmentChange={setSelectedDepartment}
-              onTagChange={setSelectedTags}
               onClearFilters={clearFilters}
               filteredEmployees={filteredEmployees}
             />

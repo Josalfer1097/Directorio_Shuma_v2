@@ -50,13 +50,7 @@ export function getReportingChain(employeeId: string): Employee[] {
   return chain;
 }
 
-export function getAllTags(): string[] {
-  const tagsSet = new Set<string>();
-  employeesData.employees.forEach((emp) => {
-    emp.tags.forEach((tag) => tagsSet.add(tag));
-  });
-  return Array.from(tagsSet).sort();
-}
+
 
 export function getCompanyColor(companyId: string): string {
   const company = getCompanyById(companyId);

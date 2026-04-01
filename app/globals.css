@@ -3,71 +3,80 @@
 
 @custom-variant dark (&:is(.dark *));
 
-/* Light Mode - Grupo Shuma */
+/* Dark Mode as Default - Premium Corporate Theme */
 :root {
-  --background: #F8F8FC;
-  --foreground: #1A1A24;
-  --card: #FFFFFF;
-  --card-foreground: #1A1A24;
-  --popover: #FFFFFF;
-  --popover-foreground: #1A1A24;
-  --primary: #7C3AED;
-  --primary-foreground: #FFFFFF;
-  --secondary: #F1F1F5;
-  --secondary-foreground: #1A1A24;
-  --muted: #F1F1F5;
+  --background: #0A0A0F;
+  --foreground: #F1F1F5;
+  --card: #111118;
+  --card-foreground: #F1F1F5;
+  --popover: #111118;
+  --popover-foreground: #F1F1F5;
+  --primary: #C9A84C;
+  --primary-foreground: #0A0A0F;
+  --secondary: #1A1A24;
+  --secondary-foreground: #F1F1F5;
+  --muted: #1A1A24;
   --muted-foreground: #8B8B9E;
-  --accent: #06B6D4;
-  --accent-foreground: #FFFFFF;
+  --accent: #C9A84C;
+  --accent-foreground: #0A0A0F;
   --destructive: #DC2626;
   --destructive-foreground: #FFFFFF;
-  --border: #E4E4EB;
-  --input: #E4E4EB;
-  --ring: #7C3AED;
+  --border: #2A2A38;
+  --input: #2A2A38;
+  --ring: #C9A84C;
   --radius: 0.625rem;
   
   /* Company Colors */
-  --shuma-holding: #7C3AED;
+  --shuma-corporativo: #C9A84C;
   --shuma-comercializadora: #2563EB;
   --shuma-acabados: #D97706;
   --shuma-ferrecapital: #DC2626;
   --shuma-arkiramica: #16A34A;
   
   /* Surface variants */
-  --surface: #FFFFFF;
-  --surface-hover: #F8F8FC;
+  --surface: #111118;
+  --surface-hover: #1A1A24;
+  
+  /* Glass effect */
+  --glass-bg: rgba(17, 17, 24, 0.8);
+  --glass-border: rgba(201, 168, 76, 0.15);
 }
 
-/* Dark Mode - Grupo Shuma (Default) */
-.dark {
-  --background: #0A0A0F;
-  --foreground: #F1F1F5;
-  --card: #1A1A24;
-  --card-foreground: #F1F1F5;
-  --popover: #1A1A24;
-  --popover-foreground: #F1F1F5;
-  --primary: #7C3AED;
+/* Light Mode - Grupo Shuma */
+.light {
+  --background: #F8F8FC;
+  --foreground: #1A1A24;
+  --card: #FFFFFF;
+  --card-foreground: #1A1A24;
+  --popover: #FFFFFF;
+  --popover-foreground: #1A1A24;
+  --primary: #9A7B2C;
   --primary-foreground: #FFFFFF;
-  --secondary: #111118;
-  --secondary-foreground: #F1F1F5;
-  --muted: #2A2A38;
-  --muted-foreground: #8B8B9E;
-  --accent: #06B6D4;
+  --secondary: #F1F1F5;
+  --secondary-foreground: #1A1A24;
+  --muted: #F1F1F5;
+  --muted-foreground: #5A5A6E;
+  --accent: #9A7B2C;
   --accent-foreground: #FFFFFF;
   --destructive: #DC2626;
   --destructive-foreground: #FFFFFF;
-  --border: #2A2A38;
-  --input: #2A2A38;
-  --ring: #7C3AED;
+  --border: #E4E4EB;
+  --input: #E4E4EB;
+  --ring: #9A7B2C;
   
   /* Surface variants */
-  --surface: #111118;
-  --surface-hover: #1A1A24;
+  --surface: #FFFFFF;
+  --surface-hover: #F8F8FC;
+  
+  /* Glass effect */
+  --glass-bg: rgba(255, 255, 255, 0.8);
+  --glass-border: rgba(154, 123, 44, 0.2);
 }
 
 @theme inline {
-  --font-sans: 'Geist', 'Geist Fallback';
-  --font-mono: 'Geist Mono', 'Geist Mono Fallback';
+  --font-sans: 'DM Sans', 'DM Sans Fallback', system-ui, sans-serif;
+  --font-mono: 'Geist Mono', 'Geist Mono Fallback', monospace;
+  --font-display: 'Neuropol', 'Neuropol Fallback', 'DM Sans', sans-serif;
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --color-card: var(--card);
@@ -95,11 +104,21 @@
   --color-surface-hover: var(--surface-hover);
   
   /* Company colors */
-  --color-shuma-holding: var(--shuma-holding);
+  --color-shuma-corporativo: var(--shuma-corporativo);
   --color-shuma-comercializadora: var(--shuma-comercializadora);
   --color-shuma-acabados: var(--shuma-acabados);
   --color-shuma-ferrecapital: var(--shuma-ferrecapital);
   --color-shuma-arkiramica: var(--shuma-arkiramica);
+}
+
+/* Neuropol font face */
+@font-face {
+  font-family: 'Neuropol';
+  src: url('/fonts/neuropol.woff2') format('woff2'),
+       url('/fonts/neuropol.woff') format('woff');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
 }
 
 @layer base {
@@ -113,33 +132,36 @@
   
   /* Responsive typography with clamp */
   h1 {
-    font-size: clamp(1.5rem, 4vw, 3rem);
+    font-size: clamp(1.75rem, 4vw, 3.5rem);
     font-weight: 700;
+    letter-spacing: -0.03em;
   }
   
   h2 {
-    font-size: clamp(1.25rem, 3vw, 2rem);
+    font-size: clamp(1.35rem, 3vw, 2.25rem);
     font-weight: 600;
+    letter-spacing: -0.02em;
   }
   
   h3 {
-    font-size: clamp(1.1rem, 2.5vw, 1.5rem);
+    font-size: clamp(1.15rem, 2.5vw, 1.5rem);
     font-weight: 600;
+    letter-spacing: -0.01em;
   }
   
   h4, h5, h6 {
-    font-size: clamp(0.95rem, 2vw, 1.25rem);
+    font-size: clamp(1rem, 2vw, 1.25rem);
     font-weight: 600;
   }
   
   p, body {
     font-size: clamp(0.875rem, 2vw, 1rem);
+    line-height: 1.6;
   }
   
   /* Typography enhancements for headings */
   h1, h2, h3, h4, h5, h6 {
     font-feature-settings: "ss01", "cv01";
-    letter-spacing: -0.02em;
   }
 }
 
@@ -165,19 +187,88 @@
   --ease-premium: cubic-bezier(0.25, 0.46, 0.45, 0.94);
 }
 
-/* Geometric diamond pattern background */
-.geometric-pattern {
+/* Animated noise/grain texture overlay */
+.noise-overlay {
   position: fixed;
   inset: 0;
   pointer-events: none;
   z-index: 0;
-  opacity: 0.05;
-  background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' stroke='%237C3AED' stroke-width='0.5'%3E%3Cpath d='M30 0L60 30L30 60L0 30Z'/%3E%3Cpath d='M30 10L50 30L30 50L10 30Z'/%3E%3C/g%3E%3C/svg%3E");
-  background-size: 60px 60px;
+  opacity: 0.015;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
 }
 
-.dark .geometric-pattern {
+/* Subtle geometric grid lines background */
+.grid-pattern {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
   opacity: 0.03;
+  background-image: 
+    linear-gradient(to right, var(--primary) 1px, transparent 1px),
+    linear-gradient(to bottom, var(--primary) 1px, transparent 1px);
+  background-size: 40px 40px;
+}
+
+/* Gradient depth background */
+.depth-gradient {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: -1;
+  background: linear-gradient(
+    180deg,
+    var(--background) 0%,
+    rgba(10, 10, 15, 1) 40%,
+    rgba(17, 17, 24, 1) 100%
+  );
+}
+
+.light .depth-gradient {
+  background: linear-gradient(
+    180deg,
+    var(--background) 0%,
+    rgba(248, 248, 252, 1) 40%,
+    rgba(241, 241, 245, 1) 100%
+  );
+}
+
+/* Glass morphism effect */
+.glass {
+  background: var(--glass-bg);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid var(--glass-border);
+}
+
+.glass-strong {
+  background: rgba(17, 17, 24, 0.95);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border: 1px solid var(--glass-border);
+}
+
+.light .glass-strong {
+  background: rgba(255, 255, 255, 0.95);
+}
+
+/* Premium card with accent border */
+.premium-card {
+  position: relative;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  overflow: hidden;
+}
+
+.premium-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  width: 3px;
+  background: var(--primary);
 }
 
 /* Card shimmer effect on hover */
@@ -197,7 +288,7 @@
   top: 0;
   left: 0;
   right: 0;
-  height: 3px;
+  height: 2px;
   background: linear-gradient(
     90deg,
     transparent 0%,
@@ -217,7 +308,7 @@
 /* Gradient section divider */
 .gradient-divider {
   height: 1px;
-  background: linear-gradient(90deg, #7C3AED 0%, transparent 100%);
+  background: linear-gradient(90deg, var(--primary) 0%, transparent 100%);
   border: none;
 }
 
@@ -236,14 +327,14 @@
 }
 
 .corner-bracket::before {
-  width: 8px;
+  width: 10px;
   height: 2px;
   background-color: var(--bracket-color, var(--primary));
 }
 
 .corner-bracket::after {
   width: 2px;
-  height: 8px;
+  height: 10px;
   background-color: var(--bracket-color, var(--primary));
 }
 
@@ -300,8 +391,8 @@
 
 /* Blur backdrop for modals */
 .backdrop-blur-premium {
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
 }
 
 /* Mobile-specific utility classes */
@@ -441,4 +532,134 @@ html, body {
     -webkit-user-select: none;
     user-select: none;
   }
+}
+
+/* Premium button press effect */
+.btn-press {
+  transition: transform 0.1s ease;
+}
+
+.btn-press:active {
+  transform: scale(0.97);
+}
+
+/* Display font class for headings */
+.font-display {
+  font-family: var(--font-display);
+}
+
+/* Animated edges for org chart */
+@keyframes dash-flow {
+  0% { stroke-dashoffset: 20; }
+  100% { stroke-dashoffset: 0; }
+}
+
+.animated-edge {
+  stroke-dasharray: 5, 5;
+  animation: dash-flow 1s linear infinite;
+}
+
+/* Node hover effect for org chart */
+.org-node-hover {
+  transition: transform 0.2s var(--ease-premium), box-shadow 0.2s var(--ease-premium);
+}
+
+.org-node-hover:hover {
+  transform: scale(1.05);
+  box-shadow: 0 8px 32px -8px rgba(201, 168, 76, 0.3);
+}
+
+/* Monogram avatar gradient backgrounds per business unit */
+.monogram-corporativo {
+  background: linear-gradient(135deg, #C9A84C 0%, #9A7B2C 100%);
+}
+
+.monogram-comercializadora {
+  background: linear-gradient(135deg, #2563EB 0%, #1D4ED8 100%);
+}
+
+.monogram-acabados {
+  background: linear-gradient(135deg, #D97706 0%, #B45309 100%);
+}
+
+.monogram-ferrecapital {
+  background: linear-gradient(135deg, #DC2626 0%, #B91C1C 100%);
+}
+
+.monogram-arkiramica {
+  background: linear-gradient(135deg, #16A34A 0%, #15803D 100%);
+}
+
+/* PIN pad styling */
+.pin-dot {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  border: 2px solid var(--primary);
+  background: transparent;
+  transition: all 0.2s var(--ease-premium);
+}
+
+.pin-dot.filled {
+  background: var(--primary);
+  box-shadow: 0 0 12px rgba(201, 168, 76, 0.5);
+}
+
+/* Shake animation for wrong PIN */
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  10%, 30%, 50%, 70%, 90% { transform: translateX(-8px); }
+  20%, 40%, 60%, 80% { transform: translateX(8px); }
+}
+
+.shake {
+  animation: shake 0.5s ease-in-out;
+}
+
+/* PIN pad button styling */
+.pin-button {
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: var(--foreground);
+  font-size: 1.5rem;
+  font-weight: 500;
+  transition: all 0.15s var(--ease-premium);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.pin-button:hover {
+  background: rgba(201, 168, 76, 0.1);
+  border-color: var(--primary);
+}
+
+.pin-button:active {
+  transform: scale(0.95);
+  background: rgba(201, 168, 76, 0.2);
+}
+
+/* Admin toolbar slide-in */
+@keyframes slide-up {
+  0% { transform: translateY(100%); }
+  100% { transform: translateY(0); }
+}
+
+.admin-toolbar {
+  animation: slide-up 0.3s var(--ease-premium);
+}
+
+/* Skeleton loader that matches card dimensions */
+.skeleton-card {
+  background: linear-gradient(
+    90deg,
+    var(--muted) 0%,
+    var(--surface) 50%,
+    var(--muted) 100%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
 }

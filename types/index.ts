@@ -2,7 +2,7 @@ export interface Company {
   id: string;
   name: string;
   shortName?: string;
-  type: "holding" | "subsidiary";
+  type: "corporativo" | "unidad-negocio";
   color: string;
   description: string;
 }
@@ -18,8 +18,6 @@ export interface Employee {
   extension: string;
   reportsTo: string | null;
   avatar: string | null;
-  tags: string[];
-  startDate: string;
 }
 
 export interface EmployeeData {

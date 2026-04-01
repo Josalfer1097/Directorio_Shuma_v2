@@ -21,6 +21,18 @@ interface EmployeeCardProps {
 // Premium easing curve
 const premiumEase = [0.25, 0.46, 0.45, 0.94];
 
+// Get monogram class based on company
+const getMonogramClass = (companyId: string) => {
+  const classMap: Record<string, string> = {
+    "grupo-shuma": "monogram-corporativo",
+    "comercializadora-shuma": "monogram-comercializadora",
+    "acabados-shuma": "monogram-acabados",
+    "ferrecapital": "monogram-ferrecapital",
+    "arkiramica": "monogram-arkiramica",
+  };
+  return classMap[companyId] || "monogram-corporativo";
+};
+
 // Format phone number for display
 const formatPhone = (phone: string) => {
   const digits = phone.replace(/\D/g, "");
@@ -92,28 +104,27 @@ export function EmployeeCard({
       >
         <Link href={`/directorio/${employee.id}`}>
           <div 
-            className="group flex items-center gap-4 p-4 rounded-lg border border-border bg-card transition-all duration-[180ms] hover:scale-[1.01] hover:shadow-lg hover:border-primary/30"
+            className={cn(
+              "premium-card group flex items-center gap-4 p-4",
+              "transition-all duration-200",
+              "hover:shadow-lg hover:shadow-primary/5 hover:border-primary/30"
+            )}
             style={{ 
               ["--bracket-color" as string]: company.color,
-              transitionTimingFunction: "cubic-bezier(0.25, 0.46, 0.45, 0.94)"
             }}
           >
-            <div className="corner-bracket">
-              <Avatar className="w-12 h-12 border border-border">
-                <AvatarFallback
-                  style={{
-                    backgroundColor: `${company.color}20`,
-                    color: company.color,
-                  }}
-                >
-                  {getInitials(employee.name)}
-                </AvatarFallback>
-              </Avatar>
-            </div>
+            <Avatar className={cn(
+              "w-12 h-12 border-2 border-border",
+              getMonogramClass(employee.company)
+            )}>
+              <AvatarFallback className="text-white font-semibold">
+                {getInitials(employee.name)}
+              </AvatarFallback>
+            </Avatar>
 
             <div className="flex-1 min-w-0">
               <div className="flex items-center gap-2">
-                <h3 className="font-medium text-foreground group-hover:text-primary transition-colors duration-[180ms] truncate">
+                <h3 className="font-semibold text-foreground group-hover:text-primary transition-colors duration-200 truncate">
                   {employee.name}
                 </h3>
                 <span
@@ -198,7 +209,7 @@ export function EmployeeCard({
     );
   }
 
-  // Grid view - max height 220px
+  // Grid view - premium glass card with accent border
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -209,40 +220,30 @@ export function EmployeeCard({
       <Link href={`/directorio/${employee.id}`}>
         <div
           className={cn(
-            "card-shimmer corner-bracket group relative overflow-hidden rounded-xl border border-border bg-card p-4 h-[220px] flex flex-col",
-            "transition-all duration-[180ms] hover:scale-[1.02] hover:shadow-lg"
+            "card-shimmer group relative overflow-hidden rounded-xl border border-border bg-card p-4 h-[220px] flex flex-col",
+            "transition-all duration-200",
+            "hover:shadow-xl hover:shadow-primary/10 hover:border-primary/30"
           )}
           style={{ 
             ["--shimmer-color" as string]: company.color,
-            ["--bracket-color" as string]: company.color,
-            boxShadow: "0 0 0 0 transparent",
-            transitionTimingFunction: "cubic-bezier(0.25, 0.46, 0.45, 0.94)"
-          }}
-          onMouseEnter={(e) => {
-            e.currentTarget.style.boxShadow = `0 8px 30px -10px ${company.color}40`;
-            e.currentTarget.style.borderColor = `${company.color}50`;
-          }}
-          onMouseLeave={(e) => {
-            e.currentTarget.style.boxShadow = "0 0 0 0 transparent";
-            e.currentTarget.style.borderColor = "";
+            borderLeftColor: company.color,
+            borderLeftWidth: "3px",
           }}
         >
           {/* Top section: Avatar + Info */}
           <div className="flex items-start gap-3 flex-1">
-            <Avatar className="w-14 h-14 border-2 border-border group-hover:border-primary/50 transition-colors duration-[180ms] shrink-0">
-              <AvatarFallback
-                className="text-sm font-semibold"
-                style={{
-                  backgroundColor: `${company.color}20`,
-                  color: company.color,
-                }}
-              >
+            <Avatar className={cn(
+              "w-14 h-14 border-2 border-border shrink-0",
+              "group-hover:scale-105 transition-transform duration-200",
+              getMonogramClass(employee.company)
+            )}>
+              <AvatarFallback className="text-sm font-bold text-white">
                 {getInitials(employee.name)}
               </AvatarFallback>
             </Avatar>
 
             <div className="flex-1 min-w-0">
-              <h3 className="font-semibold text-foreground group-hover:text-primary transition-colors duration-[180ms] line-clamp-1 text-sm">
+              <h3 className="font-semibold text-foreground group-hover:text-primary transition-colors duration-200 line-clamp-1 text-sm">
                 {employee.name}
               </h3>
               <p className="text-xs text-muted-foreground line-clamp-1">
@@ -252,7 +253,7 @@ export function EmployeeCard({
                 {employee.department}
               </p>
               <span
-                className="inline-block text-[10px] font-medium px-1.5 py-0.5 rounded-full mt-1"
+                className="inline-block text-[10px] font-medium px-2 py-0.5 rounded-full mt-1.5"
                 style={{
                   backgroundColor: `${company.color}15`,
                   color: company.color,
@@ -264,10 +265,10 @@ export function EmployeeCard({
           </div>
 
           {/* Divider */}
-          <div className="gradient-divider my-2" />
+          <div className="gradient-divider my-3" />
 
           {/* Bottom section: Contact info */}
-          <div className="space-y-1.5 text-[12px]">
+          <div className="space-y-2 text-[12px]">
             {/* Email row */}
             <div className="flex items-center gap-1">
               <button
@@ -312,7 +313,7 @@ export function EmployeeCard({
                 <Phone className="w-3.5 h-3.5 shrink-0" />
                 <span>{formatPhone(employee.phone)}</span>
               </button>
-              <span className="px-1.5 py-0.5 rounded bg-muted text-[10px] font-medium shrink-0">
+              <span className="px-1.5 py-0.5 rounded bg-primary/10 text-primary text-[10px] font-medium shrink-0">
                 Ext. {employee.extension}
               </span>
               <button
