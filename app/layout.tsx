@@ -23,6 +23,8 @@ export const metadata: Metadata = {
   description: 'Directorio corporativo de las empresas Shuma',
 }
 
+export type ViewMode = "grid" | "list";
+
 export const viewport: Viewport = {
   themeColor: '#080810',
   viewportFit: 'cover',
