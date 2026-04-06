@@ -53,6 +53,7 @@ export function getReportingChain(employeeId: string): Employee[] {
 const defaultColors: CompanyColors = {
   primary: "#C9A84C",
   secondary: "#A68A3A",
+  glow: "rgba(201,168,76,0.15)",
   accent: "#E0C060"
 };
 

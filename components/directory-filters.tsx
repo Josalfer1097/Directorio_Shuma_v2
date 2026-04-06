@@ -76,7 +76,6 @@ export function DirectoryFilters({
       "Empresa",
       "Email",
       "Teléfono",
-      "Extensión",
     ];
     const rows = filteredEmployees.map((emp) => {
       const company = companies.find((c) => c.id === emp.company);
@@ -87,7 +86,6 @@ export function DirectoryFilters({
         company?.name || emp.company,
         emp.email,
         emp.phone,
-        emp.extension,
       ];
     });
 
@@ -107,12 +105,13 @@ export function DirectoryFilters({
     <div className="space-y-6">
       {/* Companies */}
       <div>
-        <h4 className="font-medium text-foreground mb-3">Empresas</h4>
+        <h4 className="font-medium text-foreground mb-3" style={{ fontFamily: "'Neuropol', sans-serif" }}>Empresas</h4>
         <div className="space-y-2">
-          {companies.map((company) => (
+          {companies.filter(c => !c.disabled).map((company) => (
             <label
               key={company.id}
               className="flex items-center gap-3 cursor-pointer group"
+              style={{ fontFamily: "'Neuropol', sans-serif" }}
             >
               <Checkbox
                 checked={selectedCompanies.includes(company.id)}
@@ -121,9 +120,9 @@ export function DirectoryFilters({
               <div className="flex items-center gap-2">
                 <div
                   className="w-3 h-3 rounded-full"
-                  style={{ backgroundColor: company.color }}
+                  style={{ backgroundColor: company.colors.primary }}
                 />
-                <span className="text-sm text-muted-foreground group-hover:text-foreground transition-colors">
+                <span className="text-sm text-muted-foreground group-hover:text-foreground transition-colors" style={{ fontFamily: "'Neuropol', sans-serif" }}>
                   {company.shortName || company.name}
                 </span>
               </div>
@@ -134,15 +133,15 @@ export function DirectoryFilters({
 
       {/* Departments */}
       <div>
-        <h4 className="font-medium text-foreground mb-3">Departamento</h4>
+        <h4 className="font-medium text-foreground mb-3" style={{ fontFamily: "'Neuropol', sans-serif" }}>Departamento</h4>
         <Select value={selectedDepartment} onValueChange={onDepartmentChange}>
-          <SelectTrigger>
+          <SelectTrigger style={{ fontFamily: "'Neuropol', sans-serif" }}>
             <SelectValue placeholder="Todos los departamentos" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="all">Todos los departamentos</SelectItem>
+            <SelectItem value="all" style={{ fontFamily: "'Neuropol', sans-serif" }}>Todos los departamentos</SelectItem>
             {departments.map((dept) => (
-              <SelectItem key={dept} value={dept}>
+              <SelectItem key={dept} value={dept} style={{ fontFamily: "'Neuropol', sans-serif" }}>
                 {dept}
               </SelectItem>
             ))}
@@ -151,7 +150,7 @@ export function DirectoryFilters({
       </div>
 
       {/* Clear and Export */}
-      <div className="flex flex-col gap-2 pt-4 border-t border-border">
+      <div className="flex flex-col gap-2 pt-4 border-t border-[--border-subtle]">
         {hasActiveFilters && (
           <Button variant="ghost" onClick={onClearFilters} className="gap-2">
             <X className="w-4 h-4" />
@@ -170,9 +169,9 @@ export function DirectoryFilters({
     <>
       {/* Desktop Filters */}
       <aside className="hidden lg:block w-72 shrink-0">
-        <div className="sticky top-24 rounded-xl border border-border bg-card p-6">
-          <div className="flex items-center justify-between mb-6">
-            <h3 className="font-semibold text-foreground">Filtros</h3>
+        <div className="sticky top-24 rounded-xl border border-[--border-subtle] bg-[--bg-surface] p-6">
+          <div className="flex items-center justify-between mb-6 font-neuropol">
+            <h3 className="font-semibold text-foreground font-neuropol">Filtros</h3>
             {hasActiveFilters && (
               <Button
                 variant="ghost"
@@ -207,7 +206,7 @@ export function DirectoryFilters({
       <MobileFiltersBottomSheet
         isOpen={mobileSheetOpen}
         onClose={() => setMobileSheetOpen(false)}
-        companies={companies}
+        companies={companies.filter(c => !c.disabled)}
         departments={departments}
         selectedCompanies={selectedCompanies}
         selectedDepartment={selectedDepartment}

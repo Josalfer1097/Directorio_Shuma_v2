@@ -1,7 +1,9 @@
 export interface CompanyColors {
   primary: string;
   secondary: string;
-  accent: string;
+  glow: string;
+  accent?: string;
+  textOnColor?: string;
 }
 
 export interface Company {
@@ -10,6 +12,7 @@ export interface Company {
   shortName?: string;
   colors: CompanyColors;
   description: string;
+  disabled?: boolean;
 }
 
 export interface Employee {
@@ -18,9 +21,10 @@ export interface Employee {
   position: string; // Free text role
   department: string;
   company: string;
-  email?: string;
-  phone?: string;
-  extension?: string;
+  email: string;
+  phone: string;
+  extension?: string;   // phone extension, e.g. "101"
+  location?: string;    // city/office, e.g. "Puebla"
   reportsTo?: string | null;
   avatar?: string | null;
 }
@@ -31,6 +35,6 @@ export interface EmployeeData {
   employees: Employee[];
 }
 
-export type ViewMode = "grid" | "list";
+export type ViewMode = "grid" | "compact";
 
 export type OrgChartLayout = "horizontal" | "vertical";

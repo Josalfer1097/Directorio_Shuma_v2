@@ -3,22 +3,22 @@
     {
       "id": "comercializadora-shuma",
       "name": "Comercializadora y Ferretería Shuma",
-      "shortName": "Comercializadora",
+      "shortName": "Comercializadora y Ferretería Shuma",
       "colors": {
-        "primary": "#0047AB",
-        "secondary": "#002D6E",
-        "accent": "#4D9FFF"
+        "primary": "#0066CC",
+        "secondary": "#004499",
+        "glow": "rgba(0,102,204,0.20)"
       },
       "description": "Distribución y venta de productos ferreteros"
     },
     {
       "id": "acabados-shuma",
       "name": "Acabados Shuma",
-      "shortName": "Acabados",
+      "shortName": "Acabados Shuma",
       "colors": {
         "primary": "#C0152A",
         "secondary": "#8B0000",
-        "accent": "#FF4D5E"
+        "glow": "rgba(192,21,42,0.20)"
       },
       "description": "Acabados y materiales de construcción"
     },
@@ -27,20 +27,23 @@
       "name": "Ferrecapital",
       "shortName": "Ferrecapital",
       "colors": {
-        "primary": "#4A525A",
+        "primary": "#2A2A2A",
         "secondary": "#1A1A1A",
-        "accent": "#CC0000"
+        "accent": "#CC0000",
+        "glow": "rgba(204,0,0,0.12)"
       },
       "description": "Servicios financieros y crédito"
     },
     {
       "id": "arkiramica",
+      "disabled": true,
       "name": "Arkirámica",
       "shortName": "Arkirámica",
       "colors": {
         "primary": "#F5C400",
         "secondary": "#C49A00",
-        "accent": "#FFE566"
+        "glow": "rgba(245,196,0,0.18)",
+        "textOnColor": "#2A1E00"
       },
       "description": "Pisos, azulejos y cerámica"
     }
@@ -62,7 +65,8 @@
       "company": "comercializadora-shuma",
       "email": "ana.vega@comercializadorashuma.mx",
       "phone": "+52 55 2345 6789",
-      "extension": "201",
+      "extension": "",
+      "location": "",
       "reportsTo": null,
       "avatar": null
     },
@@ -74,7 +78,8 @@
       "company": "comercializadora-shuma",
       "email": "jorge.mendoza@comercializadorashuma.mx",
       "phone": "+52 55 2345 6790",
-      "extension": "202",
+      "extension": "",
+      "location": "",
       "reportsTo": "emp001",
       "avatar": null
     },
@@ -86,7 +91,8 @@
       "company": "comercializadora-shuma",
       "email": "laura.torres@comercializadorashuma.mx",
       "phone": "+52 55 2345 6791",
-      "extension": "203",
+      "extension": "",
+      "location": "",
       "reportsTo": "emp001",
       "avatar": null
     },
@@ -98,7 +104,8 @@
       "company": "comercializadora-shuma",
       "email": "isabel.pena@comercializadorashuma.mx",
       "phone": "+52 55 2345 6792",
-      "extension": "204",
+      "extension": "",
+      "location": "",
       "reportsTo": "emp001",
       "avatar": null
     },
@@ -110,7 +117,8 @@
       "company": "acabados-shuma",
       "email": "francisco.ruiz@acabadosshuma.mx",
       "phone": "+52 55 3456 7890",
-      "extension": "301",
+      "extension": "",
+      "location": "",
       "reportsTo": null,
       "avatar": null
     },
@@ -122,7 +130,8 @@
       "company": "acabados-shuma",
       "email": "gabriela.sanchez@acabadosshuma.mx",
       "phone": "+52 55 3456 7891",
-      "extension": "302",
+      "extension": "",
+      "location": "",
       "reportsTo": "emp005",
       "avatar": null
     },
@@ -134,7 +143,8 @@
       "company": "acabados-shuma",
       "email": "miguel.herrera@acabadosshuma.mx",
       "phone": "+52 55 3456 7892",
-      "extension": "303",
+      "extension": "",
+      "location": "",
       "reportsTo": "emp005",
       "avatar": null
     },
@@ -146,7 +156,8 @@
       "company": "ferrecapital",
       "email": "patricia.navarro@ferrecapital.mx",
       "phone": "+52 55 4567 8901",
-      "extension": "401",
+      "extension": "",
+      "location": "",
       "reportsTo": null,
       "avatar": null
     },
@@ -158,7 +169,8 @@
       "company": "ferrecapital",
       "email": "ricardo.ortega@ferrecapital.mx",
       "phone": "+52 55 4567 8902",
-      "extension": "402",
+      "extension": "",
+      "location": "",
       "reportsTo": "emp008",
       "avatar": null
     },
@@ -170,7 +182,8 @@
       "company": "ferrecapital",
       "email": "sofia.guzman@ferrecapital.mx",
       "phone": "+52 55 4567 8903",
-      "extension": "403",
+      "extension": "",
+      "location": "",
       "reportsTo": "emp008",
       "avatar": null
     },
@@ -182,7 +195,8 @@
       "company": "arkiramica",
       "email": "andres.castro@arkiramica.mx",
       "phone": "+52 55 5678 9012",
-      "extension": "501",
+      "extension": "",
+      "location": "",
       "reportsTo": null,
       "avatar": null
     },
@@ -194,7 +208,8 @@
       "company": "arkiramica",
       "email": "valentina.rojas@arkiramica.mx",
       "phone": "+52 55 5678 9013",
-      "extension": "502",
+      "extension": "",
+      "location": "",
       "reportsTo": "emp011",
       "avatar": null
     },
@@ -206,7 +221,8 @@
       "company": "arkiramica",
       "email": "diego.moreno@arkiramica.mx",
       "phone": "+52 55 5678 9014",
-      "extension": "503",
+      "extension": "",
+      "location": "",
       "reportsTo": "emp011",
       "avatar": null
     },
@@ -218,7 +234,8 @@
       "company": "arkiramica",
       "email": "carmen.varela@arkiramica.mx",
       "phone": "+52 55 5678 9015",
-      "extension": "504",
+      "extension": "",
+      "location": "",
       "reportsTo": "emp011",
       "avatar": null
     }

@@ -33,7 +33,6 @@ interface FormData {
   company: string;
   email: string;
   phone: string;
-  extension: string;
   reportsTo: string;
 }
 
@@ -42,10 +41,9 @@ const initialFormData: FormData = {
   name: "",
   position: "",
   department: "",
-  company: "grupo-shuma",
+  company: "comercializadora-shuma",
   email: "",
   phone: "",
-  extension: "",
   reportsTo: "",
 };
 
@@ -58,7 +56,7 @@ export function EmployeeFormModal({
   const [formData, setFormData] = useState<FormData>(initialFormData);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const companies = getCompanies();
+  const companies = getCompanies().filter(c => !c.disabled);
   const departments = getDepartments();
   const employees = getEmployees();
 
@@ -74,7 +72,6 @@ export function EmployeeFormModal({
           company: employee.company,
           email: employee.email,
           phone: employee.phone,
-          extension: employee.extension,
           reportsTo: employee.reportsTo || "",
         });
       }
@@ -234,7 +231,7 @@ export function EmployeeFormModal({
                         <div className="flex items-center gap-2">
                           <div
                             className="w-2 h-2 rounded-full"
-                            style={{ backgroundColor: company.color }}
+                            style={{ backgroundColor: company.colors.primary }}
                           />
                           {company.shortName || company.name}
                         </div>
@@ -257,26 +254,15 @@ export function EmployeeFormModal({
                 />
               </div>
 
-              {/* Phone and Extension */}
-              <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <Label htmlFor="phone">Teléfono</Label>
-                  <Input
-                    id="phone"
-                    value={formData.phone}
-                    onChange={(e) => handleChange("phone", e.target.value)}
-                    placeholder="+52 55 1234 5678"
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="extension">Extensión</Label>
-                  <Input
-                    id="extension"
-                    value={formData.extension}
-                    onChange={(e) => handleChange("extension", e.target.value)}
-                    placeholder="101"
-                  />
-                </div>
+              {/* Phone */}
+              <div className="space-y-2">
+                <Label htmlFor="phone">Teléfono</Label>
+                <Input
+                  id="phone"
+                  value={formData.phone}
+                  onChange={(e) => handleChange("phone", e.target.value)}
+                  placeholder="+52 55 1234 5678"
+                />
               </div>
 
               {/* Reports To */}

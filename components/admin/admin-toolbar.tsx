@@ -19,23 +19,9 @@ export function AdminToolbar() {
 
   if (isLoading || !isAuthenticated) return null;
 
-  const handleEditSelect = (employeeId: string) => {
-    setSelectedEmployeeId(employeeId);
-    setCurrentAction("edit");
-  };
-
-  const handleDeleteSelect = (employeeId: string) => {
-    setSelectedEmployeeId(employeeId);
-    setCurrentAction("delete");
-  };
-
   const handleClose = () => {
     setCurrentAction(null);
     setSelectedEmployeeId(null);
-  };
-
-  const handleLogout = async () => {
-    await logout();
   };
 
   return (
@@ -45,66 +31,27 @@ export function AdminToolbar() {
         initial={{ y: 100, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
         exit={{ y: 100, opacity: 0 }}
-        transition={{ type: "spring", damping: 25, stiffness: 300 }}
-        className={cn(
-          "admin-toolbar fixed bottom-4 left-1/2 -translate-x-1/2 z-40",
-          "flex items-center gap-2 p-2",
-          "bg-card/95 backdrop-blur-xl border border-primary/20",
-          "rounded-full shadow-2xl shadow-black/30"
-        )}
+        className="fixed bottom-6 left-1/2 -translate-x-1/2 z-[80] flex items-center gap-2 p-2 bg-[--bg-surface]/80 backdrop-blur-xl border border-white/10 rounded-full shadow-2xl"
       >
-        {/* Admin indicator */}
-        <div className="flex items-center gap-2 px-3 py-1.5 bg-primary/10 rounded-full mr-1">
-          <div className="w-2 h-2 rounded-full bg-primary animate-pulse" />
-          <span className="text-xs font-medium text-primary">Admin</span>
-        </div>
-
         {/* Add Employee */}
-        <Button
-          variant="ghost"
-          size="sm"
+        <button
           onClick={() => setCurrentAction("add")}
-          className="gap-2 btn-press hover:bg-primary/10 hover:text-primary"
+          className="flex items-center gap-2 px-4 py-2 rounded-full hover:bg-white/5 transition-colors text-text-primary"
         >
-          <Plus className="w-4 h-4" />
-          <span className="hidden sm:inline">Agregar</span>
-        </Button>
+          <Plus className="w-5 h-5" />
+          <span className="hidden sm:inline font-dm-sans text-sm">Agregar empleado</span>
+        </button>
 
-        {/* Edit Employee */}
-        <Button
-          variant="ghost"
-          size="sm"
-          onClick={() => setCurrentAction("edit-select")}
-          className="gap-2 btn-press hover:bg-primary/10 hover:text-primary"
-        >
-          <Edit className="w-4 h-4" />
-          <span className="hidden sm:inline">Editar</span>
-        </Button>
-
-        {/* Delete Employee */}
-        <Button
-          variant="ghost"
-          size="sm"
-          onClick={() => setCurrentAction("delete-select")}
-          className="gap-2 btn-press hover:bg-destructive/10 hover:text-destructive"
-        >
-          <Trash2 className="w-4 h-4" />
-          <span className="hidden sm:inline">Eliminar</span>
-        </Button>
-
-        {/* Divider */}
-        <div className="w-px h-6 bg-border mx-1" />
+        <div className="w-px h-6 bg-white/10 mx-1" />
 
         {/* Logout */}
-        <Button
-          variant="ghost"
-          size="sm"
-          onClick={handleLogout}
-          className="gap-2 btn-press text-muted-foreground hover:text-foreground"
+        <button
+          onClick={logout}
+          className="flex items-center gap-2 px-4 py-2 rounded-full hover:bg-white/5 transition-colors text-text-muted hover:text-text-primary"
         >
-          <LogOut className="w-4 h-4" />
-          <span className="hidden sm:inline">Salir</span>
-        </Button>
+          <LogOut className="w-5 h-5" />
+          <span className="hidden sm:inline font-dm-sans text-sm">Salir</span>
+        </button>
       </motion.div>
 
       {/* Modals */}

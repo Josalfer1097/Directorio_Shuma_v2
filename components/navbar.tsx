@@ -2,98 +2,110 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useState, useEffect } from "react";
-import {
-  Users,
-  GitBranch,
-  Search,
-} from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { useState, useEffect, useRef } from "react";
+import { LayoutGrid, List } from "lucide-react";
+import type { ViewMode } from "@/types";
 import { cn } from "@/lib/utils";
-
-const navLinks = [
-  { href: "/directorio", label: "Directorio", icon: Users },
-  { href: "/organigrama", label: "Organigrama", icon: GitBranch },
-];
 
 export function Navbar() {
   const pathname = usePathname();
   const [scrolled, setScrolled] = useState(false);
+  const [mounted, setMounted] = useState(false);
+  const [viewMode, setViewMode] = useState<ViewMode>("grid");
+  const longPressTimer = useRef<NodeJS.Timeout | null>(null);
 
   useEffect(() => {
-    const handleScroll = () => {
-      setScrolled(window.scrollY > 10);
-    };
+    setMounted(true);
+    const savedViewMode = localStorage.getItem("shuma-view-mode") as ViewMode;
+    if (savedViewMode) {
+      setViewMode(savedViewMode);
+    }
+
+    const handleScroll = () => setScrolled(window.scrollY > 10);
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
+  const toggleViewMode = () => {
+    const nextView = viewMode === "grid" ? "compact" : "grid";
+    setViewMode(nextView);
+    localStorage.setItem("shuma-view-mode", nextView);
+    window.dispatchEvent(new CustomEvent("view-mode-change", { detail: nextView }));
+  };
+
+  const handleTouchStart = () => {
+    longPressTimer.current = setTimeout(() => {
+      window.dispatchEvent(new CustomEvent("trigger-pin-overlay"));
+    }, 1500);
+  };
+
+  const handleTouchEnd = () => {
+    if (longPressTimer.current) {
+      clearTimeout(longPressTimer.current);
+    }
+  };
+
+  if (!mounted) return null;
+
   return (
     <header
       className={cn(
-        "fixed top-0 left-0 right-0 z-40 transition-all duration-300 hidden md:block",
+        "fixed top-0 left-0 right-0 z-50 transition-all duration-300 h-[64px] flex items-center border-b",
         scrolled
-          ? "glass border-b border-[--border-subtle] shadow-lg shadow-black/10"
-          : "bg-transparent"
+          ? "bg-[--bg-base] backdrop-blur-xl border-[--border-subtle] saturate-[180%]"
+          : "bg-transparent border-transparent"
       )}
+      style={{
+        backgroundColor: scrolled ? 'rgba(var(--bg-base-rgb), 0.88)' : 'transparent'
+      } as any}
     >
-      <nav className="container mx-auto px-4">
-        <div className="flex items-center justify-between h-16">
-          {/* Logo with long-press trigger for admin */}
+      <nav className="container mx-auto px-4 flex items-center justify-between">
           <Link
             href="/"
-            className="flex items-center gap-3 group"
-            data-logo-trigger
+            style={{ fontFamily: "'Neuropol', sans-serif" }}
+            className="text-lg tracking-wider"
+            onTouchStart={handleTouchStart}
+            onTouchEnd={handleTouchEnd}
+            onMouseDown={handleTouchStart}
+            onMouseUp={handleTouchEnd}
           >
-            {/* Monogram S */}
-            <div className="relative">
-              <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-[--gold] to-[#A68A3A] flex items-center justify-center shadow-lg shadow-[--gold-glow]">
-                <span className="font-display text-lg font-bold text-[--bg-base]">
-                  S
-                </span>
-              </div>
-              <div className="absolute inset-0 rounded-lg bg-[--gold]/40 blur-xl opacity-0 group-hover:opacity-60 transition-opacity duration-300" />
-            </div>
-            <div className="flex flex-col relative">
-              <span className="font-display font-semibold text-lg text-[--text-primary] leading-none tracking-widest">
-                SHUMA
-              </span>
-              <span className="text-[10px] text-[--gold] leading-none mt-1 tracking-widest uppercase">
-                Directorio
-              </span>
-            </div>
+            <span className="text-[#F2F0EC]" style={{ fontFamily: "'Neuropol', sans-serif" }}>DIRECTO</span>
+            <span className="animate-gradient-text" style={{ fontFamily: "'Neuropol', sans-serif" }}>RIO</span>
           </Link>
 
-          {/* Desktop Navigation */}
-          <div className="hidden md:flex items-center gap-1">
-            {navLinks.map((link) => {
-              const isActive = pathname === link.href;
-              return (
-                <Link key={link.href} href={link.href}>
-                  <Button
-                    variant={isActive ? "secondary" : "ghost"}
-                    size="sm"
-                    className={cn(
-                      "gap-2 font-display text-xs tracking-wider",
-                      isActive && "bg-[--bg-elevated] text-[--text-primary]"
-                    )}
-                  >
-                    <link.icon className="w-4 h-4" />
-                    {link.label.toUpperCase()}
-                  </Button>
-                </Link>
-              );
-            })}
-          </div>
+        <div className="flex items-center gap-6">
+          <Link 
+            href="/directorio" 
+            className={cn(
+              "font-neuropol text-[12px] uppercase tracking-wider transition-colors active:scale-95 font-neuropol",
+              pathname === "/directorio" ? "text-text-primary" : "text-text-muted hover:text-text-primary"
+            )}
+          >
+            Directorio
+          </Link>
+          <Link 
+            href="/organigrama" 
+            className={cn(
+              "font-neuropol text-[12px] uppercase tracking-wider transition-colors active:scale-95 font-neuropol",
+              pathname === "/organigrama" ? "text-text-primary" : "text-text-muted hover:text-text-primary"
+            )}
+          >
+            Organigrama
+          </Link>
 
-          {/* Right Section */}
-          <div className="flex items-center gap-2">
-            <Link href="/directorio" className="hidden sm:block">
-              <Button variant="ghost" size="icon" className="relative">
-                <Search className="w-4 h-4" />
-              </Button>
-            </Link>
-          </div>
+          {/* View Toggle */}
+          <button
+            onClick={toggleViewMode}
+            className="p-2 text-text-muted hover:text-text-primary transition-all active:scale-95 group relative"
+            title={viewMode === "grid" ? "Vista compacta" : "Vista tarjetas"}
+          >
+            {viewMode === "grid" ? (
+              <LayoutGrid className="w-5 h-5 transition-transform group-hover:scale-110" />
+            ) : (
+              <List className="w-5 h-5 transition-transform group-hover:scale-110" />
+            )}
+            <div className="absolute inset-0 rounded-full blur-[8px] opacity-0 group-hover:opacity-100 bg-gradient-to-r from-irid-a to-irid-b transition-opacity -z-10" />
+          </button>
         </div>
       </nav>
     </header>

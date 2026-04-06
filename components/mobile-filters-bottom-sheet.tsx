@@ -97,11 +97,11 @@ export function MobileFiltersBottomSheet({
                 onClose();
               }
             }}
-            className="fixed bottom-0 left-0 right-0 z-50 md:hidden bg-card rounded-t-2xl border-t border-border shadow-2xl"
+            className="fixed bottom-0 left-0 right-0 z-50 md:hidden bg-[--bg-surface] rounded-t-2xl border-t border-[--border-subtle] shadow-2xl"
             style={{ height: "65vh", maxHeight: "65vh" }}
           >
             {/* Header */}
-            <div className="flex items-center justify-between p-4 border-b border-border sticky top-0 bg-card rounded-t-2xl">
+            <div className="flex items-center justify-between p-4 border-b border-[--border-subtle] sticky top-0 bg-[--bg-surface] rounded-t-2xl">
               {/* Drag handle */}
               <div className="flex-1 flex justify-center">
                 <div className="w-10 h-1 rounded-full bg-muted-foreground/30" />
@@ -148,7 +148,7 @@ export function MobileFiltersBottomSheet({
                       }`}
                       style={{
                         backgroundColor: localCompanies.includes(company.id)
-                          ? company.color
+                          ? company.colors.primary
                           : undefined,
                       }}
                     >

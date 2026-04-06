@@ -14,6 +14,7 @@ interface CompanyCardProps {
 const premiumEase = [0.25, 0.46, 0.45, 0.94];
 
 export function CompanyCard({ company, index }: CompanyCardProps) {
+  const primaryColor = company.colors.primary;
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -25,14 +26,14 @@ export function CompanyCard({ company, index }: CompanyCardProps) {
         <div
           className="card-shimmer corner-bracket group relative overflow-hidden rounded-xl border border-border bg-card p-6 transition-all duration-[180ms] hover:scale-[1.02] hover:shadow-lg"
           style={{
-            ["--shimmer-color" as string]: company.color,
-            ["--bracket-color" as string]: company.color,
-            background: `linear-gradient(135deg, ${company.color}08 0%, transparent 50%)`,
+            ["--shimmer-color" as string]: primaryColor,
+            ["--bracket-color" as string]: primaryColor,
+            background: `linear-gradient(135deg, ${primaryColor}08 0%, transparent 50%)`,
             transitionTimingFunction: "cubic-bezier(0.25, 0.46, 0.45, 0.94)"
           }}
           onMouseEnter={(e) => {
-            e.currentTarget.style.boxShadow = `0 8px 30px -10px ${company.color}40`;
-            e.currentTarget.style.borderColor = `${company.color}50`;
+            e.currentTarget.style.boxShadow = `0 8px 30px -10px ${primaryColor}40`;
+            e.currentTarget.style.borderColor = `${primaryColor}50`;
           }}
           onMouseLeave={(e) => {
             e.currentTarget.style.boxShadow = "";
@@ -42,7 +43,7 @@ export function CompanyCard({ company, index }: CompanyCardProps) {
           {/* Glow effect */}
           <div
             className="absolute -top-24 -right-24 w-48 h-48 rounded-full opacity-0 group-hover:opacity-20 transition-opacity duration-[180ms] blur-3xl"
-            style={{ backgroundColor: company.color }}
+            style={{ backgroundColor: primaryColor }}
           />
 
           <div className="relative">
@@ -50,21 +51,21 @@ export function CompanyCard({ company, index }: CompanyCardProps) {
             <div className="flex items-start justify-between mb-4">
               <div
                 className="w-12 h-12 rounded-lg flex items-center justify-center"
-                style={{ backgroundColor: `${company.color}20` }}
+                style={{ backgroundColor: `${primaryColor}20` }}
               >
                 <Building2
                   className="w-6 h-6"
-                  style={{ color: company.color }}
+                  style={{ color: primaryColor }}
                 />
               </div>
               <span
-                className="text-xs font-medium px-2 py-1 rounded-full"
+                className="text-xs font-neuropol px-2 py-1 rounded-full uppercase tracking-wider"
                 style={{
-                  backgroundColor: `${company.color}15`,
-                  color: company.color,
+                  backgroundColor: `${primaryColor}15`,
+                  color: primaryColor,
                 }}
               >
-                {company.type === "holding" ? "Holding" : "Subsidiaria"}
+                Empresa
               </span>
             </div>
 

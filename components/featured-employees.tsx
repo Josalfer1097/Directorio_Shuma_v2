@@ -92,7 +92,7 @@ export function FeaturedEmployees({
   );
 
   const getCompanyColor = (companyId: string) => {
-    return companies.find((c) => c.id === companyId)?.color || "#7C3AED";
+    return companies.find((c) => c.id === companyId)?.colors.primary || "#7C3AED";
   };
 
   const getCompanyName = (companyId: string) => {
@@ -262,13 +262,6 @@ export function FeaturedEmployees({
                         <Copy className="w-3 h-3 text-muted-foreground" />
                       )}
                     </button>
-                    <button
-                      onClick={(e: MouseEvent) => openTeamsChat(e, employee.email)}
-                      className="p-1 rounded hover:bg-muted transition-colors shrink-0"
-                      title="Abrir chat en Teams"
-                    >
-                      <MessageSquare className="w-3 h-3 text-muted-foreground hover:text-[#6264A7]" />
-                    </button>
                   </div>
 
                   {/* Phone row */}
@@ -283,9 +276,6 @@ export function FeaturedEmployees({
                       <Phone className="w-3.5 h-3.5 shrink-0" />
                       <span>{formatPhone(employee.phone)}</span>
                     </button>
-                    <span className="px-1.5 py-0.5 rounded bg-muted text-[10px] font-medium shrink-0">
-                      Ext. {employee.extension}
-                    </span>
                     <button
                       onClick={(e: MouseEvent) => copyToClipboard(e, employee.phone, `featured-phone-${employee.id}`)}
                       className="p-1 rounded hover:bg-muted transition-colors shrink-0 ml-auto"
