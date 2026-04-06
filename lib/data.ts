@@ -17,6 +17,10 @@ export function getDepartments(): string[] {
   return employeesData.departments;
 }
 
+export function getAllTags(): string[] {
+  return [];
+}
+
 export function getEmployeeById(id: string): Employee | undefined {
   return employeesData.employees.find((emp) => emp.id === id) as Employee | undefined;
 }
@@ -36,7 +40,7 @@ export function getDirectReports(employeeId: string): Employee[] {
 export function getReportingChain(employeeId: string): Employee[] {
   const chain: Employee[] = [];
   let currentEmployee = getEmployeeById(employeeId);
-  
+
   while (currentEmployee?.reportsTo) {
     const manager = getEmployeeById(currentEmployee.reportsTo);
     if (manager) {
@@ -46,7 +50,7 @@ export function getReportingChain(employeeId: string): Employee[] {
       break;
     }
   }
-  
+
   return chain;
 }
 
@@ -54,7 +58,7 @@ const defaultColors: CompanyColors = {
   primary: "#C9A84C",
   secondary: "#A68A3A",
   glow: "rgba(201,168,76,0.15)",
-  accent: "#E0C060"
+  accent: "#E0C060",
 };
 
 export function getCompanyColors(companyId: string): CompanyColors {

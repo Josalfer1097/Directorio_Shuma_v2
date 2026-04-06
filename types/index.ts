@@ -18,13 +18,13 @@ export interface Company {
 export interface Employee {
   id: string;
   name: string;
-  position: string; // Free text role
+  position: string;
   department: string;
   company: string;
   email: string;
   phone: string;
-  extension?: string;   // phone extension, e.g. "101"
-  location?: string;    // city/office, e.g. "Puebla"
+  extension?: string;
+  location?: string;
   reportsTo?: string | null;
   avatar?: string | null;
 }
@@ -35,6 +35,6 @@ export interface EmployeeData {
   employees: Employee[];
 }
 
-export type ViewMode = "grid" | "compact";
+export type ViewMode = "grid" | "list";
 
 export type OrgChartLayout = "horizontal" | "vertical";
