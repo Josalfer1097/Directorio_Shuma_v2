@@ -1,60 +1,54 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
 import { motion } from "framer-motion";
-import { Mail, Phone, MapPin } from "lucide-react";
+import { Mail, Phone, Copy, Check, MessageSquare } from "lucide-react";
+import { useState } from "react";
 import Link from "next/link";
+import { toast } from "sonner";
+import { Button } from "@/components/ui/button";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import type { Employee, Company } from "@/types";
 import { cn } from "@/lib/utils";
 
 interface EmployeeCardProps {
   employee: Employee;
-  company?: Company;
+  company: Company;
+  view: "grid" | "list";
   index: number;
+  hideCompanyBadge?: boolean;
 }
 
 // Premium easing curve
 const premiumEase = [0.25, 0.46, 0.45, 0.94];
 
-// Get company initial for watermark
-const getCompanyInitial = (companyId: string) => {
-  const initials: Record<string, string> = {
-    "comercializadora-shuma": "S",
-    "acabados-shuma": "A",
-    ferrecapital: "F",
-    arkiramica: "A",
-  };
-  return initials[companyId] || "S";
+// Format phone number for display
+const formatPhone = (phone: string) => {
+  const digits = phone.replace(/\D/g, "");
+  if (digits.length === 10) {
+    return `+52 ${digits.slice(0, 2)} ${digits.slice(2, 6)} ${digits.slice(6)}`;
+  }
+  return phone;
+};
+
+// Truncate email for display
+const truncateEmail = (email: string, maxLength = 20) => {
+  if (email.length <= maxLength) return email;
+  const [user, domain] = email.split("@");
+  const truncatedUser = user.slice(0, Math.max(6, maxLength - domain.length - 4));
+  return `${truncatedUser}...@${domain}`;
 };
 
 export function EmployeeCard({
   employee,
   company,
+  view,
   index,
+  hideCompanyBadge = false,
 }: EmployeeCardProps) {
-  const [isVisible, setIsVisible] = useState(false);
-  const cardRef = useRef<HTMLDivElement>(null);
+  const [copiedField, setCopiedField] = useState<string | null>(null);
 
-  useEffect(() => {
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting) {
-          setIsVisible(true);
-          observer.unobserve(entry.target);
-        }
-      },
-      { threshold: 0.1 }
-    );
-
-    if (cardRef.current) {
-      observer.observe(cardRef.current);
-    }
-
-    return () => observer.disconnect();
-  }, []);
-
-  const getInitials = (name?: string) => {
-    if (!name) return "??";
+  const getInitials = (name: string) => {
     return name
       .split(" ")
       .map((n) => n[0])
@@ -63,172 +57,293 @@ export function EmployeeCard({
       .toUpperCase();
   };
 
-  const isTodos = !company;
-  
-  // Specific company colors as requested
-  const companyColors = {
-    "comercializadora-shuma": {
-      primary: "#0066CC",
-      secondary: "#004499",
-      highlight: "#00AAFF",
-      glow: "rgba(0,102,204,0.20)",
-      badge: "bg-[rgba(0,102,204,0.12)] border-[rgba(0,102,204,0.25)] text-[#00AAFF]"
-    },
-    "acabados-shuma": {
-      primary: "#C0152A",
-      secondary: "#8B0000",
-      glow: "rgba(192,21,42,0.18)",
-      badge: "bg-[rgba(192,21,42,0.15)] border-[rgba(192,21,42,0.30)] text-[#FF4D5E]"
-    },
-    "ferrecapital": {
-      primary: "#2A2A2A",
-      secondary: "#1A1A1A",
-      glow: "rgba(204,0,0,0.12)",
-      badge: "bg-[rgba(204,0,0,0.10)] border-[rgba(204,0,0,0.25)] text-[#CC0000]"
-    },
-    "arkiramica": {
-      primary: "#F5C400",
-      secondary: "#C49A00",
-      glow: "rgba(245,196,0,0.18)",
-      badge: "bg-[rgba(245,196,0,0.15)] border-[rgba(245,196,0,0.30)] text-[#2A1E00]"
-    }
+  const copyToClipboard = (e: React.MouseEvent, text: string, field: string) => {
+    e.preventDefault();
+    e.stopPropagation();
+    navigator.clipboard.writeText(text);
+    setCopiedField(field);
+    toast.success("Copiado al portapapeles", { duration: 2000 });
+    setTimeout(() => setCopiedField(null), 2000);
   };
 
-  const colors = companyColors[employee.company as keyof typeof companyColors] || {
-    primary: "var(--irid-a)",
-    secondary: "var(--irid-b)",
-    glow: "rgba(59,130,246,0.15)",
-    badge: "bg-[rgba(99,102,241,0.10)] border-[rgba(99,102,241,0.20)] text-[#818CF8]"
+  const openTeamsChat = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    window.open(`https://teams.microsoft.com/l/chat/0/0?users=${employee.email}`, "_blank");
   };
 
-  const barGradient = isTodos 
-    ? (index % 2 === 0 ? "linear-gradient(180deg, #3B82F6, #8B5CF6)" : "linear-gradient(180deg, #8B5CF6, #EC4899)")
-    : employee.company === 'ferrecapital'
-      ? "linear-gradient(180deg, #CC0000, #2A2A2A)"
-      : `linear-gradient(180deg, ${colors.primary}, ${colors.secondary})`;
+  const handleEmailClick = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    window.location.href = `mailto:${employee.email}`;
+  };
 
-  const monogramGradient = isTodos
-    ? (index % 2 === 0 ? "linear-gradient(135deg, #3B82F6, #8B5CF6)" : "linear-gradient(135deg, #8B5CF6, #EC4899)")
-    : employee.company === 'comercializadora-shuma'
-      ? `linear-gradient(135deg, ${colors.primary}, ${colors.highlight || colors.secondary})`
-      : employee.company === 'ferrecapital'
-        ? "linear-gradient(135deg, #2A2A2A, #1A1A1A)"
-        : `linear-gradient(135deg, ${colors.primary}, ${colors.secondary})`;
+  const handlePhoneClick = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    window.location.href = `tel:${employee.phone}`;
+  };
 
-  const companyInitial = getCompanyInitial(employee.company);
-
-  return (
-    <motion.div
-      ref={cardRef}
-      initial={{ opacity: 0, y: 20, scale: 0.97 }}
-      animate={isVisible ? { opacity: 1, y: 0, scale: 1 } : {}}
-      transition={{ duration: 0.3, delay: index * 0.035, ease: premiumEase }}
-      className="group relative h-full"
-    >
-      <Link href={`/directorio/${employee.id}`} className="block h-full">
-        <div
-          className={cn(
-            "relative overflow-hidden rounded-[14px] border border-[--border-subtle] bg-[--bg-surface] p-5 h-full",
-            "transition-all duration-300 hover:-translate-y-[6px] hover:shadow-[0_12px_40px_-12px_var(--glow)] active:scale-[0.96]"
-          )}
-          style={{ 
-            "--glow": colors.glow 
-          } as React.CSSProperties}
-        >
-          {/* Left Accent Bar */}
+  if (view === "list") {
+    return (
+      <motion.div
+        initial={{ opacity: 0, x: -20 }}
+        animate={{ opacity: 1, x: 0 }}
+        transition={{ duration: 0.18, delay: index * 0.04, ease: premiumEase }}
+        className="will-change-transform gpu-accelerated"
+      >
+        <Link href={`/directorio/${employee.id}`}>
           <div 
-            className="absolute left-0 top-0 bottom-0 w-[3px] rounded-l-[14px] transition-all duration-300 group-hover:w-[5px] z-20"
+            className="group flex items-center gap-4 p-4 rounded-lg border border-border bg-card transition-all duration-[180ms] hover:scale-[1.01] hover:shadow-lg hover:border-primary/30"
             style={{ 
-              background: barGradient
+              ["--bracket-color" as string]: company.color,
+              transitionTimingFunction: "cubic-bezier(0.25, 0.46, 0.45, 0.94)"
             }}
-          />
-
-          {/* Watermark */}
-          <div 
-            className="absolute bottom-[-20px] right-[-10px] font-neuropol text-[96px] leading-none pointer-events-none select-none transition-all duration-300 opacity-[0.05] group-hover:opacity-[0.10] z-0"
-            style={{ color: colors.primary }}
           >
-            {companyInitial}
-          </div>
-
-          <div className="relative flex flex-col h-full z-10">
-            {/* Monogram circle */}
-            <div className="flex items-start gap-4 mb-4">
-              <div 
-                className="w-14 h-14 rounded-full flex items-center justify-center text-lg font-bold shrink-0 text-white shadow-lg"
-                style={{ 
-                  background: monogramGradient,
-                  border: employee.company === 'ferrecapital' ? "2px solid #CC0000" : "none"
-                }}
-              >
-                <span style={{ fontFamily: "'Neuropol', sans-serif" }}>{getInitials(employee.name)}</span>
-              </div>
-              <div className="flex-1 min-w-0">
-                <h3 
-                  className="text-base text-text-primary leading-tight truncate"
-                  style={{ fontFamily: "'Neuropol', sans-serif" }}
-                >
-                  <span style={{ fontFamily: "'Neuropol', sans-serif" }}>{employee.name || "—"}</span>
-                </h3>
-                <p className="font-dm-sans italic text-[13px] text-text-muted truncate mt-0.5" style={{ fontFamily: "inherit" }}>
-                  {employee.position || "—"}
-                </p>
-              </div>
-            </div>
-
-            {/* Department Badge & Location */}
-            <div className="mb-auto flex flex-col gap-2">
-              <div className="flex flex-wrap gap-2">
-                <span 
-                  className={cn(
-                    "inline-flex items-center px-2.5 py-1 rounded-full text-[10px] uppercase tracking-wider border",
-                  )}
-                  style={{ 
-                    fontFamily: "'Neuropol', sans-serif",
-                    backgroundColor: employee.company === 'ferrecapital' ? 'rgba(204,0,0,0.10)' : colors.primary + '1f',
-                    borderColor: employee.company === 'ferrecapital' ? 'rgba(204,0,0,0.25)' : colors.primary + '40',
-                    color: employee.company === 'ferrecapital' ? '#CC0000' : (employee.company === 'comercializadora-shuma' ? '#00AAFF' : colors.primary)
+            <div className="corner-bracket">
+              <Avatar className="w-12 h-12 border border-border">
+                <AvatarFallback
+                  style={{
+                    backgroundColor: `${company.color}20`,
+                    color: company.color,
                   }}
                 >
-                  {employee.department || "—"}
-                </span>
-              </div>
-              {employee.location && (
-                <div className="flex items-center gap-1.5 text-text-muted">
-                  <MapPin className="w-3 h-3" />
-                  <span className="font-dm-sans text-[11px] truncate">{employee.location}</span>
-                </div>
-              )}
+                  {getInitials(employee.name)}
+                </AvatarFallback>
+              </Avatar>
             </div>
 
-            {/* Contact Row */}
-            <div className="flex items-center gap-4 mt-4 md:opacity-0 md:group-hover:opacity-100 transition-opacity duration-200">
+            <div className="flex-1 min-w-0">
               <div className="flex items-center gap-2">
-                <button 
-                  onClick={(e) => {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    window.location.href = `tel:${employee.phone}`;
-                  }}
-                  className="p-2 rounded-full bg-[--bg-elevated] hover:bg-[--border-subtle] transition-colors"
-                  title="Llamar"
-                >
-                  <Phone className="w-4 h-4 text-text-muted" />
-                </button>
-                {employee.extension && (
-                  <span className="font-dm-sans text-[11px] text-text-muted">Ext. {employee.extension}</span>
+                <h3 className="font-medium text-foreground group-hover:text-primary transition-colors duration-[180ms] truncate">
+                  {employee.name}
+                </h3>
+                {!hideCompanyBadge && (
+                  <span
+                    className="text-xs font-medium px-2 py-0.5 rounded-full shrink-0"
+                    style={{
+                      backgroundColor: `${company.color}15`,
+                      color: company.color,
+                    }}
+                  >
+                    {company.shortName || company.name}
+                  </span>
                 )}
               </div>
-              <button 
-                onClick={(e) => {
-                  e.preventDefault();
-                  e.stopPropagation();
-                  window.location.href = `mailto:${employee.email}`;
+              <p className="text-sm text-muted-foreground truncate">
+                {employee.position} · {employee.department}
+              </p>
+            </div>
+
+            {/* Contact info inline for list view */}
+            <div className="hidden md:flex items-center gap-3 text-xs">
+              <TooltipProvider>
+                {/* Email */}
+                <div className="flex items-center gap-1">
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <button
+                        onClick={handleEmailClick}
+                        className="flex items-center gap-1 text-muted-foreground hover:text-foreground transition-colors"
+                      >
+                        <Mail className="w-3.5 h-3.5" />
+                        <span className="hidden lg:inline max-w-28 truncate">{truncateEmail(employee.email)}</span>
+                      </button>
+                    </TooltipTrigger>
+                    <TooltipContent>{employee.email}</TooltipContent>
+                  </Tooltip>
+                  <button
+                    onClick={(e) => copyToClipboard(e, employee.email, "email-list")}
+                    className="p-1 rounded hover:bg-muted transition-colors"
+                  >
+                    {copiedField === "email-list" ? (
+                      <Check className="w-3 h-3 text-green-500" />
+                    ) : (
+                      <Copy className="w-3 h-3 text-muted-foreground" />
+                    )}
+                  </button>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <button
+                        onClick={openTeamsChat}
+                        className="p-1 rounded hover:bg-[#6264A7]/10 transition-colors group/teams"
+                      >
+                        <MessageSquare className="w-3 h-3 text-muted-foreground group-hover/teams:text-[#6264A7]" />
+                      </button>
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      <p>Enviar mensaje en Teams</p>
+                    </TooltipContent>
+                  </Tooltip>
+                </div>
+
+                {/* Phone */}
+                <div className="flex items-center gap-1">
+                  <button
+                    onClick={handlePhoneClick}
+                    className="flex items-center gap-1 text-muted-foreground hover:text-foreground transition-colors"
+                  >
+                    <Phone className="w-3.5 h-3.5" />
+                    <span className="hidden lg:inline">{formatPhone(employee.phone)}</span>
+                  </button>
+                  <span className="px-1.5 py-0.5 rounded bg-muted text-[10px] font-medium">
+                    Ext. {employee.extension}
+                  </span>
+                  <button
+                    onClick={(e) => copyToClipboard(e, employee.phone, "phone-list")}
+                    className="p-1 rounded hover:bg-muted transition-colors"
+                  >
+                    {copiedField === "phone-list" ? (
+                      <Check className="w-3 h-3 text-green-500" />
+                    ) : (
+                      <Copy className="w-3 h-3 text-muted-foreground" />
+                    )}
+                  </button>
+                </div>
+              </TooltipProvider>
+            </div>
+          </div>
+        </Link>
+      </motion.div>
+    );
+  }
+
+  // Grid view - max height 220px
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.18, delay: index * 0.04, ease: premiumEase }}
+      className="will-change-transform gpu-accelerated"
+    >
+      <Link href={`/directorio/${employee.id}`}>
+        <div
+          className={cn(
+            "card-shimmer corner-bracket group relative overflow-hidden rounded-xl border border-border bg-card p-4 h-[220px] flex flex-col",
+            "transition-all duration-[180ms] hover:scale-[1.02] hover:shadow-lg"
+          )}
+          style={{ 
+            ["--shimmer-color" as string]: company.color,
+            ["--bracket-color" as string]: company.color,
+            boxShadow: "0 0 0 0 transparent",
+            transitionTimingFunction: "cubic-bezier(0.25, 0.46, 0.45, 0.94)"
+          }}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.boxShadow = `0 8px 30px -10px ${company.color}40`;
+            e.currentTarget.style.borderColor = `${company.color}50`;
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.boxShadow = "0 0 0 0 transparent";
+            e.currentTarget.style.borderColor = "";
+          }}
+        >
+          {/* Top section: Avatar + Info */}
+          <div className="flex items-start gap-3 flex-1">
+            <Avatar className="w-14 h-14 border-2 border-border group-hover:border-primary/50 transition-colors duration-[180ms] shrink-0">
+              <AvatarFallback
+                className="text-sm font-semibold"
+                style={{
+                  backgroundColor: `${company.color}20`,
+                  color: company.color,
                 }}
-                className="p-2 rounded-full bg-[--bg-elevated] hover:bg-[--border-subtle] transition-colors"
-                title="Enviar correo"
               >
-                <Mail className="w-4 h-4 text-text-muted" />
+                {getInitials(employee.name)}
+              </AvatarFallback>
+            </Avatar>
+
+            <div className="flex-1 min-w-0">
+              <h3 className="font-semibold text-foreground group-hover:text-primary transition-colors duration-[180ms] line-clamp-1 text-sm">
+                {employee.name}
+              </h3>
+              <p className="text-xs text-muted-foreground line-clamp-1">
+                {employee.position}
+              </p>
+              <p className="text-[11px] text-muted-foreground/70 line-clamp-1">
+                {employee.department}
+              </p>
+              {!hideCompanyBadge && (
+                <span
+                  className="inline-block text-[10px] font-medium px-1.5 py-0.5 rounded-full mt-1"
+                  style={{
+                    backgroundColor: `${company.color}15`,
+                    color: company.color,
+                  }}
+                >
+                  {company.shortName || company.name}
+                </span>
+              )}
+            </div>
+          </div>
+
+          {/* Divider */}
+          <div className="gradient-divider my-2" />
+
+          {/* Bottom section: Contact info */}
+          <div className="space-y-1.5 text-[12px]">
+            {/* Email row */}
+            <div className="flex items-center gap-1">
+              <button
+                onClick={handleEmailClick}
+                className="flex items-center gap-1.5 text-muted-foreground hover:text-foreground transition-colors flex-1 min-w-0"
+              >
+                <Mail className="w-3.5 h-3.5 shrink-0" />
+                <TooltipProvider>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <span className="truncate">{truncateEmail(employee.email, 18)}</span>
+                    </TooltipTrigger>
+                    <TooltipContent>{employee.email}</TooltipContent>
+                  </Tooltip>
+                </TooltipProvider>
+              </button>
+              <button
+                onClick={(e) => copyToClipboard(e, employee.email, `email-${employee.id}`)}
+                className="p-1 rounded hover:bg-muted transition-colors shrink-0"
+              >
+                {copiedField === `email-${employee.id}` ? (
+                  <Check className="w-3 h-3 text-green-500" />
+                ) : (
+                  <Copy className="w-3 h-3 text-muted-foreground" />
+                )}
+              </button>
+              <TooltipProvider>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <button
+                      onClick={openTeamsChat}
+                      className="p-1 rounded hover:bg-[#6264A7]/10 transition-colors shrink-0 group/teams"
+                    >
+                      <MessageSquare className="w-3 h-3 text-muted-foreground group-hover/teams:text-[#6264A7]" />
+                    </button>
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p>Enviar mensaje en Teams</p>
+                  </TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
+            </div>
+
+            {/* Phone row */}
+            <div className="flex items-center gap-1">
+              <button
+                onClick={handlePhoneClick}
+                className="flex items-center gap-1.5 text-muted-foreground hover:text-foreground transition-colors"
+              >
+                <Phone className="w-3.5 h-3.5 shrink-0" />
+                <span>{formatPhone(employee.phone)}</span>
+              </button>
+              <span className="px-1.5 py-0.5 rounded bg-muted text-[10px] font-medium shrink-0">
+                Ext. {employee.extension}
+              </span>
+              <button
+                onClick={(e) => copyToClipboard(e, employee.phone, `phone-${employee.id}`)}
+                className="p-1 rounded hover:bg-muted transition-colors shrink-0 ml-auto"
+              >
+                {copiedField === `phone-${employee.id}` ? (
+                  <Check className="w-3 h-3 text-green-500" />
+                ) : (
+                  <Copy className="w-3 h-3 text-muted-foreground" />
+                )}
               </button>
             </div>
           </div>

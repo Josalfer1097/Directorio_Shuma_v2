@@ -158,32 +158,66 @@ export function MobileFiltersBottomSheet({
                 </div>
               </div>
 
-              {/* Departamento - Vertical list with checkboxes */}
+              {/* Departamento - Vertical list with radio buttons for single selection */}
               <div>
                 <h3 className="font-semibold text-foreground mb-3">
                   Departamento
                 </h3>
                 <div className="space-y-1">
-                  <label className="flex items-center gap-3 p-3 rounded-lg cursor-pointer hover:bg-muted transition-colors">
-                    <Checkbox
-                      checked={localDepartment === "all"}
-                      onCheckedChange={() => setLocalDepartment("all")}
-                    />
-                    <span className="text-sm text-foreground">
+                  <button
+                    type="button"
+                    onClick={() => setLocalDepartment("all")}
+                    className={`w-full flex items-center gap-3 p-3 rounded-lg cursor-pointer transition-colors ${
+                      localDepartment === "all" 
+                        ? "bg-primary/10 border border-primary/30" 
+                        : "hover:bg-muted"
+                    }`}
+                  >
+                    <div className={`w-4 h-4 rounded-full border-2 flex items-center justify-center ${
+                      localDepartment === "all" 
+                        ? "border-primary" 
+                        : "border-muted-foreground"
+                    }`}>
+                      {localDepartment === "all" && (
+                        <div className="w-2 h-2 rounded-full bg-primary" />
+                      )}
+                    </div>
+                    <span className={`text-sm ${
+                      localDepartment === "all" 
+                        ? "text-foreground font-medium" 
+                        : "text-foreground"
+                    }`}>
                       Todos los departamentos
                     </span>
-                  </label>
+                  </button>
                   {departments.map((dept) => (
-                    <label
+                    <button
                       key={dept}
-                      className="flex items-center gap-3 p-3 rounded-lg cursor-pointer hover:bg-muted transition-colors"
+                      type="button"
+                      onClick={() => setLocalDepartment(dept)}
+                      className={`w-full flex items-center gap-3 p-3 rounded-lg cursor-pointer transition-colors ${
+                        localDepartment === dept 
+                          ? "bg-primary/10 border border-primary/30" 
+                          : "hover:bg-muted"
+                      }`}
                     >
-                      <Checkbox
-                        checked={localDepartment === dept}
-                        onCheckedChange={() => setLocalDepartment(dept)}
-                      />
-                      <span className="text-sm text-foreground">{dept}</span>
-                    </label>
+                      <div className={`w-4 h-4 rounded-full border-2 flex items-center justify-center ${
+                        localDepartment === dept 
+                          ? "border-primary" 
+                          : "border-muted-foreground"
+                      }`}>
+                        {localDepartment === dept && (
+                          <div className="w-2 h-2 rounded-full bg-primary" />
+                        )}
+                      </div>
+                      <span className={`text-sm ${
+                        localDepartment === dept 
+                          ? "text-foreground font-medium" 
+                          : "text-foreground"
+                      }`}>
+                        {dept}
+                      </span>
+                    </button>
                   ))}
                 </div>
               </div>
