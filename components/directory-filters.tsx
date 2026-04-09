@@ -22,6 +22,14 @@ import {
 import { MobileFiltersBottomSheet } from "./mobile-filters-bottom-sheet";
 import type { Company, Employee } from "@/types";
 
+// Company config for consistent colors
+const companyConfigMap: Record<string, { primary: string }> = {
+  comercializadora: { primary: '#0047AB' },
+  acabados: { primary: '#C0152A' },
+  ferrecapital: { primary: '#CC0000' },
+  arkiramica: { primary: '#F5C400' },
+};
+
 // Spring animation for filter panel
 const springTransition = {
   type: "spring",
@@ -109,27 +117,35 @@ export function DirectoryFilters({
       <div>
         <h4 className="font-medium text-foreground mb-3" style={{ fontFamily: "'Neuropol', sans-serif" }}>Empresas</h4>
         <div className="space-y-2">
-          {companies.filter(c => !c.disabled).map((company) => (
-            <label
-              key={company.id}
-              className="flex items-center gap-3 cursor-pointer group"
-              style={{ fontFamily: "'Neuropol', sans-serif" }}
-            >
-              <Checkbox
-                checked={selectedCompanies.includes(company.id)}
-                onCheckedChange={() => toggleCompany(company.id)}
-              />
-              <div className="flex items-center gap-2">
-                <div
-                  className="w-3 h-3 rounded-full"
-                  style={{ backgroundColor: company.colors.primary }}
+          {companies.filter(c => !c.disabled).map((company) => {
+            const companyColor = companyConfigMap[company.id]?.primary || company.colors.primary;
+            const isChecked = selectedCompanies.includes(company.id);
+            return (
+              <label
+                key={company.id}
+                className="flex items-center gap-3 cursor-pointer group"
+                style={{ fontFamily: "'Neuropol', sans-serif" }}
+              >
+                <Checkbox
+                  checked={isChecked}
+                  onCheckedChange={() => toggleCompany(company.id)}
+                  style={{
+                    borderColor: isChecked ? companyColor : undefined,
+                    backgroundColor: isChecked ? companyColor : undefined,
+                  }}
                 />
-                <span className="text-sm text-muted-foreground group-hover:text-foreground transition-colors" style={{ fontFamily: "'Neuropol', sans-serif" }}>
-                  {company.shortName || company.name}
-                </span>
-              </div>
-            </label>
-          ))}
+                <div className="flex items-center gap-2">
+                  <div
+                    className="w-3 h-3 rounded-full"
+                    style={{ backgroundColor: companyColor }}
+                  />
+                  <span className="text-sm text-muted-foreground group-hover:text-foreground transition-colors" style={{ fontFamily: "'Neuropol', sans-serif" }}>
+                    {company.shortName || company.name}
+                  </span>
+                </div>
+              </label>
+            );
+          })}
         </div>
       </div>
 
