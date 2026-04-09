@@ -40,10 +40,10 @@ const truncateEmail = (email: string, maxLength = 20) => {
 };
 
 // Company config for hover colors based on company id
-const companyConfigMap: Record<string, { primary: string; secondary: string; glow: string }> = {
+const companyConfigMap: Record<string, { primary: string; secondary: string; glow: string; accent?: string; accentGlow?: string; textColor?: string }> = {
   comercializadora: { primary: '#0047AB', secondary: '#002D6E', glow: 'rgba(0,71,171,0.25)' },
   acabados: { primary: '#C0152A', secondary: '#8B0000', glow: 'rgba(192,21,42,0.25)' },
-  ferrecapital: { primary: '#CC0000', secondary: '#1A1A1A', glow: 'rgba(204,0,0,0.22)' },
+  ferrecapital: { primary: '#2C3338', secondary: '#1A1E21', glow: 'rgba(44,51,56,0.35)', accent: '#CC0000', accentGlow: 'rgba(204,0,0,0.18)', textColor: '#E8EAED' },
   arkiramica: { primary: '#F5C400', secondary: '#C49A00', glow: 'rgba(245,196,0,0.22)' },
 };
 
@@ -134,8 +134,10 @@ export function EmployeeCard({
               className="absolute left-0 top-0 bottom-0 transition-all duration-[180ms]"
               style={{
                 width: isHovered ? '5px' : '3px',
-                backgroundColor: companyConfig.primary,
-                opacity: isHovered ? 1 : 0.6,
+                background: isHovered && companyConfig.accent 
+                  ? `linear-gradient(to bottom, ${companyConfig.accent}, ${companyConfig.primary})`
+                  : companyConfig.primary,
+                opacity: isHovered ? 1 : 0.7,
               }}
             />
             <div className="corner-bracket ml-2">
@@ -144,15 +146,19 @@ export function EmployeeCard({
                 style={{
                   borderWidth: isHovered ? '2px' : '1.5px',
                   borderStyle: 'solid',
-                  borderColor: isHovered ? companyConfig.primary : `${companyConfig.primary}66`,
-                  boxShadow: isHovered ? `0 0 12px ${companyConfig.glow}` : 'none',
+                  borderColor: isHovered 
+                    ? (companyConfig.accent || companyConfig.primary) 
+                    : `${companyConfig.primary}66`,
+                  boxShadow: isHovered 
+                    ? `0 0 12px ${companyConfig.accentGlow || companyConfig.glow}` 
+                    : 'none',
                   transform: isHovered ? 'scale(1.05)' : 'none',
                 }}
               >
                 <AvatarFallback
                   style={{
                     background: `linear-gradient(135deg, ${companyConfig.secondary}, ${companyConfig.primary})`,
-                    color: 'white',
+                    color: companyConfig.textColor || 'white',
                   }}
                 >
                   {getInitials(employee.name)}
@@ -169,8 +175,9 @@ export function EmployeeCard({
                   <span
                     className="text-xs font-medium px-2 py-0.5 rounded-full shrink-0"
                     style={{
-                      backgroundColor: `${companyConfig.primary}15`,
-                      color: companyConfig.primary,
+                      backgroundColor: companyConfig.accent ? companyConfig.secondary : `${companyConfig.primary}15`,
+                      border: companyConfig.accent ? `1px solid ${companyConfig.primary}` : 'none',
+                      color: companyConfig.accent || companyConfig.primary,
                     }}
                   >
                     {company.shortName || company.name}
@@ -290,8 +297,10 @@ export function EmployeeCard({
             className="absolute left-0 top-0 bottom-0 transition-all duration-[180ms]"
             style={{
               width: isHovered ? '5px' : '3px',
-              backgroundColor: companyConfig.primary,
-              opacity: isHovered ? 1 : 0.6,
+              background: isHovered && companyConfig.accent 
+                ? `linear-gradient(to bottom, ${companyConfig.accent}, ${companyConfig.primary})`
+                : companyConfig.primary,
+              opacity: isHovered ? 1 : 0.7,
             }}
           />
           
@@ -302,8 +311,12 @@ export function EmployeeCard({
               style={{
                 borderWidth: isHovered ? '2px' : '1.5px',
                 borderStyle: 'solid',
-                borderColor: isHovered ? companyConfig.primary : `${companyConfig.primary}66`,
-                boxShadow: isHovered ? `0 0 12px ${companyConfig.glow}` : 'none',
+                borderColor: isHovered 
+                  ? (companyConfig.accent || companyConfig.primary) 
+                  : `${companyConfig.primary}66`,
+                boxShadow: isHovered 
+                  ? `0 0 12px ${companyConfig.accentGlow || companyConfig.glow}` 
+                  : 'none',
                 transform: isHovered ? 'scale(1.05)' : 'none',
               }}
             >
@@ -311,7 +324,7 @@ export function EmployeeCard({
                 className="text-sm font-semibold"
                 style={{
                   background: `linear-gradient(135deg, ${companyConfig.secondary}, ${companyConfig.primary})`,
-                  color: 'white',
+                  color: companyConfig.textColor || 'white',
                 }}
               >
                 {getInitials(employee.name)}
@@ -332,8 +345,9 @@ export function EmployeeCard({
                 <span
                   className="inline-block text-[10px] font-medium px-1.5 py-0.5 rounded-full mt-1"
                   style={{
-                    backgroundColor: `${companyConfig.primary}15`,
-                    color: companyConfig.primary,
+                    backgroundColor: companyConfig.accent ? companyConfig.secondary : `${companyConfig.primary}15`,
+                    border: companyConfig.accent ? `1px solid ${companyConfig.primary}` : 'none',
+                    color: companyConfig.accent || companyConfig.primary,
                   }}
                 >
                   {company.shortName || company.name}
