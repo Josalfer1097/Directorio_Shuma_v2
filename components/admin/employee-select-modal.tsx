@@ -7,6 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { getEmployees, getCompanyById } from "@/lib/data";
 import { cn } from "@/lib/utils";
+import { getCompanyConfig } from "@/lib/companyConfig";
 
 interface EmployeeSelectModalProps {
   isOpen: boolean;
@@ -138,7 +139,7 @@ export function EmployeeSelectModal({
                         {company && (
                           <div
                             className="w-2 h-2 rounded-full shrink-0"
-                            style={{ backgroundColor: company.color }}
+                            style={{ backgroundColor: getCompanyConfig(company?.id).primary }}
                           />
                         )}
                       </button>

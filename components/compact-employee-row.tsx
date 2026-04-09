@@ -4,6 +4,7 @@ import { motion } from "framer-motion";
 import { Phone } from "lucide-react";
 import type { Employee, Company } from "@/types";
 import { cn } from "@/lib/utils";
+import { getCompanyConfig } from "@/lib/companyConfig";
 
 interface CompactEmployeeRowProps {
   employee: Employee;
@@ -26,8 +27,8 @@ export function CompactEmployeeRow({
       .toUpperCase();
   };
 
-  const colors = company.colors;
-  const isFerrecapital = company.id === "ferrecapital";
+  const colors = getCompanyConfig(company?.id);
+  const isFerrecapital = company?.id === "ferrecapital";
 
   const monogramGradient = isFerrecapital
     ? "linear-gradient(135deg, #1A1A1A, #2A2A2A)"

@@ -6,6 +6,7 @@ import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import type { Company } from "@/types";
+import { getCompanyConfig } from "@/lib/companyConfig";
 
 // Spring animation for bottom sheet
 const springTransition = {
@@ -167,7 +168,7 @@ export function MobileFiltersBottomSheet({
                       }`}
                       style={{
                         backgroundColor: localCompanies.includes(company.id)
-                          ? company.colors.primary
+                          ? getCompanyConfig(company.id).primary
                           : undefined,
                       }}
                     >

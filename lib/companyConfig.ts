@@ -44,19 +44,22 @@ export const companyConfig: Record<string, {
   },
 };
 
-export function getCompanyConfig(companyId: string) {
-  const normalized = companyId?.toLowerCase()
+export function getCompanyConfig(companyId?: string | null) {
+  // Always return a valid config, never undefined
+  if (!companyId) return companyConfig.comercializadora;
+  
+  const normalized = companyId.toLowerCase()
     .normalize('NFD')
     .replace(/[\u0300-\u036f]/g, '')
     .replace(/[^a-z]/g, '');
   
-  if (normalized?.includes('comercializ') || normalized?.includes('ferreteria')) 
+  if (normalized.includes('comercializ') || normalized.includes('ferreteria')) 
     return companyConfig.comercializadora;
-  if (normalized?.includes('acabado')) 
+  if (normalized.includes('acabado')) 
     return companyConfig.acabados;
-  if (normalized?.includes('ferrecapital')) 
+  if (normalized.includes('ferrecapital')) 
     return companyConfig.ferrecapital;
-  if (normalized?.includes('arkiram') || normalized?.includes('arkiream')) 
+  if (normalized.includes('arkiram') || normalized.includes('arkiream')) 
     return companyConfig.arkiramica;
   
   return companyConfig.comercializadora; // safe fallback
