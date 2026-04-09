@@ -38,8 +38,18 @@ function DirectoryContent() {
       initialCompany ? [initialCompany] : []
   );
   const [selectedDepartment, setSelectedDepartment] = useState("all");
+  const [selectedLocations, setSelectedLocations] = useState<string[]>([]);
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
   const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
+
+  // Get available locations from employees
+  const availableLocations = useMemo(() => {
+    const locations = new Set<string>();
+    employees.forEach(emp => {
+      if (emp.location) locations.add(emp.location);
+    });
+    return Array.from(locations).sort();
+  }, [employees]);
 
   const employees = getEmployees();
   const companies = getCompanies();
@@ -76,12 +86,16 @@ function DirectoryContent() {
       results = results.filter((emp) => emp.department === selectedDepartment);
     }
 
+    if (selectedLocations.length > 0) {
+      results = results.filter((emp) => emp.location && selectedLocations.includes(emp.location));
+    }
+
     if (!searchQuery.trim()) {
       results = [...results].sort((a, b) => a.name.localeCompare(b.name, "es"));
     }
 
     return results;
-  }, [employees, searchQuery, selectedCompanies, selectedDepartment, fuse]);
+  }, [employees, searchQuery, selectedCompanies, selectedDepartment, selectedLocations, fuse]);
 
   // Pagination
   const totalPages = Math.ceil(filteredEmployees.length / ITEMS_PER_PAGE);
@@ -93,12 +107,13 @@ function DirectoryContent() {
   // Reset page when filters change
   useEffect(() => {
     setCurrentPage(1);
-  }, [searchQuery, selectedCompanies, selectedDepartment, selectedTags]);
+  }, [searchQuery, selectedCompanies, selectedDepartment, selectedLocations, selectedTags]);
 
   const clearFilters = () => {
     setSearchQuery("");
     setSelectedCompanies([]);
     setSelectedDepartment("all");
+    setSelectedLocations([]);
     setSelectedTags([]);
   };
 
@@ -131,10 +146,13 @@ function DirectoryContent() {
                 <DirectoryFilters
                     companies={companies}
                     departments={departments}
+                    locations={availableLocations}
                     selectedCompanies={selectedCompanies}
                     selectedDepartment={selectedDepartment}
+                    selectedLocations={selectedLocations}
                     onCompanyChange={setSelectedCompanies}
                     onDepartmentChange={setSelectedDepartment}
+                    onLocationChange={setSelectedLocations}
                     onClearFilters={clearFilters}
                     filteredEmployees={filteredEmployees}
                 />
@@ -294,9 +312,9 @@ function DirectoryContent() {
         >
           <Filter className="w-4 h-4 text-text-primary" />
           <span className="font-neuropol text-xs uppercase tracking-wider text-text-primary">Filtros</span>
-          {(selectedCompanies.length > 0 || selectedDepartment !== "all") && (
+          {(selectedCompanies.length > 0 || selectedDepartment !== "all" || selectedLocations.length > 0) && (
             <span className="w-5 h-5 rounded-full bg-primary text-primary-foreground text-xs flex items-center justify-center font-semibold">
-              {selectedCompanies.length + (selectedDepartment !== "all" ? 1 : 0)}
+              {selectedCompanies.length + (selectedDepartment !== "all" ? 1 : 0) + selectedLocations.length}
             </span>
           )}
         </motion.button>
@@ -307,10 +325,13 @@ function DirectoryContent() {
           onClose={() => setMobileFiltersOpen(false)}
           companies={companies.filter(c => !c.disabled)}
           departments={departments}
+          locations={availableLocations}
           selectedCompanies={selectedCompanies}
           selectedDepartment={selectedDepartment}
+          selectedLocations={selectedLocations}
           onCompanyChange={setSelectedCompanies}
           onDepartmentChange={setSelectedDepartment}
+          onLocationChange={setSelectedLocations}
           onClearFilters={clearFilters}
           onApply={() => setMobileFiltersOpen(false)}
         />

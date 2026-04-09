@@ -12,6 +12,7 @@ import {
   X,
   MessageSquare,
   AlertTriangle,
+  MapPin,
 } from "lucide-react";
 import {
   getEmployeeById,
@@ -363,6 +364,41 @@ function EmployeeDetailContent({ id }: { id: string }) {
                   }}
                 >
                   Sin extension
+                </span>
+              )}
+            </div>
+
+            {/* Sucursal - spans both columns */}
+            <div className="col-span-2 pb-3" style={{ borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
+              <p 
+                className="mb-1"
+                style={{ 
+                  fontSize: '0.6rem', 
+                  color: 'rgba(255,255,255,0.27)', 
+                  textTransform: 'uppercase',
+                  letterSpacing: '0.1em',
+                }}
+              >
+                Sucursal
+              </p>
+              {employee.location ? (
+                <span 
+                  className="inline-flex items-center gap-1.5"
+                  style={{
+                    background: 'rgba(255,255,255,0.05)',
+                    border: '1px solid rgba(255,255,255,0.10)',
+                    borderRadius: '20px',
+                    padding: '4px 12px',
+                    fontSize: '0.8rem',
+                    color: 'white',
+                  }}
+                >
+                  <MapPin className="w-3 h-3" style={{ color: config.primary }} />
+                  {employee.location}
+                </span>
+              ) : (
+                <span style={{ fontSize: '0.8rem', color: 'rgba(255,255,255,0.4)' }}>
+                  Sin sucursal
                 </span>
               )}
             </div>

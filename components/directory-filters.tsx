@@ -33,10 +33,13 @@ const springTransition = {
 interface DirectoryFiltersProps {
   companies: Company[];
   departments: string[];
+  locations: string[];
   selectedCompanies: string[];
   selectedDepartment: string;
+  selectedLocations: string[];
   onCompanyChange: (companies: string[]) => void;
   onDepartmentChange: (department: string) => void;
+  onLocationChange: (locations: string[]) => void;
   onClearFilters: () => void;
   filteredEmployees: Employee[];
 }
@@ -44,10 +47,13 @@ interface DirectoryFiltersProps {
 export function DirectoryFilters({
   companies,
   departments,
+  locations,
   selectedCompanies,
   selectedDepartment,
+  selectedLocations,
   onCompanyChange,
   onDepartmentChange,
+  onLocationChange,
   onClearFilters,
   filteredEmployees,
 }: DirectoryFiltersProps) {
@@ -55,11 +61,21 @@ export function DirectoryFilters({
   
   const hasActiveFilters =
     selectedCompanies.length > 0 ||
-    selectedDepartment !== "all";
+    selectedDepartment !== "all" ||
+    selectedLocations.length > 0;
 
   const activeFilterCount =
     selectedCompanies.length +
-    (selectedDepartment !== "all" ? 1 : 0);
+    (selectedDepartment !== "all" ? 1 : 0) +
+    selectedLocations.length;
+
+  const toggleLocation = (location: string) => {
+    if (selectedLocations.includes(location)) {
+      onLocationChange(selectedLocations.filter((l) => l !== location));
+    } else {
+      onLocationChange([...selectedLocations, location]);
+    }
+  };
 
   const toggleCompany = (companyId: string) => {
     if (selectedCompanies.includes(companyId)) {
@@ -75,6 +91,7 @@ export function DirectoryFilters({
       "Puesto",
       "Departamento",
       "Empresa",
+      "Sucursal",
       "Email",
       "Teléfono",
     ];
@@ -85,6 +102,7 @@ export function DirectoryFilters({
         emp.position,
         emp.department,
         company?.name || emp.company,
+        emp.location || "Sin sucursal",
         emp.email,
         emp.phone,
       ];
@@ -176,6 +194,33 @@ export function DirectoryFilters({
           </SelectContent>
         </Select>
       </div>
+
+      {/* Locations */}
+      {locations.length > 0 && (
+        <div>
+          <h4 className="font-medium text-foreground mb-3" style={{ fontFamily: "'Neuropol', sans-serif" }}>Sucursal</h4>
+          <div className="space-y-2">
+            {locations.map((location) => {
+              const isChecked = selectedLocations.includes(location);
+              return (
+                <label
+                  key={location}
+                  className="flex items-center gap-3 cursor-pointer group"
+                  style={{ fontFamily: "'Neuropol', sans-serif" }}
+                >
+                  <Checkbox
+                    checked={isChecked}
+                    onCheckedChange={() => toggleLocation(location)}
+                  />
+                  <span className="text-sm text-muted-foreground group-hover:text-foreground transition-colors" style={{ fontFamily: "'Neuropol', sans-serif" }}>
+                    {location}
+                  </span>
+                </label>
+              );
+            })}
+          </div>
+        </div>
+      )}
 
       {/* Clear and Export */}
       <div className="flex flex-col gap-2 pt-4 border-t border-[--border-subtle]">

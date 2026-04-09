@@ -1,7 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { Mail, Phone, Copy, Check, MessageSquare } from "lucide-react";
+import { Mail, Phone, Copy, Check, MessageSquare, MapPin } from "lucide-react";
 import { useState } from "react";
 import Link from "next/link";
 import { toast } from "sonner";
@@ -352,6 +352,12 @@ export function EmployeeCard({
               <p className="text-[11px] text-muted-foreground/70 line-clamp-1">
                 {employee.department}
               </p>
+              {employee.location && (
+                <p className="flex items-center gap-1 text-[10px] text-muted-foreground/50 line-clamp-1 mt-0.5">
+                  <MapPin className="w-2.5 h-2.5" />
+                  {employee.location}
+                </p>
+              )}
               {!hideCompanyBadge && (
                 <span
                   className="inline-block text-[10px] font-medium px-2 py-0.5 rounded-full mt-1"

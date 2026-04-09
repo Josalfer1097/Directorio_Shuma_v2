@@ -19,10 +19,13 @@ interface MobileFiltersBottomSheetProps {
   onClose: () => void;
   companies: Company[];
   departments: string[];
+  locations: string[];
   selectedCompanies: string[];
   selectedDepartment: string;
+  selectedLocations: string[];
   onCompanyChange: (companies: string[]) => void;
   onDepartmentChange: (department: string) => void;
+  onLocationChange: (locations: string[]) => void;
   onClearFilters: () => void;
   onApply: () => void;
 }
@@ -32,24 +35,30 @@ export function MobileFiltersBottomSheet({
   onClose,
   companies,
   departments,
+  locations,
   selectedCompanies,
   selectedDepartment,
+  selectedLocations,
   onCompanyChange,
   onDepartmentChange,
+  onLocationChange,
   onClearFilters,
   onApply,
 }: MobileFiltersBottomSheetProps) {
   const [localCompanies, setLocalCompanies] = useState(selectedCompanies);
   const [localDepartment, setLocalDepartment] = useState(selectedDepartment);
+  const [localLocations, setLocalLocations] = useState(selectedLocations);
 
   useEffect(() => {
     setLocalCompanies(selectedCompanies);
     setLocalDepartment(selectedDepartment);
-  }, [selectedCompanies, selectedDepartment]);
+    setLocalLocations(selectedLocations);
+  }, [selectedCompanies, selectedDepartment, selectedLocations]);
 
   const activeFilterCount =
     localCompanies.length +
-    (localDepartment !== "all" ? 1 : 0);
+    (localDepartment !== "all" ? 1 : 0) +
+    localLocations.length;
 
   const toggleCompany = (companyId: string) => {
     setLocalCompanies((prev) =>
@@ -59,9 +68,18 @@ export function MobileFiltersBottomSheet({
     );
   };
 
+  const toggleLocation = (location: string) => {
+    setLocalLocations((prev) =>
+      prev.includes(location)
+        ? prev.filter((l) => l !== location)
+        : [...prev, location]
+    );
+  };
+
   const handleApply = () => {
     onCompanyChange(localCompanies);
     onDepartmentChange(localDepartment);
+    onLocationChange(localLocations);
     onApply();
     onClose();
   };
@@ -69,6 +87,7 @@ export function MobileFiltersBottomSheet({
   const handleClearAll = () => {
     setLocalCompanies([]);
     setLocalDepartment("all");
+    setLocalLocations([]);
   };
 
   return (
@@ -221,6 +240,28 @@ export function MobileFiltersBottomSheet({
                   ))}
                 </div>
               </div>
+
+              {/* Sucursal - Horizontal pills like empresas */}
+              {locations.length > 0 && (
+                <div>
+                  <h3 className="font-semibold text-foreground mb-3">Sucursal</h3>
+                  <div className="flex flex-wrap gap-2">
+                    {locations.map((location) => (
+                      <button
+                        key={location}
+                        onClick={() => toggleLocation(location)}
+                        className={`px-4 py-2 rounded-full text-sm font-medium transition-all duration-150 ${
+                          localLocations.includes(location)
+                            ? "bg-primary text-primary-foreground"
+                            : "bg-muted text-muted-foreground"
+                        }`}
+                      >
+                        {location}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
             </div>
 
             {/* Fixed footer button */}
