@@ -42,6 +42,11 @@ function DirectoryContent() {
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
   const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
 
+  const employees = getEmployees();
+  const companies = getCompanies();
+  const departments = getDepartments();
+  const tags = getAllTags();
+
   // Get available locations from employees
   const availableLocations = useMemo(() => {
     const locations = new Set<string>();
@@ -50,11 +55,6 @@ function DirectoryContent() {
     });
     return Array.from(locations).sort();
   }, [employees]);
-
-  const employees = getEmployees();
-  const companies = getCompanies();
-  const departments = getDepartments();
-  const tags = getAllTags();
 
   // Fuse.js setup for fuzzy search
   const fuse = useMemo(
