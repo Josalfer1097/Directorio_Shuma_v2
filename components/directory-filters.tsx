@@ -21,14 +21,7 @@ import {
 } from "@/components/ui/sheet";
 import { MobileFiltersBottomSheet } from "./mobile-filters-bottom-sheet";
 import type { Company, Employee } from "@/types";
-
-// Company config for consistent colors
-const companyConfigMap: Record<string, { primary: string; accent?: string }> = {
-  comercializadora: { primary: '#0047AB' },
-  acabados: { primary: '#C0152A' },
-  ferrecapital: { primary: '#2C3338', accent: '#CC0000' },
-  arkiramica: { primary: '#F5C400' },
-};
+import { getCompanyConfig } from "@/lib/companyConfig";
 
 // Spring animation for filter panel
 const springTransition = {
@@ -40,10 +33,13 @@ const springTransition = {
 interface DirectoryFiltersProps {
   companies: Company[];
   departments: string[];
+  locations: string[];
   selectedCompanies: string[];
   selectedDepartment: string;
+  selectedLocations: string[];
   onCompanyChange: (companies: string[]) => void;
   onDepartmentChange: (department: string) => void;
+  onLocationChange: (locations: string[]) => void;
   onClearFilters: () => void;
   filteredEmployees: Employee[];
 }
@@ -51,10 +47,13 @@ interface DirectoryFiltersProps {
 export function DirectoryFilters({
   companies,
   departments,
+  locations,
   selectedCompanies,
   selectedDepartment,
+  selectedLocations,
   onCompanyChange,
   onDepartmentChange,
+  onLocationChange,
   onClearFilters,
   filteredEmployees,
 }: DirectoryFiltersProps) {
@@ -62,11 +61,21 @@ export function DirectoryFilters({
   
   const hasActiveFilters =
     selectedCompanies.length > 0 ||
-    selectedDepartment !== "all";
+    selectedDepartment !== "all" ||
+    selectedLocations.length > 0;
 
   const activeFilterCount =
     selectedCompanies.length +
-    (selectedDepartment !== "all" ? 1 : 0);
+    (selectedDepartment !== "all" ? 1 : 0) +
+    selectedLocations.length;
+
+  const toggleLocation = (location: string) => {
+    if (selectedLocations.includes(location)) {
+      onLocationChange(selectedLocations.filter((l) => l !== location));
+    } else {
+      onLocationChange([...selectedLocations, location]);
+    }
+  };
 
   const toggleCompany = (companyId: string) => {
     if (selectedCompanies.includes(companyId)) {
@@ -82,6 +91,7 @@ export function DirectoryFilters({
       "Puesto",
       "Departamento",
       "Empresa",
+      "Sucursal",
       "Email",
       "Teléfono",
     ];
@@ -92,6 +102,7 @@ export function DirectoryFilters({
         emp.position,
         emp.department,
         company?.name || emp.company,
+        emp.location || "Sin sucursal",
         emp.email,
         emp.phone,
       ];
@@ -118,7 +129,8 @@ export function DirectoryFilters({
         <h4 className="font-medium text-foreground mb-3" style={{ fontFamily: "'Neuropol', sans-serif" }}>Empresas</h4>
         <div className="space-y-2">
           {companies.filter(c => !c.disabled).map((company) => {
-            const companyColor = companyConfigMap[company.id]?.primary || company.colors.primary;
+            const companyConf = getCompanyConfig(company.id);
+            const companyColor = companyConf.primary;
             const isChecked = selectedCompanies.includes(company.id);
             return (
               <label
@@ -131,12 +143,12 @@ export function DirectoryFilters({
                   onCheckedChange={() => toggleCompany(company.id)}
                   style={{
                     borderColor: isChecked ? companyColor : undefined,
-                    backgroundColor: isChecked ? (companyConfigMap[company.id]?.accent ? companyColor : companyColor) : undefined,
+                    backgroundColor: isChecked ? companyColor : undefined,
                   }}
                 />
                 <div className="flex items-center gap-2">
                   {/* Two-tone dot for Ferrecapital (industrial feel), solid dot for others */}
-                  {companyConfigMap[company.id]?.accent ? (
+                  {companyConf.accent ? (
                     <div 
                       className="w-3 h-3 rounded-full flex items-center justify-center"
                       style={{ 
@@ -146,7 +158,7 @@ export function DirectoryFilters({
                     >
                       <div 
                         className="w-1.5 h-1.5 rounded-full"
-                        style={{ backgroundColor: companyConfigMap[company.id].accent }}
+                        style={{ backgroundColor: companyConf.accent }}
                       />
                     </div>
                   ) : (
@@ -182,6 +194,33 @@ export function DirectoryFilters({
           </SelectContent>
         </Select>
       </div>
+
+      {/* Locations */}
+      {locations.length > 0 && (
+        <div>
+          <h4 className="font-medium text-foreground mb-3" style={{ fontFamily: "'Neuropol', sans-serif" }}>Sucursal</h4>
+          <div className="space-y-2">
+            {locations.map((location) => {
+              const isChecked = selectedLocations.includes(location);
+              return (
+                <label
+                  key={location}
+                  className="flex items-center gap-3 cursor-pointer group"
+                  style={{ fontFamily: "'Neuropol', sans-serif" }}
+                >
+                  <Checkbox
+                    checked={isChecked}
+                    onCheckedChange={() => toggleLocation(location)}
+                  />
+                  <span className="text-sm text-muted-foreground group-hover:text-foreground transition-colors" style={{ fontFamily: "'Neuropol', sans-serif" }}>
+                    {location}
+                  </span>
+                </label>
+              );
+            })}
+          </div>
+        </div>
+      )}
 
       {/* Clear and Export */}
       <div className="flex flex-col gap-2 pt-4 border-t border-[--border-subtle]">

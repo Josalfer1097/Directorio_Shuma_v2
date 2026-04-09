@@ -137,28 +137,48 @@
   }
   
   *:focus-visible {
-    outline: 2px solid var(--ring);
+    outline: 2px solid #00C9A7;
     outline-offset: 2px;
+  }
+  
+  /* Company-specific focus rings applied via data attribute */
+  [data-company="comercializadora"]:focus-visible {
+    outline-color: var(--comercializadora-primary);
+  }
+  [data-company="acabados"]:focus-visible {
+    outline-color: var(--acabados-primary);
+  }
+  [data-company="ferrecapital"]:focus-visible {
+    outline-color: var(--ferrecapital-primary);
+  }
+  [data-company="arkiramica"]:focus-visible {
+    outline-color: var(--arkiramica-primary);
   }
 }
 
-/* Custom scrollbar */
+/* Custom scrollbar - thin 4px */
 ::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
+  width: 4px;
+  height: 4px;
 }
 
 ::-webkit-scrollbar-track {
-  background: var(--bg-base);
+  background: transparent;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: var(--border-strong);
-  border-radius: 4px;
+  background: rgba(255, 255, 255, 0.15);
+  border-radius: 2px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: var(--text-faint);
+  background: rgba(255, 255, 255, 0.25);
+}
+
+/* Firefox scrollbar */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 255, 255, 0.15) transparent;
 }
 
 /* Hide scrollbar utility */
@@ -545,7 +565,7 @@
   background: linear-gradient(135deg, var(--arkiramica-primary) 0%, var(--arkiramica-secondary) 100%);
 }
 
-/* ═══════════════════════════════════════════════════════════════════
+/* ���══════════════════════════════════════════════════════════════════
    PIN OVERLAY
    ═══════════════════════════════════════════════════════════════════ */
 
@@ -706,6 +726,22 @@
 
 .slide-up {
   animation: slide-up 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+/* Page transition animation */
+@keyframes page-fade-in {
+  from { 
+    opacity: 0; 
+    transform: translateY(8px); 
+  }
+  to { 
+    opacity: 1; 
+    transform: translateY(0); 
+  }
+}
+
+.page-transition {
+  animation: page-fade-in 0.2s ease-out;
 }
 
 /* ═══════════════════════════════════════════════════════════════════

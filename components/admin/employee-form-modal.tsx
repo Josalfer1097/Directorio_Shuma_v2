@@ -33,8 +33,19 @@ interface FormData {
   company: string;
   email: string;
   phone: string;
+  location: string;
   reportsTo: string;
 }
+
+const LOCATION_OPTIONS = [
+  "Oficina Central",
+  "Sucursal Puebla",
+  "Sucursal CDMX",
+  "Sucursal Monterrey",
+  "Sucursal Guadalajara",
+  "Almacén Central",
+  "Bodega Norte",
+];
 
 const initialFormData: FormData = {
   id: "",
@@ -44,6 +55,7 @@ const initialFormData: FormData = {
   company: "comercializadora-shuma",
   email: "",
   phone: "",
+  location: "",
   reportsTo: "",
 };
 
@@ -72,6 +84,7 @@ export function EmployeeFormModal({
           company: employee.company,
           email: employee.email,
           phone: employee.phone,
+          location: employee.location || "",
           reportsTo: employee.reportsTo || "",
         });
       }
@@ -109,6 +122,7 @@ export function EmployeeFormModal({
       // Log the data that would be saved
       console.log("[v0] Employee data to save:", {
         ...formData,
+        location: formData.location || "",
         reportsTo: formData.reportsTo || null,
         avatar: null,
       });
@@ -263,6 +277,27 @@ export function EmployeeFormModal({
                   onChange={(e) => handleChange("phone", e.target.value)}
                   placeholder="+52 55 1234 5678"
                 />
+              </div>
+
+              {/* Location */}
+              <div className="space-y-2">
+                <Label htmlFor="location">Sucursal</Label>
+                <Select
+                  value={formData.location}
+                  onValueChange={(value) => handleChange("location", value)}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Seleccionar sucursal" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="">Sin sucursal</SelectItem>
+                    {LOCATION_OPTIONS.map((loc) => (
+                      <SelectItem key={loc} value={loc}>
+                        {loc}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
               </div>
 
               {/* Reports To */}

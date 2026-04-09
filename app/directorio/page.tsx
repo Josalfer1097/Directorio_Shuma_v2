@@ -2,9 +2,9 @@
 
 import { useState, useMemo, useEffect, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import Fuse from "fuse.js";
-import { Search, LayoutGrid, List, Users } from "lucide-react";
+import { Search, LayoutGrid, List, Users, Filter } from "lucide-react";
 import { Navbar } from "@/components/navbar";
 import { EmployeeCard } from "@/components/employee-card";
 import { DirectoryFilters } from "@/components/directory-filters";
@@ -18,6 +18,7 @@ import {
   getAllTags,
   getCompanyById,
 } from "@/lib/data";
+import { MobileFiltersBottomSheet } from "@/components/mobile-filters-bottom-sheet";
 import type { ViewMode, Employee } from "@/types";
 
 const ITEMS_PER_PAGE = 12;
@@ -37,7 +38,18 @@ function DirectoryContent() {
       initialCompany ? [initialCompany] : []
   );
   const [selectedDepartment, setSelectedDepartment] = useState("all");
+  const [selectedLocations, setSelectedLocations] = useState<string[]>([]);
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
+  const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
+
+  // Get available locations from employees
+  const availableLocations = useMemo(() => {
+    const locations = new Set<string>();
+    employees.forEach(emp => {
+      if (emp.location) locations.add(emp.location);
+    });
+    return Array.from(locations).sort();
+  }, [employees]);
 
   const employees = getEmployees();
   const companies = getCompanies();
@@ -74,12 +86,16 @@ function DirectoryContent() {
       results = results.filter((emp) => emp.department === selectedDepartment);
     }
 
+    if (selectedLocations.length > 0) {
+      results = results.filter((emp) => emp.location && selectedLocations.includes(emp.location));
+    }
+
     if (!searchQuery.trim()) {
       results = [...results].sort((a, b) => a.name.localeCompare(b.name, "es"));
     }
 
     return results;
-  }, [employees, searchQuery, selectedCompanies, selectedDepartment, fuse]);
+  }, [employees, searchQuery, selectedCompanies, selectedDepartment, selectedLocations, fuse]);
 
   // Pagination
   const totalPages = Math.ceil(filteredEmployees.length / ITEMS_PER_PAGE);
@@ -91,17 +107,18 @@ function DirectoryContent() {
   // Reset page when filters change
   useEffect(() => {
     setCurrentPage(1);
-  }, [searchQuery, selectedCompanies, selectedDepartment, selectedTags]);
+  }, [searchQuery, selectedCompanies, selectedDepartment, selectedLocations, selectedTags]);
 
   const clearFilters = () => {
     setSearchQuery("");
     setSelectedCompanies([]);
     setSelectedDepartment("all");
+    setSelectedLocations([]);
     setSelectedTags([]);
   };
 
   return (
-      <div className="min-h-screen bg-background relative">
+      <div className="min-h-screen bg-background relative page-transition">
         <div className="geometric-pattern" />
 
         <Navbar />
@@ -124,47 +141,54 @@ function DirectoryContent() {
             </motion.div>
 
             <div className="flex gap-8">
-              {/* Filters Sidebar */}
-              <DirectoryFilters
-                  companies={companies}
-                  departments={departments}
-                  selectedCompanies={selectedCompanies}
-                  selectedDepartment={selectedDepartment}
-                  onCompanyChange={setSelectedCompanies}
-                  onDepartmentChange={setSelectedDepartment}
-                  onClearFilters={clearFilters}
-                  filteredEmployees={filteredEmployees}
-              />
+              {/* Filters Sidebar - Desktop only */}
+              <aside className="hidden lg:block w-72 shrink-0">
+                <DirectoryFilters
+                    companies={companies}
+                    departments={departments}
+                    locations={availableLocations}
+                    selectedCompanies={selectedCompanies}
+                    selectedDepartment={selectedDepartment}
+                    selectedLocations={selectedLocations}
+                    onCompanyChange={setSelectedCompanies}
+                    onDepartmentChange={setSelectedDepartment}
+                    onLocationChange={setSelectedLocations}
+                    onClearFilters={clearFilters}
+                    filteredEmployees={filteredEmployees}
+                />
+              </aside>
 
               {/* Main Content */}
               <div className="flex-1 min-w-0">
-                {/* Search and View Toggle */}
-                <div className="flex flex-col sm:flex-row gap-4 mb-6">
-                  <div className="relative flex-1">
-                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-                    <Input
-                        type="text"
-                        placeholder="Buscar por nombre, puesto, extensión..."
-                        value={searchQuery}
-                        onChange={(e) => setSearchQuery(e.target.value)}
-                        className="pl-10"
-                    />
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <Button
-                        variant={viewMode === "grid" ? "secondary" : "ghost"}
-                        size="icon"
-                        onClick={() => setViewMode("grid")}
-                    >
-                      <LayoutGrid className="w-4 h-4" />
-                    </Button>
-                    <Button
-                        variant={viewMode === "list" ? "secondary" : "ghost"}
-                        size="icon"
-                        onClick={() => setViewMode("list")}
-                    >
-                      <List className="w-4 h-4" />
-                    </Button>
+                {/* Search Bar - Sticky on mobile */}
+                <div className="sticky top-[64px] z-30 bg-background/95 backdrop-blur-sm pb-4 -mx-4 px-4 lg:static lg:bg-transparent lg:backdrop-blur-none lg:pb-0 lg:mx-0 lg:px-0">
+                  <div className="flex flex-col sm:flex-row gap-4 mb-4 lg:mb-6">
+                    <div className="relative flex-1">
+                      <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                      <Input
+                          type="text"
+                          placeholder="Buscar por nombre, puesto, extensión..."
+                          value={searchQuery}
+                          onChange={(e) => setSearchQuery(e.target.value)}
+                          className="pl-10 w-full"
+                      />
+                    </div>
+                    <div className="hidden sm:flex items-center gap-2">
+                      <Button
+                          variant={viewMode === "grid" ? "secondary" : "ghost"}
+                          size="icon"
+                          onClick={() => setViewMode("grid")}
+                      >
+                        <LayoutGrid className="w-4 h-4" />
+                      </Button>
+                      <Button
+                          variant={viewMode === "list" ? "secondary" : "ghost"}
+                          size="icon"
+                          onClick={() => setViewMode("list")}
+                      >
+                        <List className="w-4 h-4" />
+                      </Button>
+                    </div>
                   </div>
                 </div>
 
@@ -174,12 +198,12 @@ function DirectoryContent() {
                   {filteredEmployees.length} empleados
                 </p>
 
-                {/* Employee Grid/List */}
+                {/* Employee Grid/List - Single column on mobile */}
                 {paginatedEmployees.length > 0 ? (
                     <div
                         className={
                           viewMode === "grid"
-                              ? "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-3 gap-4"
+                              ? "grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 gap-4"
                               : "flex flex-col gap-3"
                         }
                     >
@@ -277,6 +301,40 @@ function DirectoryContent() {
             </div>
           </div>
         </main>
+
+        {/* Mobile Floating Filter Button */}
+        <motion.button
+          initial={{ y: 100, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          transition={{ delay: 0.3, type: "spring", stiffness: 400, damping: 30 }}
+          onClick={() => setMobileFiltersOpen(true)}
+          className="lg:hidden fixed bottom-6 left-1/2 -translate-x-1/2 z-40 flex items-center gap-2 px-6 py-3 rounded-full bg-[--bg-surface]/95 backdrop-blur-xl border border-white/10 shadow-lg shadow-black/20"
+        >
+          <Filter className="w-4 h-4 text-text-primary" />
+          <span className="font-neuropol text-xs uppercase tracking-wider text-text-primary">Filtros</span>
+          {(selectedCompanies.length > 0 || selectedDepartment !== "all" || selectedLocations.length > 0) && (
+            <span className="w-5 h-5 rounded-full bg-primary text-primary-foreground text-xs flex items-center justify-center font-semibold">
+              {selectedCompanies.length + (selectedDepartment !== "all" ? 1 : 0) + selectedLocations.length}
+            </span>
+          )}
+        </motion.button>
+
+        {/* Mobile Filters Bottom Sheet */}
+        <MobileFiltersBottomSheet
+          isOpen={mobileFiltersOpen}
+          onClose={() => setMobileFiltersOpen(false)}
+          companies={companies.filter(c => !c.disabled)}
+          departments={departments}
+          locations={availableLocations}
+          selectedCompanies={selectedCompanies}
+          selectedDepartment={selectedDepartment}
+          selectedLocations={selectedLocations}
+          onCompanyChange={setSelectedCompanies}
+          onDepartmentChange={setSelectedDepartment}
+          onLocationChange={setSelectedLocations}
+          onClearFilters={clearFilters}
+          onApply={() => setMobileFiltersOpen(false)}
+        />
       </div>
   );
 }

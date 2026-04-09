@@ -66,7 +66,7 @@
       "email": "ana.vega@comercializadorashuma.mx",
       "phone": "+52 55 2345 6789",
       "extension": "",
-      "location": "",
+      "location": "Oficina Central",
       "reportsTo": null,
       "avatar": null
     },
@@ -79,7 +79,7 @@
       "email": "jorge.mendoza@comercializadorashuma.mx",
       "phone": "+52 55 2345 6790",
       "extension": "",
-      "location": "",
+      "location": "Sucursal Puebla",
       "reportsTo": "emp001",
       "avatar": null
     },
@@ -92,7 +92,7 @@
       "email": "laura.torres@comercializadorashuma.mx",
       "phone": "+52 55 2345 6791",
       "extension": "",
-      "location": "",
+      "location": "Almacén Central",
       "reportsTo": "emp001",
       "avatar": null
     },
@@ -105,7 +105,7 @@
       "email": "isabel.pena@comercializadorashuma.mx",
       "phone": "+52 55 2345 6792",
       "extension": "",
-      "location": "",
+      "location": "Oficina Central",
       "reportsTo": "emp001",
       "avatar": null
     },
@@ -118,7 +118,7 @@
       "email": "francisco.ruiz@acabadosshuma.mx",
       "phone": "+52 55 3456 7890",
       "extension": "",
-      "location": "",
+      "location": "Oficina Central",
       "reportsTo": null,
       "avatar": null
     },
@@ -131,7 +131,7 @@
       "email": "gabriela.sanchez@acabadosshuma.mx",
       "phone": "+52 55 3456 7891",
       "extension": "",
-      "location": "",
+      "location": "Sucursal CDMX",
       "reportsTo": "emp005",
       "avatar": null
     },
@@ -144,7 +144,7 @@
       "email": "miguel.herrera@acabadosshuma.mx",
       "phone": "+52 55 3456 7892",
       "extension": "",
-      "location": "",
+      "location": "Bodega Norte",
       "reportsTo": "emp005",
       "avatar": null
     },
@@ -157,7 +157,7 @@
       "email": "patricia.navarro@ferrecapital.mx",
       "phone": "+52 55 4567 8901",
       "extension": "",
-      "location": "",
+      "location": "Oficina Central",
       "reportsTo": null,
       "avatar": null
     },
@@ -170,7 +170,7 @@
       "email": "ricardo.ortega@ferrecapital.mx",
       "phone": "+52 55 4567 8902",
       "extension": "",
-      "location": "",
+      "location": "Sucursal Monterrey",
       "reportsTo": "emp008",
       "avatar": null
     },
@@ -183,7 +183,7 @@
       "email": "sofia.guzman@ferrecapital.mx",
       "phone": "+52 55 4567 8903",
       "extension": "",
-      "location": "",
+      "location": "Sucursal Guadalajara",
       "reportsTo": "emp008",
       "avatar": null
     },
@@ -196,7 +196,7 @@
       "email": "andres.castro@arkiramica.mx",
       "phone": "+52 55 5678 9012",
       "extension": "",
-      "location": "",
+      "location": "Oficina Central",
       "reportsTo": null,
       "avatar": null
     },
@@ -209,7 +209,7 @@
       "email": "valentina.rojas@arkiramica.mx",
       "phone": "+52 55 5678 9013",
       "extension": "",
-      "location": "",
+      "location": "Sucursal CDMX",
       "reportsTo": "emp011",
       "avatar": null
     },
@@ -222,7 +222,7 @@
       "email": "diego.moreno@arkiramica.mx",
       "phone": "+52 55 5678 9014",
       "extension": "",
-      "location": "",
+      "location": "Almacén Central",
       "reportsTo": "emp011",
       "avatar": null
     },
@@ -235,7 +235,7 @@
       "email": "carmen.varela@arkiramica.mx",
       "phone": "+52 55 5678 9015",
       "extension": "",
-      "location": "",
+      "location": "Oficina Central",
       "reportsTo": "emp011",
       "avatar": null
     }

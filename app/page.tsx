@@ -1,7 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { ArrowRight, Building2, Users, GitBranch } from "lucide-react";
+import { ArrowRight, Building2, Users, GitBranch, Layers } from "lucide-react";
 import Link from "next/link";
 import { Navbar } from "@/components/navbar";
 import { FeaturedEmployees } from "@/components/featured-employees";
@@ -29,7 +29,7 @@ export default function HomePage() {
 
   return (
     <AdminProvider>
-      <div className="min-h-screen bg-[--bg-base] relative overflow-x-hidden">
+      <div className="min-h-screen bg-[--bg-base] relative overflow-x-hidden page-transition">
         <div className="dot-grid fixed inset-0" />
         
         {/* Ambient Blobs */}
@@ -47,10 +47,10 @@ export default function HomePage() {
               transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
             >
               <h1 
-                className="text-4xl md:text-7xl mb-6 tracking-tight"
+                className="mb-6 tracking-tight"
                 style={{ 
                   fontFamily: "'Neuropol', sans-serif",
-                  fontSize: "clamp(64px, 10vw, 120px)",
+                  fontSize: "clamp(2.5rem, 10vw, 5rem)",
                   letterSpacing: "-0.03em"
                 }}
               >
@@ -100,33 +100,21 @@ export default function HomePage() {
         {/* Companies Grid */}
         <section className="py-20 px-4">
           <div className="container mx-auto">
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
               {companyStats.map((company, index) => {
-                const colors = {
-                  "comercializadora-shuma": {
-                    border: "#0066CC",
-                    bg: "rgba(0,102,204,0.12)",
-                    icon: "#00AAFF",
-                    glow: "rgba(0,102,204,0.20)"
-                  },
-                  "acabados-shuma": {
-                    border: "#C0152A",
-                    bg: "rgba(192,21,42,0.15)",
-                    icon: "#FF4D5E",
-                    glow: "rgba(192,21,42,0.25)"
-                  },
-                  "ferrecapital": {
-                    border: "#2A2A2A",
-                    borderAccent: "#CC0000",
-                    bg: "rgba(204,0,0,0.10)",
-                    icon: "#CC0000",
-                    glow: "rgba(204,0,0,0.12)"
-                  }
-                }[company.id] || {
-                  border: company.colors?.primary,
-                  bg: `${company.colors?.primary}20`,
-                  icon: company.colors?.primary,
-                  glow: "rgba(0,0,0,0.2)"
+                // Company color config
+                const colorConfig: Record<string, { primary: string; glow: string; highlight: string; initial: string }> = {
+                  comercializadora: { primary: "#0047AB", glow: "rgba(0,71,171,0.25)", highlight: "#4D9FFF", initial: "C" },
+                  acabados: { primary: "#C0152A", glow: "rgba(192,21,42,0.25)", highlight: "#FF4D5E", initial: "A" },
+                  ferrecapital: { primary: "#2C3338", glow: "rgba(44,51,56,0.35)", highlight: "#CC0000", initial: "F" },
+                  arkiramica: { primary: "#F5C400", glow: "rgba(245,196,0,0.22)", highlight: "#FFE566", initial: "Ar" },
+                };
+                
+                const config = colorConfig[company.id] || {
+                  primary: company.colors?.primary || "#C9A84C",
+                  glow: "rgba(201,168,76,0.25)",
+                  highlight: company.colors?.accent || "#E0C060",
+                  initial: company.shortName?.[0] || "S"
                 };
 
                 return (
@@ -136,32 +124,92 @@ export default function HomePage() {
                     whileInView={{ opacity: 1, y: 0 }}
                     viewport={{ once: true }}
                     transition={{ delay: index * 0.1 }}
+                    className="group"
                   >
                     <Link href={`/directorio?empresa=${company.id}`}>
                       <div 
-                        className="group relative p-8 rounded-[14px] bg-[--bg-surface] border border-[--border-subtle] overflow-hidden transition-all duration-[250ms] ease hover:-translate-y-2 hover:shadow-[0_0_40px_var(--glow-color)]"
+                        className="relative p-6 sm:p-8 rounded-[14px] overflow-hidden transition-all duration-[250ms] ease-out"
                         style={{ 
-                          borderLeft: `4px solid ${colors.border}`,
-                          boxShadow: company.id === 'ferrecapital' ? 'inset 1px 0 0 #CC0000' : 'none',
-                          ['--glow-color' as any]: colors.glow
+                          borderLeft: `4px solid ${config.primary}`,
+                          background: 'rgba(255,255,255,0.03)',
+                          border: '1px solid var(--border-subtle)',
+                          borderLeftWidth: '4px',
+                          borderLeftColor: config.primary,
+                        }}
+                        onMouseEnter={(e) => {
+                          e.currentTarget.style.transform = 'translateY(-4px)';
+                          e.currentTarget.style.boxShadow = `0 0 40px ${config.glow}`;
+                          e.currentTarget.style.background = 'rgba(255,255,255,0.06)';
+                          e.currentTarget.style.borderLeftColor = config.highlight;
+                        }}
+                        onMouseLeave={(e) => {
+                          e.currentTarget.style.transform = 'translateY(0)';
+                          e.currentTarget.style.boxShadow = 'none';
+                          e.currentTarget.style.background = 'rgba(255,255,255,0.03)';
+                          e.currentTarget.style.borderLeftColor = config.primary;
                         }}
                       >
+                        {/* Top gradient overlay */}
+                        <div 
+                          className="absolute top-0 left-0 right-0 h-16 opacity-30 pointer-events-none"
+                          style={{ 
+                            background: `linear-gradient(180deg, ${config.glow} 0%, transparent 100%)` 
+                          }}
+                        />
+                        
+                        {/* Large decorative initial watermark */}
+                        <div 
+                          className="absolute -top-4 -right-2 pointer-events-none select-none"
+                          style={{ 
+                            fontFamily: "'Neuropol', sans-serif",
+                            fontSize: '80px',
+                            fontWeight: 700,
+                            opacity: 0.07,
+                            color: config.primary,
+                            lineHeight: 1,
+                          }}
+                        >
+                          {config.initial}
+                        </div>
+                        
                         <div className="relative z-10">
+                          {/* Company icon */}
                           <div 
-                            className="w-12 h-12 rounded-xl flex items-center justify-center mb-6"
-                            style={{ backgroundColor: colors.bg }}
+                            className="w-12 h-12 rounded-xl flex items-center justify-center mb-5"
+                            style={{ backgroundColor: `${config.primary}20` }}
                           >
-                            <Building2 className="w-6 h-6" style={{ color: colors.icon }} />
+                            <Building2 className="w-6 h-6" style={{ color: config.primary }} />
                           </div>
+                          
+                          {/* Company name */}
                           <h3 
-                            className="text-lg text-text-primary mb-2 leading-tight"
+                            className="text-base sm:text-lg text-text-primary mb-3 leading-tight font-bold"
                             style={{ fontFamily: "'Neuropol', sans-serif" }}
                           >
                             {company.shortName || company.name}
                           </h3>
-                          <div className="flex items-center gap-2 text-text-muted">
-                            <Users className="w-4 h-4" />
-                            <span className="font-dm-sans text-sm">{company.employeeCount} Colaboradores</span>
+                          
+                          {/* Stats */}
+                          <div className="space-y-1.5 mb-4">
+                            <div className="flex items-center gap-2 text-text-muted">
+                              <Users className="w-3.5 h-3.5" />
+                              <span className="font-dm-sans text-sm">{company.employeeCount} colaboradores</span>
+                            </div>
+                            <div className="flex items-center gap-2 text-text-muted">
+                              <Layers className="w-3.5 h-3.5" />
+                              <span className="font-dm-sans text-sm">{company.departmentCount} departamentos</span>
+                            </div>
+                          </div>
+                          
+                          {/* Ver equipo link */}
+                          <div 
+                            className="flex items-center gap-1 text-sm font-medium transition-all group-hover:gap-2"
+                            style={{ color: config.primary }}
+                          >
+                            <span style={{ fontFamily: "'Neuropol', sans-serif", fontSize: '11px', letterSpacing: '0.05em' }}>
+                              Ver equipo
+                            </span>
+                            <ArrowRight className="w-3.5 h-3.5 transition-transform group-hover:translate-x-0.5" />
                           </div>
                         </div>
                       </div>

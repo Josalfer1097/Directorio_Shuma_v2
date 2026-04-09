@@ -117,21 +117,15 @@ export function OrgChart({ initialCompany }: OrgChartProps) {
       });
 
       if (emp.reportsTo && empIds.has(emp.reportsTo)) {
-        const parentEmp = filteredEmployees.find(e => e.id === emp.reportsTo);
-        const parentCompany = companies.find(c => c.id === parentEmp?.company);
-        const edgeColor = parentCompany?.colors?.primary || "#1E1E30";
-        
         edges.push({
           id: `${emp.reportsTo}-${emp.id}`,
           source: emp.reportsTo,
           target: emp.id,
           type: "smoothstep",
-          animated: true,
+          animated: false,
           style: { 
-            stroke: edgeColor, 
-            strokeWidth: 2, 
-            opacity: 0.55,
-            strokeDasharray: '5,5'
+            stroke: 'rgba(255,255,255,0.14)', 
+            strokeWidth: 1.5,
           },
         });
       }
@@ -140,8 +134,38 @@ export function OrgChart({ initialCompany }: OrgChartProps) {
     return getLayoutedElements(nodes, edges, layout === 'horizontal' ? 'LR' : 'TB');
   }, [filteredEmployees, companies, layout]);
 
+  // Company filter config
+  const companyFilters = [
+    { id: "all", label: "Todos", color: "#C9A84C" },
+    { id: "comercializadora", label: "Com. Shuma", color: "#0047AB" },
+    { id: "acabados", label: "Acabados", color: "#C0152A" },
+    { id: "ferrecapital", label: "Ferrecapital", color: "#2C3338" },
+  ];
+
   return (
     <div className="h-[calc(100vh-8rem)] min-h-[500px] w-full rounded-xl border border-border-subtle overflow-hidden bg-[--bg-base] relative">
+      {/* Company Filter Pills */}
+      <div className="absolute top-4 left-4 z-10 flex gap-2 flex-wrap">
+        {companyFilters.map((filter) => (
+          <button
+            key={filter.id}
+            onClick={() => setSelectedCompany(filter.id)}
+            className={cn(
+              "px-3 py-1.5 rounded-full text-[10px] uppercase tracking-wider font-neuropol transition-all duration-[180ms]",
+              selectedCompany === filter.id 
+                ? "text-white shadow-lg" 
+                : "bg-[--bg-surface]/80 text-text-muted hover:text-text-primary border border-border-subtle"
+            )}
+            style={{
+              backgroundColor: selectedCompany === filter.id ? filter.color : undefined,
+              boxShadow: selectedCompany === filter.id ? `0 4px 12px ${filter.color}40` : undefined,
+            }}
+          >
+            {filter.label}
+          </button>
+        ))}
+      </div>
+
       <ReactFlow
         nodes={hierarchyData.nodes}
         edges={hierarchyData.edges}
@@ -169,7 +193,8 @@ export function OrgChart({ initialCompany }: OrgChartProps) {
 
         <Controls
           showInteractive={false}
-          className="!bg-[--bg-surface]/80 !backdrop-blur-md !border-border-subtle !shadow-xl"
+          position="bottom-right"
+          className="!bg-[--bg-surface]/90 !backdrop-blur-xl !border-border-subtle !shadow-xl !rounded-xl"
         />
 
         <MiniMap

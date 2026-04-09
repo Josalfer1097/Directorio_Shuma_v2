@@ -1,32 +1,24 @@
 "use client";
 
 import { use, useState, Component, ReactNode } from "react";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import { notFound, useRouter } from "next/navigation";
-import Link from "next/link";
 import { toast } from "sonner";
 import {
   Mail,
   Phone,
   Copy,
   Check,
-  Building2,
-  Calendar,
-  ChevronRight,
-  Users,
   X,
   MessageSquare,
   AlertTriangle,
+  MapPin,
 } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
 import {
   getEmployeeById,
   getCompanyById,
-  getDirectReports,
-  getReportingChain,
 } from "@/lib/data";
-import { cn } from "@/lib/utils";
+import { getCompanyConfig } from "@/lib/companyConfig";
 
 interface Props {
   params: Promise<{ id: string }>;
@@ -57,7 +49,7 @@ class EmployeeDetailErrorBoundary extends Component<
   }
 
   componentDidCatch(error: Error, errorInfo: React.ErrorInfo) {
-    console.error("[v0] Employee detail error:", error, errorInfo);
+    console.error("Employee detail error:", error, errorInfo);
   }
 
   render() {
@@ -69,17 +61,6 @@ class EmployeeDetailErrorBoundary extends Component<
   }
 }
 
-// Get monogram class based on company
-const getMonogramClass = (companyId: string) => {
-  const classMap: Record<string, string> = {
-    "comercializadora-shuma": "monogram-comercializadora",
-    "acabados-shuma": "monogram-acabados",
-    ferrecapital: "monogram-ferrecapital",
-    arkiramica: "monogram-arkiramica",
-  };
-  return classMap[companyId] || "monogram-comercializadora";
-};
-
 function EmployeeDetailContent({ id }: { id: string }) {
   const router = useRouter();
   const [copiedField, setCopiedField] = useState<string | null>(null);
@@ -90,155 +71,842 @@ function EmployeeDetailContent({ id }: { id: string }) {
   }
 
   const company = getCompanyById(employee.company);
-  
-  const companyColors = {
-    "comercializadora-shuma": {
-      primary: "#0047AB",
-      secondary: "#002D6E"
-    },
-    "acabados-shuma": {
-      primary: "#C0152A",
-      secondary: "#8B0000"
-    },
-    "ferrecapital": {
-      primary: "#4A525A",
-      secondary: "#1A1A1A"
-    },
-    "arkiramica": {
-      primary: "#F5C400",
-      secondary: "#C49A00"
-    }
-  };
-
-  const colors = companyColors[employee.company as keyof typeof companyColors] || {
-    primary: "var(--irid-a)",
-    secondary: "var(--irid-b)"
-  };
+  const config = getCompanyConfig(employee.company);
 
   const handleClose = () => {
     router.push("/directorio");
   };
 
+  const copyToClipboard = async (text: string, field: string) => {
+    try {
+      await navigator.clipboard.writeText(text);
+      setCopiedField(field);
+      toast.success("Copiado al portapapeles");
+      setTimeout(() => setCopiedField(null), 800);
+    } catch {
+      toast.error("Error al copiar");
+    }
+  };
+
+  const openTeamsChat = () => {
+    if (employee.email) {
+      window.open(`https://teams.microsoft.com/l/chat/0/0?users=${employee.email}`, "_blank");
+    }
+  };
+
+  const getInitials = (name: string) => {
+    return name
+      .split(" ")
+      .map((n) => n[0])
+      .slice(0, 2)
+      .join("")
+      .toUpperCase();
+  };
+
+  // Animation variants
+  const backdropVariants = {
+    hidden: { opacity: 0 },
+    visible: { opacity: 1 },
+  };
+
+  const modalVariants = {
+    hidden: { opacity: 0, scale: 0.95, y: 12 },
+    visible: { opacity: 1, scale: 1, y: 0 },
+    exit: { opacity: 0, scale: 0.97 },
+  };
+
+  const mobileModalVariants = {
+    hidden: { y: "100%" },
+    visible: { y: 0 },
+    exit: { y: "100%" },
+  };
+
+  // CSS custom properties for company colors
+  const companyVars = {
+    '--company-primary': config.primary,
+    '--company-secondary': config.secondary,
+    '--company-glow': config.glow,
+    '--company-highlight': config.highlight,
+  } as React.CSSProperties;
+
   return (
-    <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center">
+    <div className="fixed inset-0 z-50 flex items-end md:items-center justify-center">
       {/* Backdrop */}
       <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        exit={{ opacity: 0 }}
+        variants={backdropVariants}
+        initial="hidden"
+        animate="visible"
+        exit="hidden"
+        transition={{ duration: 0.13 }}
         onClick={handleClose}
-        className="absolute inset-0 bg-bg-base/93 backdrop-blur-md"
+        className="absolute inset-0 bg-black/60"
+        style={{ backdropFilter: 'blur(20px)' }}
       />
 
-      {/* Modal Content */}
+      {/* Desktop Modal */}
       <motion.div
-        initial={{ y: "100%" }}
-        animate={{ y: 0 }}
-        exit={{ y: "100%" }}
-        transition={{ type: "spring", damping: 25, stiffness: 200 }}
+        variants={modalVariants}
+        initial="hidden"
+        animate="visible"
+        exit="exit"
+        transition={{ duration: 0.16, ease: [0.16, 1, 0.3, 1] }}
+        className="relative hidden md:block overflow-hidden z-10"
+        style={{
+          ...companyVars,
+          width: 'min(520px, 94vw)',
+          borderRadius: '20px',
+          background: '#0C0E11',
+          border: '1px solid rgba(255,255,255,0.07)',
+          boxShadow: `0 32px 80px rgba(0,0,0,0.7), 0 0 0 1px ${config.primary}33`,
+        }}
+      >
+        {/* Top border accent */}
+        <div 
+          className="h-[3px] w-full" 
+          style={{ backgroundColor: config.primary }} 
+        />
+
+        {/* Header Band */}
+        <div 
+          className="relative overflow-hidden"
+          style={{
+            height: '160px',
+            background: `linear-gradient(135deg, ${config.secondary} 0%, color-mix(in srgb, ${config.primary} 40%, #0C0E11) 100%)`,
+          }}
+        >
+          {/* Company watermark */}
+          <div 
+            className="absolute pointer-events-none select-none"
+            style={{ 
+              right: '-10px',
+              top: '-20px',
+              fontFamily: "'Neuropol', sans-serif",
+              fontSize: '160px',
+              fontWeight: 900,
+              opacity: 0.08,
+              color: config.primary,
+              lineHeight: 1,
+              zIndex: 0,
+            }}
+          >
+            {config.initial}
+          </div>
+
+          {/* Close button */}
+          <button
+            onClick={handleClose}
+            className="absolute top-4 right-4 w-[30px] h-[30px] rounded-full flex items-center justify-center transition-all duration-150 z-10"
+            style={{
+              background: 'rgba(0,0,0,0.3)',
+              border: '1px solid rgba(255,255,255,0.12)',
+              color: 'rgba(255,255,255,0.5)',
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.background = 'rgba(255,255,255,0.12)';
+              e.currentTarget.style.color = 'white';
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.background = 'rgba(0,0,0,0.3)';
+              e.currentTarget.style.color = 'rgba(255,255,255,0.5)';
+            }}
+          >
+            <X className="w-[13px] h-[13px]" />
+          </button>
+
+          {/* Header Content */}
+          <div className="relative z-[1] px-7 pt-7 pb-6 flex flex-col items-center text-center">
+            {/* Avatar */}
+            <div 
+              className="w-20 h-20 rounded-full flex items-center justify-center"
+              style={{ 
+                background: `linear-gradient(135deg, ${config.secondary}, ${config.primary})`,
+                border: `2.5px solid ${config.primary}`,
+                boxShadow: `0 0 24px ${config.glow}, 0 0 48px ${config.glow}50`,
+              }}
+            >
+              <span 
+                className="text-white font-bold"
+                style={{ 
+                  fontFamily: "'Neuropol', sans-serif",
+                  fontSize: '1.6rem',
+                }}
+              >
+                {getInitials(employee.name)}
+              </span>
+            </div>
+
+            {/* Name */}
+            <h2 
+              className="text-white font-bold mt-4"
+              style={{ 
+                fontFamily: "'DM Sans', sans-serif",
+                fontSize: '1.3rem',
+                fontWeight: 700,
+              }}
+            >
+              {employee.name}
+            </h2>
+
+            {/* Position */}
+            <p 
+              className="italic mt-1"
+              style={{ 
+                color: config.primary,
+                fontSize: '0.85rem',
+                fontFamily: "'DM Sans', sans-serif",
+              }}
+            >
+              {employee.position}
+            </p>
+
+            {/* Company badge */}
+            <span 
+              className="mt-2"
+              style={{
+                background: `color-mix(in srgb, ${config.primary} 18%, transparent)`,
+                border: `1px solid color-mix(in srgb, ${config.primary} 45%, transparent)`,
+                color: config.highlight,
+                fontSize: '0.65rem',
+                fontFamily: "'Neuropol', sans-serif",
+                textTransform: 'uppercase',
+                letterSpacing: '0.1em',
+                padding: '3px 10px',
+                borderRadius: '20px',
+              }}
+            >
+              {company?.shortName || company?.name}
+            </span>
+          </div>
+        </div>
+
+        {/* Body Section - Info Grid */}
+        <div className="px-7 py-6">
+          <div className="grid grid-cols-2 gap-x-6 gap-y-4">
+            {/* Departamento */}
+            <div className="pb-3" style={{ borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
+              <p 
+                className="mb-1"
+                style={{ 
+                  fontSize: '0.6rem', 
+                  color: 'rgba(255,255,255,0.27)', 
+                  textTransform: 'uppercase',
+                  letterSpacing: '0.1em',
+                }}
+              >
+                Departamento
+              </p>
+              <p style={{ fontSize: '0.9rem', color: '#FFFFFF', fontWeight: 500 }}>
+                {employee.department || "—"}
+              </p>
+            </div>
+
+            {/* Empresa */}
+            <div className="pb-3" style={{ borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
+              <p 
+                className="mb-1"
+                style={{ 
+                  fontSize: '0.6rem', 
+                  color: 'rgba(255,255,255,0.27)', 
+                  textTransform: 'uppercase',
+                  letterSpacing: '0.1em',
+                }}
+              >
+                Empresa
+              </p>
+              <p style={{ fontSize: '0.9rem', color: '#FFFFFF', fontWeight: 500 }}>
+                {company?.name || "—"}
+              </p>
+            </div>
+
+            {/* Telefono */}
+            <div className="pb-3" style={{ borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
+              <p 
+                className="mb-1"
+                style={{ 
+                  fontSize: '0.6rem', 
+                  color: 'rgba(255,255,255,0.27)', 
+                  textTransform: 'uppercase',
+                  letterSpacing: '0.1em',
+                }}
+              >
+                Telefono
+              </p>
+              <p style={{ fontSize: '0.9rem', color: '#FFFFFF', fontWeight: 500 }}>
+                {employee.phone || "—"}
+              </p>
+            </div>
+
+            {/* Extension */}
+            <div className="pb-3" style={{ borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
+              <p 
+                className="mb-1"
+                style={{ 
+                  fontSize: '0.6rem', 
+                  color: 'rgba(255,255,255,0.27)', 
+                  textTransform: 'uppercase',
+                  letterSpacing: '0.1em',
+                }}
+              >
+                Extension
+              </p>
+              {employee.extension && employee.extension !== "—" ? (
+                <p style={{ fontSize: '0.9rem', color: '#FFFFFF', fontWeight: 500 }}>
+                  {employee.extension}
+                </p>
+              ) : (
+                <span 
+                  style={{ 
+                    fontSize: '0.75rem', 
+                    color: 'rgba(255,255,255,0.3)',
+                    padding: '2px 8px',
+                    background: 'rgba(255,255,255,0.05)',
+                    borderRadius: '4px',
+                  }}
+                >
+                  Sin extension
+                </span>
+              )}
+            </div>
+
+            {/* Sucursal - spans both columns */}
+            <div className="col-span-2 pb-3" style={{ borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
+              <p 
+                className="mb-1"
+                style={{ 
+                  fontSize: '0.6rem', 
+                  color: 'rgba(255,255,255,0.27)', 
+                  textTransform: 'uppercase',
+                  letterSpacing: '0.1em',
+                }}
+              >
+                Sucursal
+              </p>
+              {employee.location ? (
+                <span 
+                  className="inline-flex items-center gap-1.5"
+                  style={{
+                    background: 'rgba(255,255,255,0.05)',
+                    border: '1px solid rgba(255,255,255,0.10)',
+                    borderRadius: '20px',
+                    padding: '4px 12px',
+                    fontSize: '0.8rem',
+                    color: 'white',
+                  }}
+                >
+                  <MapPin className="w-3 h-3" style={{ color: config.primary }} />
+                  {employee.location}
+                </span>
+              ) : (
+                <span style={{ fontSize: '0.8rem', color: 'rgba(255,255,255,0.4)' }}>
+                  Sin sucursal
+                </span>
+              )}
+            </div>
+
+            {/* Email - spans both columns */}
+            <div className="col-span-2 pb-3" style={{ borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
+              <p 
+                className="mb-1"
+                style={{ 
+                  fontSize: '0.6rem', 
+                  color: 'rgba(255,255,255,0.27)', 
+                  textTransform: 'uppercase',
+                  letterSpacing: '0.1em',
+                }}
+              >
+                Email
+              </p>
+              <p style={{ fontSize: '0.9rem', color: '#FFFFFF', fontWeight: 500, wordBreak: 'break-all' }}>
+                {employee.email || "—"}
+              </p>
+            </div>
+          </div>
+        </div>
+
+        {/* Action Row */}
+        <div 
+          className="px-7 py-4 flex gap-3"
+          style={{
+            background: 'rgba(255,255,255,0.015)',
+            borderTop: '1px solid rgba(255,255,255,0.06)',
+            paddingBottom: '20px',
+          }}
+        >
+          {/* Copy Email */}
+          <button
+            onClick={() => employee.email && copyToClipboard(employee.email, 'email')}
+            className="flex-1 rounded-[10px] flex items-center justify-center gap-1.5 transition-all duration-[180ms]"
+            style={{
+              height: '38px',
+              background: copiedField === 'email' ? config.primary : 'rgba(255,255,255,0.04)',
+              border: `1px solid ${copiedField === 'email' ? config.primary : 'rgba(255,255,255,0.08)'}`,
+              color: copiedField === 'email' ? 'white' : 'rgba(255,255,255,0.44)',
+              fontSize: '0.8rem',
+              boxShadow: copiedField === 'email' ? `0 0 12px ${config.glow}` : 'none',
+            }}
+            onMouseEnter={(e) => {
+              if (copiedField !== 'email') {
+                e.currentTarget.style.background = `color-mix(in srgb, ${config.primary} 15%, transparent)`;
+                e.currentTarget.style.borderColor = `color-mix(in srgb, ${config.primary} 50%, transparent)`;
+                e.currentTarget.style.color = 'white';
+                e.currentTarget.style.boxShadow = `0 0 12px ${config.glow}`;
+              }
+            }}
+            onMouseLeave={(e) => {
+              if (copiedField !== 'email') {
+                e.currentTarget.style.background = 'rgba(255,255,255,0.04)';
+                e.currentTarget.style.borderColor = 'rgba(255,255,255,0.08)';
+                e.currentTarget.style.color = 'rgba(255,255,255,0.44)';
+                e.currentTarget.style.boxShadow = 'none';
+              }
+            }}
+          >
+            {copiedField === 'email' ? (
+              <>
+                <Check className="w-3.5 h-3.5" />
+                <span>Copiado</span>
+              </>
+            ) : (
+              <>
+                <Copy className="w-3.5 h-3.5" />
+                <span>Copiar email</span>
+              </>
+            )}
+          </button>
+
+          {/* Teams */}
+          <button
+            onClick={openTeamsChat}
+            className="flex-1 rounded-[10px] flex items-center justify-center gap-1.5 transition-all duration-[180ms]"
+            style={{
+              height: '38px',
+              background: 'rgba(255,255,255,0.04)',
+              border: '1px solid rgba(255,255,255,0.08)',
+              color: 'rgba(255,255,255,0.44)',
+              fontSize: '0.8rem',
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.background = `color-mix(in srgb, ${config.primary} 15%, transparent)`;
+              e.currentTarget.style.borderColor = `color-mix(in srgb, ${config.primary} 50%, transparent)`;
+              e.currentTarget.style.color = 'white';
+              e.currentTarget.style.boxShadow = `0 0 12px ${config.glow}`;
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.background = 'rgba(255,255,255,0.04)';
+              e.currentTarget.style.borderColor = 'rgba(255,255,255,0.08)';
+              e.currentTarget.style.color = 'rgba(255,255,255,0.44)';
+              e.currentTarget.style.boxShadow = 'none';
+            }}
+          >
+            <MessageSquare className="w-3.5 h-3.5" />
+            <span>Teams</span>
+          </button>
+
+          {/* Copy Phone */}
+          <button
+            onClick={() => employee.phone && copyToClipboard(employee.phone, 'phone')}
+            className="flex-1 rounded-[10px] flex items-center justify-center gap-1.5 transition-all duration-[180ms]"
+            style={{
+              height: '38px',
+              background: copiedField === 'phone' ? config.primary : 'rgba(255,255,255,0.04)',
+              border: `1px solid ${copiedField === 'phone' ? config.primary : 'rgba(255,255,255,0.08)'}`,
+              color: copiedField === 'phone' ? 'white' : 'rgba(255,255,255,0.44)',
+              fontSize: '0.8rem',
+              boxShadow: copiedField === 'phone' ? `0 0 12px ${config.glow}` : 'none',
+            }}
+            onMouseEnter={(e) => {
+              if (copiedField !== 'phone') {
+                e.currentTarget.style.background = `color-mix(in srgb, ${config.primary} 15%, transparent)`;
+                e.currentTarget.style.borderColor = `color-mix(in srgb, ${config.primary} 50%, transparent)`;
+                e.currentTarget.style.color = 'white';
+                e.currentTarget.style.boxShadow = `0 0 12px ${config.glow}`;
+              }
+            }}
+            onMouseLeave={(e) => {
+              if (copiedField !== 'phone') {
+                e.currentTarget.style.background = 'rgba(255,255,255,0.04)';
+                e.currentTarget.style.borderColor = 'rgba(255,255,255,0.08)';
+                e.currentTarget.style.color = 'rgba(255,255,255,0.44)';
+                e.currentTarget.style.boxShadow = 'none';
+              }
+            }}
+          >
+            {copiedField === 'phone' ? (
+              <>
+                <Check className="w-3.5 h-3.5" />
+                <span>Copiado</span>
+              </>
+            ) : (
+              <>
+                <Phone className="w-3.5 h-3.5" />
+                <span>Copiar tel</span>
+              </>
+            )}
+          </button>
+        </div>
+      </motion.div>
+
+      {/* Mobile Modal - Bottom Sheet */}
+      <motion.div
+        variants={mobileModalVariants}
+        initial="hidden"
+        animate="visible"
+        exit="exit"
+        transition={{ type: "spring", damping: 30, stiffness: 400, duration: 0.2 }}
         drag="y"
         dragConstraints={{ top: 0 }}
         dragElastic={0.2}
         onDragEnd={(_, info) => {
           if (info.offset.y > 100) handleClose();
         }}
-        className="relative w-full max-w-[680px] bg-bg-surface rounded-t-[24px] sm:rounded-[24px] overflow-hidden shadow-2xl z-10"
+        className="relative md:hidden w-full overflow-hidden z-10"
+        style={{
+          ...companyVars,
+          borderRadius: '20px 20px 0 0',
+          background: '#0C0E11',
+          border: '1px solid rgba(255,255,255,0.07)',
+          borderBottom: 'none',
+          boxShadow: `0 -32px 80px rgba(0,0,0,0.7)`,
+        }}
       >
-        {/* Top accent line */}
+        {/* Top border accent */}
         <div 
           className="h-[3px] w-full" 
-          style={{ backgroundColor: colors.primary }} 
+          style={{ backgroundColor: config.primary }} 
         />
 
-        {/* Mobile drag handle */}
-        <div className="flex justify-center py-3 sm:hidden">
-          <div className="w-12 h-1.5 rounded-full bg-border-subtle" />
+        {/* Drag handle */}
+        <div className="flex justify-center pt-2.5">
+          <div 
+            className="rounded-full"
+            style={{ 
+              width: '36px', 
+              height: '4px', 
+              background: 'rgba(255,255,255,0.18)' 
+            }}
+          />
         </div>
 
-        {/* Close button desktop */}
+        {/* Close button */}
         <button
           onClick={handleClose}
-          className="absolute top-6 right-6 hidden sm:flex p-2 rounded-full hover:bg-bg-elevated transition-colors text-text-muted hover:text-text-primary"
+          className="absolute top-4 right-4 w-[30px] h-[30px] rounded-full flex items-center justify-center z-10"
+          style={{
+            background: 'rgba(0,0,0,0.3)',
+            border: '1px solid rgba(255,255,255,0.12)',
+            color: 'rgba(255,255,255,0.5)',
+          }}
         >
-          <X className="w-5 h-5" />
+          <X className="w-[13px] h-[13px]" />
         </button>
 
-        <div className="p-8 sm:p-12">
-          <div className="flex flex-col sm:flex-row items-center sm:items-start gap-8">
-            {/* Monogram */}
+        {/* Header Band */}
+        <div 
+          className="relative overflow-hidden"
+          style={{
+            background: `linear-gradient(135deg, ${config.secondary} 0%, color-mix(in srgb, ${config.primary} 40%, #0C0E11) 100%)`,
+          }}
+        >
+          {/* Company watermark */}
+          <div 
+            className="absolute pointer-events-none select-none"
+            style={{ 
+              right: '-10px',
+              top: '-10px',
+              fontFamily: "'Neuropol', sans-serif",
+              fontSize: '120px',
+              fontWeight: 900,
+              opacity: 0.08,
+              color: config.primary,
+              lineHeight: 1,
+              zIndex: 0,
+            }}
+          >
+            {config.initial}
+          </div>
+
+          {/* Header Content */}
+          <div className="relative z-[1] px-6 pt-4 pb-5 flex flex-col items-center text-center">
+            {/* Avatar */}
             <div 
-              className="w-24 h-24 sm:w-[120px] sm:h-[120px] rounded-full flex items-center justify-center text-3xl sm:text-4xl font-bold text-white shrink-0"
+              className="w-16 h-16 rounded-full flex items-center justify-center"
               style={{ 
-                background: `linear-gradient(135deg, ${colors.primary}, ${colors.secondary})` 
+                background: `linear-gradient(135deg, ${config.secondary}, ${config.primary})`,
+                border: `2.5px solid ${config.primary}`,
+                boxShadow: `0 0 24px ${config.glow}`,
               }}
             >
-              {employee.name ? employee.name.split(" ").map(n => n[0]).slice(0,2).join("").toUpperCase() : "??"}
+              <span 
+                className="text-white font-bold"
+                style={{ 
+                  fontFamily: "'Neuropol', sans-serif",
+                  fontSize: '1.3rem',
+                }}
+              >
+                {getInitials(employee.name)}
+              </span>
             </div>
 
-            <div className="flex-1 text-center sm:text-left min-w-0">
-              <h2 className="font-neuropol text-2xl sm:text-3xl text-text-primary mb-2 truncate font-neuropol">
-                {employee.name || "—"}
-              </h2>
-              <p className="font-dm-sans italic text-lg text-text-muted mb-4">
-                {employee.position || "—"}
+            {/* Name */}
+            <h2 
+              className="text-white font-bold mt-3"
+              style={{ 
+                fontFamily: "'DM Sans', sans-serif",
+                fontSize: '1.15rem',
+                fontWeight: 700,
+              }}
+            >
+              {employee.name}
+            </h2>
+
+            {/* Position */}
+            <p 
+              className="italic mt-1"
+              style={{ 
+                color: config.primary,
+                fontSize: '0.8rem',
+                fontFamily: "'DM Sans', sans-serif",
+              }}
+            >
+              {employee.position}
+            </p>
+
+            {/* Company badge */}
+            <span 
+              className="mt-2"
+              style={{
+                background: `color-mix(in srgb, ${config.primary} 18%, transparent)`,
+                border: `1px solid color-mix(in srgb, ${config.primary} 45%, transparent)`,
+                color: config.highlight,
+                fontSize: '0.6rem',
+                fontFamily: "'Neuropol', sans-serif",
+                textTransform: 'uppercase',
+                letterSpacing: '0.1em',
+                padding: '3px 10px',
+                borderRadius: '20px',
+              }}
+            >
+              {company?.shortName || company?.name}
+            </span>
+          </div>
+        </div>
+
+        {/* Body Section - Info Grid */}
+        <div className="px-6 py-5">
+          <div className="grid grid-cols-2 gap-x-4 gap-y-3">
+            {/* Departamento */}
+            <div className="pb-2" style={{ borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
+              <p 
+                className="mb-0.5"
+                style={{ 
+                  fontSize: '0.55rem', 
+                  color: 'rgba(255,255,255,0.27)', 
+                  textTransform: 'uppercase',
+                  letterSpacing: '0.1em',
+                }}
+              >
+                Departamento
               </p>
-              
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-y-4 gap-x-8 text-sm">
-                <div className="space-y-1">
-                  <p className="text-text-faint uppercase tracking-wider text-[10px] font-neuropol font-neuropol">Empresa</p>
-                  <p className="text-text-primary font-dm-sans">{company?.name || "—"}</p>
-                </div>
-                <div className="space-y-1">
-                  <p className="text-text-faint uppercase tracking-wider text-[10px] font-neuropol font-neuropol">Departamento</p>
-                  <p className="text-text-primary font-dm-sans">{employee.department || "—"}</p>
-                </div>
-                <div className="space-y-1">
-                  <p className="text-text-faint uppercase tracking-wider text-[10px] font-neuropol font-neuropol">Teléfono</p>
-                  <p className="text-text-primary font-dm-sans">{employee.phone || "—"}</p>
-                </div>
-                <div className="space-y-1">
-                  <p className="text-text-faint uppercase tracking-wider text-[10px] font-neuropol font-neuropol">Email</p>
-                  <p className="text-text-primary font-dm-sans break-all">{employee.email || "—"}</p>
-                </div>
-              </div>
+              <p style={{ fontSize: '0.8rem', color: '#FFFFFF', fontWeight: 500 }}>
+                {employee.department || "—"}
+              </p>
+            </div>
+
+            {/* Empresa */}
+            <div className="pb-2" style={{ borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
+              <p 
+                className="mb-0.5"
+                style={{ 
+                  fontSize: '0.55rem', 
+                  color: 'rgba(255,255,255,0.27)', 
+                  textTransform: 'uppercase',
+                  letterSpacing: '0.1em',
+                }}
+              >
+                Empresa
+              </p>
+              <p style={{ fontSize: '0.8rem', color: '#FFFFFF', fontWeight: 500 }}>
+                {company?.shortName || "—"}
+              </p>
+            </div>
+
+            {/* Telefono */}
+            <div className="pb-2" style={{ borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
+              <p 
+                className="mb-0.5"
+                style={{ 
+                  fontSize: '0.55rem', 
+                  color: 'rgba(255,255,255,0.27)', 
+                  textTransform: 'uppercase',
+                  letterSpacing: '0.1em',
+                }}
+              >
+                Telefono
+              </p>
+              <p style={{ fontSize: '0.8rem', color: '#FFFFFF', fontWeight: 500 }}>
+                {employee.phone || "—"}
+              </p>
+            </div>
+
+            {/* Extension */}
+            <div className="pb-2" style={{ borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
+              <p 
+                className="mb-0.5"
+                style={{ 
+                  fontSize: '0.55rem', 
+                  color: 'rgba(255,255,255,0.27)', 
+                  textTransform: 'uppercase',
+                  letterSpacing: '0.1em',
+                }}
+              >
+                Extension
+              </p>
+              {employee.extension && employee.extension !== "—" ? (
+                <p style={{ fontSize: '0.8rem', color: '#FFFFFF', fontWeight: 500 }}>
+                  {employee.extension}
+                </p>
+              ) : (
+                <span 
+                  style={{ 
+                    fontSize: '0.7rem', 
+                    color: 'rgba(255,255,255,0.3)',
+                  }}
+                >
+                  Sin ext.
+                </span>
+              )}
+            </div>
+
+            {/* Email - spans both columns */}
+            <div className="col-span-2 pb-2" style={{ borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
+              <p 
+                className="mb-0.5"
+                style={{ 
+                  fontSize: '0.55rem', 
+                  color: 'rgba(255,255,255,0.27)', 
+                  textTransform: 'uppercase',
+                  letterSpacing: '0.1em',
+                }}
+              >
+                Email
+              </p>
+              <p style={{ fontSize: '0.8rem', color: '#FFFFFF', fontWeight: 500, wordBreak: 'break-all' }}>
+                {employee.email || "—"}
+              </p>
             </div>
           </div>
+        </div>
+
+        {/* Action Row - Stacked for mobile */}
+        <div 
+          className="px-6 py-4 flex flex-col gap-2"
+          style={{
+            background: 'rgba(255,255,255,0.015)',
+            borderTop: '1px solid rgba(255,255,255,0.06)',
+            paddingBottom: '24px',
+          }}
+        >
+          {/* Copy Email */}
+          <button
+            onClick={() => employee.email && copyToClipboard(employee.email, 'email')}
+            className="w-full rounded-[10px] flex items-center justify-center gap-1.5 transition-all duration-[180ms]"
+            style={{
+              height: '44px',
+              background: copiedField === 'email' ? config.primary : 'rgba(255,255,255,0.04)',
+              border: `1px solid ${copiedField === 'email' ? config.primary : 'rgba(255,255,255,0.08)'}`,
+              color: copiedField === 'email' ? 'white' : 'rgba(255,255,255,0.44)',
+              fontSize: '0.8rem',
+            }}
+          >
+            {copiedField === 'email' ? (
+              <>
+                <Check className="w-4 h-4" />
+                <span>Copiado</span>
+              </>
+            ) : (
+              <>
+                <Copy className="w-4 h-4" />
+                <span>Copiar email</span>
+              </>
+            )}
+          </button>
+
+          {/* Teams */}
+          <button
+            onClick={openTeamsChat}
+            className="w-full rounded-[10px] flex items-center justify-center gap-1.5 transition-all duration-[180ms]"
+            style={{
+              height: '44px',
+              background: 'rgba(255,255,255,0.04)',
+              border: '1px solid rgba(255,255,255,0.08)',
+              color: 'rgba(255,255,255,0.44)',
+              fontSize: '0.8rem',
+            }}
+          >
+            <MessageSquare className="w-4 h-4" />
+            <span>Abrir en Teams</span>
+          </button>
+
+          {/* Copy Phone */}
+          <button
+            onClick={() => employee.phone && copyToClipboard(employee.phone, 'phone')}
+            className="w-full rounded-[10px] flex items-center justify-center gap-1.5 transition-all duration-[180ms]"
+            style={{
+              height: '44px',
+              background: copiedField === 'phone' ? config.primary : 'rgba(255,255,255,0.04)',
+              border: `1px solid ${copiedField === 'phone' ? config.primary : 'rgba(255,255,255,0.08)'}`,
+              color: copiedField === 'phone' ? 'white' : 'rgba(255,255,255,0.44)',
+              fontSize: '0.8rem',
+            }}
+          >
+            {copiedField === 'phone' ? (
+              <>
+                <Check className="w-4 h-4" />
+                <span>Copiado</span>
+              </>
+            ) : (
+              <>
+                <Phone className="w-4 h-4" />
+                <span>Copiar telefono</span>
+              </>
+            )}
+          </button>
         </div>
       </motion.div>
     </div>
   );
 }
 
-// Error fallback component
 function ErrorFallback() {
   const router = useRouter();
-
+  
   return (
-    <div className="min-h-screen bg-[--bg-base] flex items-center justify-center p-4">
-      <div className="modal-content max-w-sm w-full p-6 text-center">
-        <div className="w-16 h-16 rounded-full bg-[--danger]/10 flex items-center justify-center mx-auto mb-4">
-          <AlertTriangle className="w-8 h-8 text-[--danger]" />
-        </div>
-        <h2 className="text-display-md text-[--text-primary] mb-2">
-          Error al cargar
-        </h2>
-        <p className="text-sm text-[--text-muted] mb-6">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
+      <div className="bg-card p-6 rounded-xl max-w-md mx-4 text-center border border-border">
+        <AlertTriangle className="w-12 h-12 mx-auto mb-4 text-yellow-500" />
+        <h2 className="text-lg font-semibold mb-2">Error al cargar</h2>
+        <p className="text-muted-foreground mb-4">
           No se pudo cargar la informacion del empleado.
         </p>
-        <Button onClick={() => router.push("/directorio")} className="w-full">
+        <button 
+          onClick={() => router.push("/directorio")}
+          className="px-4 py-2 bg-primary text-primary-foreground rounded-lg"
+        >
           Volver al directorio
-        </Button>
+        </button>
       </div>
     </div>
   );
 }
 
 export default function EmployeeDetailPage({ params }: Props) {
-  const { id } = use(params);
-
+  const resolvedParams = use(params);
+  
   return (
-    <EmployeeDetailErrorBoundary fallback={<ErrorFallback />}>
-      <EmployeeDetailContent id={id} />
-    </EmployeeDetailErrorBoundary>
+    <AnimatePresence mode="wait">
+      <EmployeeDetailErrorBoundary fallback={<ErrorFallback />}>
+        <EmployeeDetailContent id={resolvedParams.id} />
+      </EmployeeDetailErrorBoundary>
+    </AnimatePresence>
   );
 }

@@ -5,14 +5,7 @@ import { Building2, Users } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
 import type { Company } from "@/types";
-
-// Company config for hover colors based on company id
-const companyConfigMap: Record<string, { primary: string; secondary: string; glow: string; accent?: string; accentGlow?: string; textColor?: string }> = {
-  comercializadora: { primary: '#0047AB', secondary: '#002D6E', glow: 'rgba(0,71,171,0.25)' },
-  acabados: { primary: '#C0152A', secondary: '#8B0000', glow: 'rgba(192,21,42,0.25)' },
-  ferrecapital: { primary: '#2C3338', secondary: '#1A1E21', glow: 'rgba(44,51,56,0.35)', accent: '#CC0000', accentGlow: 'rgba(204,0,0,0.18)', textColor: '#E8EAED' },
-  arkiramica: { primary: '#F5C400', secondary: '#C49A00', glow: 'rgba(245,196,0,0.22)' },
-};
+import { getCompanyConfig } from "@/lib/companyConfig";
 
 interface CompanyCardProps {
   company: Company & { employeeCount: number };
@@ -24,11 +17,7 @@ const premiumEase = [0.25, 0.46, 0.45, 0.94];
 
 export function CompanyCard({ company, index }: CompanyCardProps) {
   const [isHovered, setIsHovered] = useState(false);
-  const companyConfig = companyConfigMap[company.id] || {
-    primary: company.colors.primary,
-    secondary: '#1A1A1A',
-    glow: 'rgba(201,168,76,0.25)'
-  };
+  const companyConfig = getCompanyConfig(company.id);
   
   return (
     <motion.div
