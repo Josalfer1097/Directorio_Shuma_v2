@@ -3,7 +3,7 @@
 import React from "react";
 import { motion } from "framer-motion";
 import type { MouseEvent } from "react";
-import { ChevronLeft, ChevronRight, Mail, Phone, Copy, Check, MessageSquare } from "lucide-react";
+import { ChevronLeft, ChevronRight, Mail, Phone, Copy, Check } from "lucide-react";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
@@ -11,6 +11,14 @@ import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import type { Employee, Company } from "@/types";
+
+// Company config for hover colors based on company id
+const companyConfigMap: Record<string, { primary: string; secondary: string; glow: string; accent?: string; accentGlow?: string; textColor?: string }> = {
+  comercializadora: { primary: '#0047AB', secondary: '#002D6E', glow: 'rgba(0,71,171,0.25)' },
+  acabados: { primary: '#C0152A', secondary: '#8B0000', glow: 'rgba(192,21,42,0.25)' },
+  ferrecapital: { primary: '#2C3338', secondary: '#1A1E21', glow: 'rgba(44,51,56,0.35)', accent: '#CC0000', accentGlow: 'rgba(204,0,0,0.18)', textColor: '#E8EAED' },
+  arkiramica: { primary: '#F5C400', secondary: '#C49A00', glow: 'rgba(245,196,0,0.22)' },
+};
 
 // Premium easing curve
 const premiumEase = [0.25, 0.46, 0.45, 0.94];
@@ -55,6 +63,178 @@ const truncateEmail = (email: string, maxLength = 18) => {
   return `${truncatedUser}...@${domain}`;
 };
 
+// Featured Employee Card Component
+interface FeaturedEmployeeCardProps {
+  employee: Employee;
+  companyConfig: { primary: string; secondary: string; glow: string };
+  companyName: string;
+  getInitials: (name: string) => string;
+  handleCardClick: (employeeId: string) => void;
+  copyToClipboard: (e: MouseEvent, text: string, field: string) => void;
+  copiedField: string | null;
+}
+
+function FeaturedEmployeeCard({
+  employee,
+  companyConfig,
+  companyName,
+  getInitials,
+  handleCardClick,
+  copyToClipboard,
+  copiedField,
+}: FeaturedEmployeeCardProps) {
+  const [isHovered, setIsHovered] = useState(false);
+
+  return (
+    <motion.div
+      variants={itemVariants}
+      className="will-change-transform gpu-accelerated"
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
+    >
+      <div
+        onClick={() => handleCardClick(employee.id)}
+        className="card-shimmer corner-bracket group relative overflow-hidden rounded-xl p-4 h-[220px] flex flex-col cursor-pointer"
+        style={{
+          ["--shimmer-color" as string]: companyConfig.primary,
+          ["--bracket-color" as string]: companyConfig.primary,
+          borderWidth: isHovered ? '1.5px' : '1px',
+          borderStyle: 'solid',
+          borderColor: isHovered ? companyConfig.primary : 'var(--border)',
+          boxShadow: isHovered ? `0 0 0 1px ${companyConfig.primary}, 0 8px 32px ${companyConfig.glow}` : 'none',
+          transform: isHovered ? 'translateY(-3px) scale(1.012)' : 'none',
+          background: isHovered 
+            ? `linear-gradient(160deg, ${companyConfig.primary}10 0%, transparent 60%), rgba(255,255,255,0.07)` 
+            : 'rgba(255,255,255,0.04)',
+          transitionProperty: 'all',
+          transitionDuration: '180ms',
+          transitionTimingFunction: 'cubic-bezier(0.25, 0.46, 0.45, 0.94)'
+        }}
+      >
+        {/* Left accent bar */}
+        <div 
+          className="absolute left-0 top-0 bottom-0 transition-all duration-[180ms]"
+          style={{
+            width: isHovered ? '5px' : '3px',
+            background: isHovered && companyConfig.accent 
+              ? `linear-gradient(to bottom, ${companyConfig.accent}, ${companyConfig.primary})`
+              : companyConfig.primary,
+            opacity: isHovered ? 1 : 0.7,
+          }}
+        />
+
+        {/* Top section */}
+        <div className="flex items-start gap-3 flex-1 pl-2">
+          <Avatar 
+            className="w-14 h-14 shrink-0 transition-all duration-[180ms]"
+            style={{
+              borderWidth: isHovered ? '2px' : '1.5px',
+              borderStyle: 'solid',
+              borderColor: isHovered 
+                ? (companyConfig.accent || companyConfig.primary) 
+                : `${companyConfig.primary}66`,
+              boxShadow: isHovered 
+                ? `0 0 12px ${companyConfig.accentGlow || companyConfig.glow}` 
+                : 'none',
+              transform: isHovered ? 'scale(1.05)' : 'none',
+            }}
+          >
+            <AvatarFallback
+              className="text-sm font-semibold"
+              style={{
+                background: `linear-gradient(135deg, ${companyConfig.secondary}, ${companyConfig.primary})`,
+                color: companyConfig.textColor || 'white',
+              }}
+            >
+              {getInitials(employee.name)}
+            </AvatarFallback>
+          </Avatar>
+
+          <div className="flex-1 min-w-0">
+            <h3 className="font-semibold text-foreground group-hover:text-primary transition-colors duration-[180ms] line-clamp-1 text-sm">
+              {employee.name}
+            </h3>
+            <p className="text-xs text-muted-foreground line-clamp-1">
+              {employee.position}
+            </p>
+            <span
+              className="inline-block text-[10px] font-medium px-1.5 py-0.5 rounded-full mt-1"
+              style={{
+                backgroundColor: companyConfig.accent ? companyConfig.secondary : `${companyConfig.primary}15`,
+                border: companyConfig.accent ? `1px solid ${companyConfig.primary}` : 'none',
+                color: companyConfig.accent || companyConfig.primary,
+              }}
+            >
+              {companyName}
+            </span>
+          </div>
+        </div>
+
+        {/* Divider */}
+        <div className="gradient-divider my-2" />
+
+        {/* Contact info */}
+        <div className="space-y-1.5 text-[12px] pl-2">
+          {/* Email row */}
+          <div className="flex items-center gap-1">
+            <button
+              onClick={(e: MouseEvent) => {
+                e.stopPropagation();
+                window.location.href = `mailto:${employee.email}`;
+              }}
+              className="flex items-center gap-1.5 text-muted-foreground hover:text-foreground transition-colors flex-1 min-w-0"
+            >
+              <Mail className="w-3.5 h-3.5 shrink-0" />
+              <TooltipProvider>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <span className="truncate">{truncateEmail(employee.email)}</span>
+                  </TooltipTrigger>
+                  <TooltipContent>{employee.email}</TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
+            </button>
+            <button
+              onClick={(e: MouseEvent) => copyToClipboard(e, employee.email, `featured-email-${employee.id}`)}
+              className="p-1 rounded hover:bg-muted transition-colors shrink-0"
+            >
+              {copiedField === `featured-email-${employee.id}` ? (
+                <Check className="w-3 h-3 text-green-500" />
+              ) : (
+                <Copy className="w-3 h-3 text-muted-foreground" />
+              )}
+            </button>
+          </div>
+
+          {/* Phone row */}
+          <div className="flex items-center gap-1">
+            <button
+              onClick={(e: MouseEvent) => {
+                e.stopPropagation();
+                window.location.href = `tel:${employee.phone}`;
+              }}
+              className="flex items-center gap-1.5 text-muted-foreground hover:text-foreground transition-colors"
+            >
+              <Phone className="w-3.5 h-3.5 shrink-0" />
+              <span>{formatPhone(employee.phone)}</span>
+            </button>
+            <button
+              onClick={(e: MouseEvent) => copyToClipboard(e, employee.phone, `featured-phone-${employee.id}`)}
+              className="p-1 rounded hover:bg-muted transition-colors shrink-0 ml-auto"
+            >
+              {copiedField === `featured-phone-${employee.id}` ? (
+                <Check className="w-3 h-3 text-green-500" />
+              ) : (
+                <Copy className="w-3 h-3 text-muted-foreground" />
+              )}
+            </button>
+          </div>
+        </div>
+      </div>
+    </motion.div>
+  );
+}
+
 interface FeaturedEmployeesProps {
   employees: Employee[];
   companies: Company[];
@@ -67,12 +247,12 @@ export function FeaturedEmployees({
   const router = useRouter();
   const [currentIndex, setCurrentIndex] = useState(0);
   
-  // Responsive items per page: 1 on mobile, 2 on tablet, 3 on desktop
+  // Responsive items per page: 1 on mobile, 2 on tablet, 4 on desktop
   const getItemsPerPage = () => {
     if (typeof window === "undefined") return 4;
-    if (window.innerWidth < 768) return 1;      // Mobile
-    if (window.innerWidth < 1024) return 2;     // Tablet
-    return 4;                                     // Desktop
+    if (window.innerWidth < 768) return 1;
+    if (window.innerWidth < 1024) return 2;
+    return 4;
   };
   
   const [itemsPerPage, setItemsPerPage] = useState(4);
@@ -123,11 +303,6 @@ export function FeaturedEmployees({
     setTimeout(() => setCopiedField(null), 2000);
   };
 
-  const openTeamsChat = (e: MouseEvent, email: string) => {
-    e.stopPropagation();
-    window.open(`https://teams.microsoft.com/l/chat/0/0?users=${email}`, "_blank");
-  };
-
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
@@ -171,125 +346,22 @@ export function FeaturedEmployees({
         className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4"
       >
         {currentEmployees.map((employee) => {
-          const companyColor = getCompanyColor(employee.company);
+          const companyConfig = companyConfigMap[employee.company] || {
+            primary: getCompanyColor(employee.company),
+            secondary: '#1A1A1A',
+            glow: 'rgba(201,168,76,0.25)'
+          };
           return (
-            <motion.div
+            <FeaturedEmployeeCard
               key={employee.id}
-              variants={itemVariants}
-              className="will-change-transform gpu-accelerated"
-            >
-              <div
-                onClick={() => handleCardClick(employee.id)}
-                className="card-shimmer corner-bracket group relative overflow-hidden rounded-xl border border-border bg-card p-4 h-[220px] flex flex-col cursor-pointer transition-all duration-[180ms] hover:scale-[1.02]"
-                style={{
-                  ["--shimmer-color" as string]: companyColor,
-                  ["--bracket-color" as string]: companyColor,
-                  transitionTimingFunction: "cubic-bezier(0.25, 0.46, 0.45, 0.94)"
-                }}
-                onMouseEnter={(e) => {
-                  e.currentTarget.style.boxShadow = `0 8px 30px -10px ${companyColor}40`;
-                  e.currentTarget.style.borderColor = `${companyColor}50`;
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.boxShadow = "";
-                  e.currentTarget.style.borderColor = "";
-                }}
-              >
-                {/* Top section */}
-                <div className="flex items-start gap-3 flex-1">
-                  <Avatar className="w-14 h-14 border-2 border-border group-hover:border-primary/50 transition-colors duration-[180ms] shrink-0">
-                    <AvatarFallback
-                      className="text-sm font-semibold"
-                      style={{
-                        backgroundColor: `${companyColor}20`,
-                        color: companyColor,
-                      }}
-                    >
-                      {getInitials(employee.name)}
-                    </AvatarFallback>
-                  </Avatar>
-
-                  <div className="flex-1 min-w-0">
-                    <h3 className="font-semibold text-foreground group-hover:text-primary transition-colors duration-[180ms] line-clamp-1 text-sm">
-                      {employee.name}
-                    </h3>
-                    <p className="text-xs text-muted-foreground line-clamp-1">
-                      {employee.position}
-                    </p>
-                    <span
-                      className="inline-block text-[10px] font-medium px-1.5 py-0.5 rounded-full mt-1"
-                      style={{
-                        backgroundColor: `${companyColor}15`,
-                        color: companyColor,
-                      }}
-                    >
-                      {getCompanyName(employee.company)}
-                    </span>
-                  </div>
-                </div>
-
-                {/* Divider */}
-                <div className="gradient-divider my-2" />
-
-                {/* Contact info */}
-                <div className="space-y-1.5 text-[12px]">
-                  {/* Email row */}
-                  <div className="flex items-center gap-1">
-                    <button
-                      onClick={(e: MouseEvent) => {
-                        e.stopPropagation();
-                        window.location.href = `mailto:${employee.email}`;
-                      }}
-                      className="flex items-center gap-1.5 text-muted-foreground hover:text-foreground transition-colors flex-1 min-w-0"
-                    >
-                      <Mail className="w-3.5 h-3.5 shrink-0" />
-                      <TooltipProvider>
-                        <Tooltip>
-                          <TooltipTrigger asChild>
-                            <span className="truncate">{truncateEmail(employee.email)}</span>
-                          </TooltipTrigger>
-                          <TooltipContent>{employee.email}</TooltipContent>
-                        </Tooltip>
-                      </TooltipProvider>
-                    </button>
-                    <button
-                      onClick={(e: MouseEvent) => copyToClipboard(e, employee.email, `featured-email-${employee.id}`)}
-                      className="p-1 rounded hover:bg-muted transition-colors shrink-0"
-                    >
-                      {copiedField === `featured-email-${employee.id}` ? (
-                        <Check className="w-3 h-3 text-green-500" />
-                      ) : (
-                        <Copy className="w-3 h-3 text-muted-foreground" />
-                      )}
-                    </button>
-                  </div>
-
-                  {/* Phone row */}
-                  <div className="flex items-center gap-1">
-                    <button
-                      onClick={(e: MouseEvent) => {
-                        e.stopPropagation();
-                        window.location.href = `tel:${employee.phone}`;
-                      }}
-                      className="flex items-center gap-1.5 text-muted-foreground hover:text-foreground transition-colors"
-                    >
-                      <Phone className="w-3.5 h-3.5 shrink-0" />
-                      <span>{formatPhone(employee.phone)}</span>
-                    </button>
-                    <button
-                      onClick={(e: MouseEvent) => copyToClipboard(e, employee.phone, `featured-phone-${employee.id}`)}
-                      className="p-1 rounded hover:bg-muted transition-colors shrink-0 ml-auto"
-                    >
-                      {copiedField === `featured-phone-${employee.id}` ? (
-                        <Check className="w-3 h-3 text-green-500" />
-                      ) : (
-                        <Copy className="w-3 h-3 text-muted-foreground" />
-                      )}
-                    </button>
-                  </div>
-                </div>
-              </div>
-            </motion.div>
+              employee={employee}
+              companyConfig={companyConfig}
+              companyName={getCompanyName(employee.company)}
+              getInitials={getInitials}
+              handleCardClick={handleCardClick}
+              copyToClipboard={copyToClipboard}
+              copiedField={copiedField}
+            />
           );
         })}
       </motion.div>

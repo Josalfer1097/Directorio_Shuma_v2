@@ -39,6 +39,16 @@ const truncateEmail = (email: string, maxLength = 20) => {
   return `${truncatedUser}...@${domain}`;
 };
 
+// Company config for hover colors based on company id
+const companyConfigMap: Record<string, { primary: string; secondary: string; glow: string; accent?: string; accentGlow?: string; textColor?: string }> = {
+  comercializadora: { primary: '#0047AB', secondary: '#002D6E', glow: 'rgba(0,71,171,0.25)' },
+  acabados: { primary: '#C0152A', secondary: '#8B0000', glow: 'rgba(192,21,42,0.25)' },
+  ferrecapital: { primary: '#2C3338', secondary: '#1A1E21', glow: 'rgba(44,51,56,0.35)', accent: '#CC0000', accentGlow: 'rgba(204,0,0,0.18)', textColor: '#E8EAED' },
+  arkiramica: { primary: '#F5C400', secondary: '#C49A00', glow: 'rgba(245,196,0,0.22)' },
+};
+
+
+
 export function EmployeeCard({
   employee,
   company,
@@ -47,6 +57,14 @@ export function EmployeeCard({
   hideCompanyBadge = false,
 }: EmployeeCardProps) {
   const [copiedField, setCopiedField] = useState<string | null>(null);
+  const [isHovered, setIsHovered] = useState(false);
+  
+  // Get company-specific config from the map
+  const companyConfig = companyConfigMap[employee.company] || {
+    primary: company.colors.primary,
+    secondary: company.colors.secondary || '#1A1A1A',
+    glow: company.colors.glow || 'rgba(201,168,76,0.25)'
+  };
 
   const getInitials = (name: string) => {
     return name
@@ -94,18 +112,53 @@ export function EmployeeCard({
       >
         <Link href={`/directorio/${employee.id}`}>
           <div 
-            className="group flex items-center gap-4 p-4 rounded-lg border border-border bg-card transition-all duration-[180ms] hover:scale-[1.01] hover:shadow-lg hover:border-primary/30"
+            className="group flex items-center gap-4 p-4 rounded-lg border bg-card relative overflow-hidden"
             style={{ 
-              ["--bracket-color" as string]: company.color,
-              transitionTimingFunction: "cubic-bezier(0.25, 0.46, 0.45, 0.94)"
+              ["--bracket-color" as string]: companyConfig.primary,
+              borderColor: isHovered ? companyConfig.primary : 'var(--border)',
+              borderWidth: isHovered ? '1.5px' : '1px',
+              boxShadow: isHovered ? `0 0 0 1px ${companyConfig.primary}, 0 8px 32px ${companyConfig.glow}` : 'none',
+              transform: isHovered ? 'translateY(-3px) scale(1.012)' : 'none',
+              background: isHovered 
+                ? `linear-gradient(160deg, ${companyConfig.primary}10 0%, transparent 60%), rgba(255,255,255,0.07)` 
+                : 'rgba(255,255,255,0.04)',
+              transitionProperty: 'all',
+              transitionDuration: '180ms',
+              transitionTimingFunction: 'cubic-bezier(0.25, 0.46, 0.45, 0.94)'
             }}
+            onMouseEnter={() => setIsHovered(true)}
+            onMouseLeave={() => setIsHovered(false)}
           >
-            <div className="corner-bracket">
-              <Avatar className="w-12 h-12 border border-border">
+            {/* Left accent bar */}
+            <div 
+              className="absolute left-0 top-0 bottom-0 transition-all duration-[180ms]"
+              style={{
+                width: isHovered ? '5px' : '3px',
+                background: isHovered && companyConfig.accent 
+                  ? `linear-gradient(to bottom, ${companyConfig.accent}, ${companyConfig.primary})`
+                  : companyConfig.primary,
+                opacity: isHovered ? 1 : 0.7,
+              }}
+            />
+            <div className="corner-bracket ml-2">
+              <Avatar 
+                className="w-12 h-12 transition-all duration-[180ms]"
+                style={{
+                  borderWidth: isHovered ? '2px' : '1.5px',
+                  borderStyle: 'solid',
+                  borderColor: isHovered 
+                    ? (companyConfig.accent || companyConfig.primary) 
+                    : `${companyConfig.primary}66`,
+                  boxShadow: isHovered 
+                    ? `0 0 12px ${companyConfig.accentGlow || companyConfig.glow}` 
+                    : 'none',
+                  transform: isHovered ? 'scale(1.05)' : 'none',
+                }}
+              >
                 <AvatarFallback
                   style={{
-                    backgroundColor: `${company.color}20`,
-                    color: company.color,
+                    background: `linear-gradient(135deg, ${companyConfig.secondary}, ${companyConfig.primary})`,
+                    color: companyConfig.textColor || 'white',
                   }}
                 >
                   {getInitials(employee.name)}
@@ -122,8 +175,9 @@ export function EmployeeCard({
                   <span
                     className="text-xs font-medium px-2 py-0.5 rounded-full shrink-0"
                     style={{
-                      backgroundColor: `${company.color}15`,
-                      color: company.color,
+                      backgroundColor: companyConfig.accent ? companyConfig.secondary : `${companyConfig.primary}15`,
+                      border: companyConfig.accent ? `1px solid ${companyConfig.primary}` : 'none',
+                      color: companyConfig.accent || companyConfig.primary,
                     }}
                   >
                     {company.shortName || company.name}
@@ -215,36 +269,62 @@ export function EmployeeCard({
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.18, delay: index * 0.04, ease: premiumEase }}
       className="will-change-transform gpu-accelerated"
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
     >
       <Link href={`/directorio/${employee.id}`}>
         <div
           className={cn(
-            "card-shimmer corner-bracket group relative overflow-hidden rounded-xl border border-border bg-card p-4 h-[220px] flex flex-col",
-            "transition-all duration-[180ms] hover:scale-[1.02] hover:shadow-lg"
+            "card-shimmer corner-bracket group relative overflow-hidden rounded-xl p-4 h-[220px] flex flex-col",
+            "transition-all duration-[180ms]"
           )}
           style={{ 
-            ["--shimmer-color" as string]: company.color,
-            ["--bracket-color" as string]: company.color,
-            boxShadow: "0 0 0 0 transparent",
+            ["--shimmer-color" as string]: companyConfig.primary,
+            ["--bracket-color" as string]: companyConfig.primary,
+            borderWidth: isHovered ? '1.5px' : '1px',
+            borderStyle: 'solid',
+            borderColor: isHovered ? companyConfig.primary : 'var(--border)',
+            boxShadow: isHovered ? `0 0 0 1px ${companyConfig.primary}, 0 8px 32px ${companyConfig.glow}` : 'none',
+            transform: isHovered ? 'translateY(-3px) scale(1.012)' : 'none',
+            background: isHovered 
+              ? `linear-gradient(160deg, ${companyConfig.primary}10 0%, transparent 60%), rgba(255,255,255,0.07)` 
+              : 'rgba(255,255,255,0.04)',
             transitionTimingFunction: "cubic-bezier(0.25, 0.46, 0.45, 0.94)"
           }}
-          onMouseEnter={(e) => {
-            e.currentTarget.style.boxShadow = `0 8px 30px -10px ${company.color}40`;
-            e.currentTarget.style.borderColor = `${company.color}50`;
-          }}
-          onMouseLeave={(e) => {
-            e.currentTarget.style.boxShadow = "0 0 0 0 transparent";
-            e.currentTarget.style.borderColor = "";
-          }}
         >
+          {/* Left accent bar */}
+          <div 
+            className="absolute left-0 top-0 bottom-0 transition-all duration-[180ms]"
+            style={{
+              width: isHovered ? '5px' : '3px',
+              background: isHovered && companyConfig.accent 
+                ? `linear-gradient(to bottom, ${companyConfig.accent}, ${companyConfig.primary})`
+                : companyConfig.primary,
+              opacity: isHovered ? 1 : 0.7,
+            }}
+          />
+          
           {/* Top section: Avatar + Info */}
-          <div className="flex items-start gap-3 flex-1">
-            <Avatar className="w-14 h-14 border-2 border-border group-hover:border-primary/50 transition-colors duration-[180ms] shrink-0">
+          <div className="flex items-start gap-3 flex-1 pl-2">
+            <Avatar 
+              className="w-14 h-14 shrink-0 transition-all duration-[180ms]"
+              style={{
+                borderWidth: isHovered ? '2px' : '1.5px',
+                borderStyle: 'solid',
+                borderColor: isHovered 
+                  ? (companyConfig.accent || companyConfig.primary) 
+                  : `${companyConfig.primary}66`,
+                boxShadow: isHovered 
+                  ? `0 0 12px ${companyConfig.accentGlow || companyConfig.glow}` 
+                  : 'none',
+                transform: isHovered ? 'scale(1.05)' : 'none',
+              }}
+            >
               <AvatarFallback
                 className="text-sm font-semibold"
                 style={{
-                  backgroundColor: `${company.color}20`,
-                  color: company.color,
+                  background: `linear-gradient(135deg, ${companyConfig.secondary}, ${companyConfig.primary})`,
+                  color: companyConfig.textColor || 'white',
                 }}
               >
                 {getInitials(employee.name)}
@@ -265,8 +345,9 @@ export function EmployeeCard({
                 <span
                   className="inline-block text-[10px] font-medium px-1.5 py-0.5 rounded-full mt-1"
                   style={{
-                    backgroundColor: `${company.color}15`,
-                    color: company.color,
+                    backgroundColor: companyConfig.accent ? companyConfig.secondary : `${companyConfig.primary}15`,
+                    border: companyConfig.accent ? `1px solid ${companyConfig.primary}` : 'none',
+                    color: companyConfig.accent || companyConfig.primary,
                   }}
                 >
                   {company.shortName || company.name}
