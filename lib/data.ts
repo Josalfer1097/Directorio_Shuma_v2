@@ -73,10 +73,15 @@ export function getCompanyPrimaryColor(companyId: string): string {
 
 export function getCompanyStats() {
   const companies = getCompanies();
-  return companies.map((company) => ({
-    ...company,
-    employeeCount: getEmployeesByCompany(company.id).length,
-  }));
+  return companies.map((company) => {
+    const companyEmployees = getEmployeesByCompany(company.id);
+    const uniqueDepartments = new Set(companyEmployees.map(emp => emp.department));
+    return {
+      ...company,
+      employeeCount: companyEmployees.length,
+      departmentCount: uniqueDepartments.size,
+    };
+  });
 }
 
 export function getTotalStats() {

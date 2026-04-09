@@ -129,6 +129,16 @@ export function EmployeeCard({
             onMouseEnter={() => setIsHovered(true)}
             onMouseLeave={() => setIsHovered(false)}
           >
+            {/* Top accent line */}
+            <div 
+              className="absolute top-0 left-0 right-0 transition-all duration-[180ms]"
+              style={{
+                height: '2px',
+                backgroundColor: companyConfig.accent || companyConfig.primary,
+                opacity: isHovered ? 1 : 0.4,
+              }}
+            />
+            
             {/* Left accent bar */}
             <div 
               className="absolute left-0 top-0 bottom-0 transition-all duration-[180ms]"
@@ -262,7 +272,7 @@ export function EmployeeCard({
     );
   }
 
-  // Grid view - max height 220px
+  // Grid view - reduced height ~200px
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -275,7 +285,7 @@ export function EmployeeCard({
       <Link href={`/directorio/${employee.id}`}>
         <div
           className={cn(
-            "card-shimmer corner-bracket group relative overflow-hidden rounded-xl p-4 h-[220px] flex flex-col",
+            "card-shimmer corner-bracket group relative overflow-hidden rounded-xl p-4 h-[200px] flex flex-col",
             "transition-all duration-[180ms]"
           )}
           style={{ 
@@ -292,6 +302,16 @@ export function EmployeeCard({
             transitionTimingFunction: "cubic-bezier(0.25, 0.46, 0.45, 0.94)"
           }}
         >
+          {/* Top accent line */}
+          <div 
+            className="absolute top-0 left-0 right-0 transition-all duration-[180ms]"
+            style={{
+              height: '2px',
+              backgroundColor: companyConfig.accent || companyConfig.primary,
+              opacity: isHovered ? 1 : 0.4,
+            }}
+          />
+          
           {/* Left accent bar */}
           <div 
             className="absolute left-0 top-0 bottom-0 transition-all duration-[180ms]"
@@ -343,10 +363,10 @@ export function EmployeeCard({
               </p>
               {!hideCompanyBadge && (
                 <span
-                  className="inline-block text-[10px] font-medium px-1.5 py-0.5 rounded-full mt-1"
+                  className="inline-block text-[10px] font-medium px-2 py-0.5 rounded-full mt-1"
                   style={{
-                    backgroundColor: companyConfig.accent ? companyConfig.secondary : `${companyConfig.primary}15`,
-                    border: companyConfig.accent ? `1px solid ${companyConfig.primary}` : 'none',
+                    backgroundColor: `${companyConfig.primary}15`,
+                    border: `1px solid ${companyConfig.primary}40`,
                     color: companyConfig.accent || companyConfig.primary,
                   }}
                 >
@@ -379,12 +399,12 @@ export function EmployeeCard({
               </button>
               <button
                 onClick={(e) => copyToClipboard(e, employee.email, `email-${employee.id}`)}
-                className="p-1 rounded hover:bg-muted transition-colors shrink-0"
+                className="p-1.5 sm:p-1 rounded hover:bg-muted transition-colors shrink-0 min-w-[36px] min-h-[36px] sm:min-w-0 sm:min-h-0 flex items-center justify-center"
               >
                 {copiedField === `email-${employee.id}` ? (
-                  <Check className="w-3 h-3 text-green-500" />
+                  <Check className="w-4 h-4 sm:w-3 sm:h-3 text-green-500" />
                 ) : (
-                  <Copy className="w-3 h-3 text-muted-foreground" />
+                  <Copy className="w-4 h-4 sm:w-3 sm:h-3 text-muted-foreground" />
                 )}
               </button>
               <TooltipProvider>
@@ -392,9 +412,9 @@ export function EmployeeCard({
                   <TooltipTrigger asChild>
                     <button
                       onClick={openTeamsChat}
-                      className="p-1 rounded hover:bg-[#6264A7]/10 transition-colors shrink-0 group/teams"
+                      className="p-1.5 sm:p-1 rounded hover:bg-[#6264A7]/10 transition-colors shrink-0 group/teams min-w-[36px] min-h-[36px] sm:min-w-0 sm:min-h-0 flex items-center justify-center"
                     >
-                      <MessageSquare className="w-3 h-3 text-muted-foreground group-hover/teams:text-[#6264A7]" />
+                      <MessageSquare className="w-4 h-4 sm:w-3 sm:h-3 text-muted-foreground group-hover/teams:text-[#6264A7]" />
                     </button>
                   </TooltipTrigger>
                   <TooltipContent>
@@ -413,17 +433,25 @@ export function EmployeeCard({
                 <Phone className="w-3.5 h-3.5 shrink-0" />
                 <span>{formatPhone(employee.phone)}</span>
               </button>
-              <span className="px-1.5 py-0.5 rounded bg-muted text-[10px] font-medium shrink-0">
+              <span 
+                className="shrink-0 text-[10px] font-medium"
+                style={{
+                  padding: '2px 6px',
+                  borderRadius: '4px',
+                  background: 'rgba(255,255,255,0.06)',
+                  border: '1px solid rgba(255,255,255,0.09)',
+                }}
+              >
                 Ext. {employee.extension}
               </span>
               <button
                 onClick={(e) => copyToClipboard(e, employee.phone, `phone-${employee.id}`)}
-                className="p-1 rounded hover:bg-muted transition-colors shrink-0 ml-auto"
+                className="p-1.5 sm:p-1 rounded hover:bg-muted transition-colors shrink-0 ml-auto min-w-[36px] min-h-[36px] sm:min-w-0 sm:min-h-0 flex items-center justify-center"
               >
                 {copiedField === `phone-${employee.id}` ? (
-                  <Check className="w-3 h-3 text-green-500" />
+                  <Check className="w-4 h-4 sm:w-3 sm:h-3 text-green-500" />
                 ) : (
-                  <Copy className="w-3 h-3 text-muted-foreground" />
+                  <Copy className="w-4 h-4 sm:w-3 sm:h-3 text-muted-foreground" />
                 )}
               </button>
             </div>

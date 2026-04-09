@@ -1,12 +1,13 @@
 "use client";
 
-import { Suspense, useState } from "react";
+import { Suspense, useState, useEffect } from "react";
 import dynamic from "next/dynamic";
 import { motion, AnimatePresence } from "framer-motion";
 import { Navbar } from "@/components/navbar";
 import { Skeleton } from "@/components/ui/skeleton";
 import { GitBranch, Maximize2 } from "lucide-react";
 import { ErrorBoundary } from "@/components/error-boundary";
+import { toast } from "sonner";
 
 const OrgChart = dynamic(
   () => import("@/components/org-chart").then(mod => mod.OrgChart),
@@ -27,9 +28,25 @@ function OrgChartLoading() {
 
 export default function OrganigramaPage() {
   const [showMobileOrg, setShowMobileOrg] = useState(false);
+  const [hasShownHint, setHasShownHint] = useState(false);
+
+  // Show zoom hint toast on mobile when org chart is shown
+  useEffect(() => {
+    if (showMobileOrg && !hasShownHint) {
+      const isMobile = window.innerWidth < 768;
+      if (isMobile) {
+        toast("Pellizca para zoom", {
+          description: "Usa dos dedos para hacer zoom y navegar",
+          duration: 3000,
+          position: "bottom-center",
+        });
+        setHasShownHint(true);
+      }
+    }
+  }, [showMobileOrg, hasShownHint]);
 
   return (
-    <div className="min-h-screen bg-bg-base relative">
+    <div className="min-h-screen bg-bg-base relative page-transition">
       <div className="dot-grid fixed inset-0" />
       
       <Navbar />
