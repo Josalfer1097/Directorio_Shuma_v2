@@ -13,11 +13,11 @@ import {
   MessageSquare,
   AlertTriangle,
 } from "lucide-react";
-import { Button } from "@/components/ui/button";
 import {
   getEmployeeById,
   getCompanyById,
 } from "@/lib/data";
+import { getCompanyConfig } from "@/lib/companyConfig";
 
 interface Props {
   params: Promise<{ id: string }>;
@@ -48,7 +48,7 @@ class EmployeeDetailErrorBoundary extends Component<
   }
 
   componentDidCatch(error: Error, errorInfo: React.ErrorInfo) {
-    console.error("[v0] Employee detail error:", error, errorInfo);
+    console.error("Employee detail error:", error, errorInfo);
   }
 
   render() {
@@ -60,14 +60,6 @@ class EmployeeDetailErrorBoundary extends Component<
   }
 }
 
-// Company color config
-const companyConfigMap: Record<string, { primary: string; secondary: string; glow: string; initial: string }> = {
-  comercializadora: { primary: '#0047AB', secondary: '#002D6E', glow: 'rgba(0,71,171,0.25)', initial: 'C' },
-  acabados: { primary: '#C0152A', secondary: '#8B0000', glow: 'rgba(192,21,42,0.25)', initial: 'A' },
-  ferrecapital: { primary: '#2C3338', secondary: '#1A1E21', glow: 'rgba(44,51,56,0.35)', initial: 'F' },
-  arkiramica: { primary: '#F5C400', secondary: '#C49A00', glow: 'rgba(245,196,0,0.22)', initial: 'Ar' },
-};
-
 function EmployeeDetailContent({ id }: { id: string }) {
   const router = useRouter();
   const [copiedField, setCopiedField] = useState<string | null>(null);
@@ -78,12 +70,7 @@ function EmployeeDetailContent({ id }: { id: string }) {
   }
 
   const company = getCompanyById(employee.company);
-  const config = companyConfigMap[employee.company] || {
-    primary: '#C9A84C',
-    secondary: '#A68A3A',
-    glow: 'rgba(201,168,76,0.25)',
-    initial: 'S'
-  };
+  const config = getCompanyConfig(employee.company);
 
   const handleClose = () => {
     router.push("/directorio");
@@ -122,9 +109,9 @@ function EmployeeDetailContent({ id }: { id: string }) {
   };
 
   const modalVariants = {
-    hidden: { opacity: 0, scale: 0.96, y: 8 },
+    hidden: { opacity: 0, scale: 0.95, y: 12 },
     visible: { opacity: 1, scale: 1, y: 0 },
-    exit: { opacity: 0, scale: 0.96 },
+    exit: { opacity: 0, scale: 0.97 },
   };
 
   const mobileModalVariants = {
@@ -132,6 +119,14 @@ function EmployeeDetailContent({ id }: { id: string }) {
     visible: { y: 0 },
     exit: { y: "100%" },
   };
+
+  // CSS custom properties for company colors
+  const companyVars = {
+    '--company-primary': config.primary,
+    '--company-secondary': config.secondary,
+    '--company-glow': config.glow,
+    '--company-highlight': config.highlight,
+  } as React.CSSProperties;
 
   return (
     <div className="fixed inset-0 z-50 flex items-end md:items-center justify-center">
@@ -141,9 +136,10 @@ function EmployeeDetailContent({ id }: { id: string }) {
         initial="hidden"
         animate="visible"
         exit="hidden"
-        transition={{ duration: 0.12 }}
+        transition={{ duration: 0.13 }}
         onClick={handleClose}
-        className="absolute inset-0 bg-black/60 backdrop-blur-[16px]"
+        className="absolute inset-0 bg-black/60"
+        style={{ backdropFilter: 'blur(20px)' }}
       />
 
       {/* Desktop Modal */}
@@ -152,38 +148,44 @@ function EmployeeDetailContent({ id }: { id: string }) {
         initial="hidden"
         animate="visible"
         exit="exit"
-        transition={{ duration: 0.15, ease: [0.16, 1, 0.3, 1] }}
-        className="relative hidden md:block w-full max-w-[520px] overflow-hidden z-10"
+        transition={{ duration: 0.16, ease: [0.16, 1, 0.3, 1] }}
+        className="relative hidden md:block overflow-hidden z-10"
         style={{
-          borderRadius: '16px',
-          background: '#0F1114',
-          border: '1px solid rgba(255,255,255,0.08)',
-          boxShadow: '0 24px 80px rgba(0,0,0,0.6), 0 0 0 1px rgba(255,255,255,0.04)',
+          ...companyVars,
+          width: 'min(520px, 94vw)',
+          borderRadius: '20px',
+          background: '#0C0E11',
+          border: '1px solid rgba(255,255,255,0.07)',
+          boxShadow: `0 32px 80px rgba(0,0,0,0.7), 0 0 0 1px ${config.primary}33`,
         }}
       >
-        {/* Top accent line */}
+        {/* Top border accent */}
         <div 
           className="h-[3px] w-full" 
           style={{ backgroundColor: config.primary }} 
         />
 
-        {/* Header Section */}
+        {/* Header Band */}
         <div 
-          className="relative px-6 pt-6 pb-5 overflow-hidden"
+          className="relative overflow-hidden"
           style={{
-            background: `linear-gradient(135deg, ${config.secondary}15 0%, ${config.primary}12 100%)`,
+            height: '160px',
+            background: `linear-gradient(135deg, ${config.secondary} 0%, color-mix(in srgb, ${config.primary} 40%, #0C0E11) 100%)`,
           }}
         >
           {/* Company watermark */}
           <div 
-            className="absolute -top-4 -right-2 pointer-events-none select-none"
+            className="absolute pointer-events-none select-none"
             style={{ 
+              right: '-10px',
+              top: '-20px',
               fontFamily: "'Neuropol', sans-serif",
-              fontSize: '120px',
-              fontWeight: 700,
-              opacity: 0.06,
+              fontSize: '160px',
+              fontWeight: 900,
+              opacity: 0.08,
               color: config.primary,
               lineHeight: 1,
+              zIndex: 0,
             }}
           >
             {config.initial}
@@ -192,97 +194,102 @@ function EmployeeDetailContent({ id }: { id: string }) {
           {/* Close button */}
           <button
             onClick={handleClose}
-            className="absolute top-4 right-4 w-8 h-8 rounded-full flex items-center justify-center transition-all duration-150 hover:scale-110"
+            className="absolute top-4 right-4 w-[30px] h-[30px] rounded-full flex items-center justify-center transition-all duration-150 z-10"
             style={{
-              background: 'rgba(255,255,255,0.08)',
+              background: 'rgba(0,0,0,0.3)',
+              border: '1px solid rgba(255,255,255,0.12)',
+              color: 'rgba(255,255,255,0.5)',
             }}
             onMouseEnter={(e) => {
-              e.currentTarget.style.background = 'rgba(255,255,255,0.16)';
+              e.currentTarget.style.background = 'rgba(255,255,255,0.12)';
+              e.currentTarget.style.color = 'white';
             }}
             onMouseLeave={(e) => {
-              e.currentTarget.style.background = 'rgba(255,255,255,0.08)';
+              e.currentTarget.style.background = 'rgba(0,0,0,0.3)';
+              e.currentTarget.style.color = 'rgba(255,255,255,0.5)';
             }}
           >
-            <X className="w-3.5 h-3.5 text-white/70" />
+            <X className="w-[13px] h-[13px]" />
           </button>
 
-          {/* Avatar + Info */}
-          <div className="flex items-start gap-5 relative z-10">
+          {/* Header Content */}
+          <div className="relative z-[1] px-7 pt-7 pb-6 flex flex-col items-center text-center">
             {/* Avatar */}
             <div 
-              className="w-[72px] h-[72px] rounded-full flex items-center justify-center shrink-0"
+              className="w-20 h-20 rounded-full flex items-center justify-center"
               style={{ 
                 background: `linear-gradient(135deg, ${config.secondary}, ${config.primary})`,
-                border: `2px solid ${config.primary}`,
-                boxShadow: `0 0 20px ${config.glow}`,
+                border: `2.5px solid ${config.primary}`,
+                boxShadow: `0 0 24px ${config.glow}, 0 0 48px ${config.glow}50`,
               }}
             >
               <span 
                 className="text-white font-bold"
                 style={{ 
                   fontFamily: "'Neuropol', sans-serif",
-                  fontSize: '1.5rem',
+                  fontSize: '1.6rem',
                 }}
               >
                 {getInitials(employee.name)}
               </span>
             </div>
 
-            {/* Name + Position + Badge */}
-            <div className="flex-1 min-w-0 pt-1">
-              <div className="flex items-center gap-3 flex-wrap">
-                <h2 
-                  className="text-white font-bold leading-tight"
-                  style={{ 
-                    fontFamily: "'DM Sans', sans-serif",
-                    fontSize: '1.25rem',
-                  }}
-                >
-                  {employee.name}
-                </h2>
-                <span 
-                  className="shrink-0"
-                  style={{
-                    background: `${config.primary}15`,
-                    border: `1px solid ${config.primary}59`,
-                    color: config.primary,
-                    fontSize: '0.7rem',
-                    fontFamily: "'Neuropol', sans-serif",
-                    textTransform: 'uppercase',
-                    letterSpacing: '0.05em',
-                    padding: '2px 8px',
-                    borderRadius: '9999px',
-                  }}
-                >
-                  {company?.shortName || company?.name}
-                </span>
-              </div>
-              <p 
-                className="mt-1 italic"
-                style={{ 
-                  color: config.primary,
-                  fontSize: '0.875rem',
-                  fontFamily: "'DM Sans', sans-serif",
-                }}
-              >
-                {employee.position}
-              </p>
-            </div>
+            {/* Name */}
+            <h2 
+              className="text-white font-bold mt-4"
+              style={{ 
+                fontFamily: "'DM Sans', sans-serif",
+                fontSize: '1.3rem',
+                fontWeight: 700,
+              }}
+            >
+              {employee.name}
+            </h2>
+
+            {/* Position */}
+            <p 
+              className="italic mt-1"
+              style={{ 
+                color: config.primary,
+                fontSize: '0.85rem',
+                fontFamily: "'DM Sans', sans-serif",
+              }}
+            >
+              {employee.position}
+            </p>
+
+            {/* Company badge */}
+            <span 
+              className="mt-2"
+              style={{
+                background: `color-mix(in srgb, ${config.primary} 18%, transparent)`,
+                border: `1px solid color-mix(in srgb, ${config.primary} 45%, transparent)`,
+                color: config.highlight,
+                fontSize: '0.65rem',
+                fontFamily: "'Neuropol', sans-serif",
+                textTransform: 'uppercase',
+                letterSpacing: '0.1em',
+                padding: '3px 10px',
+                borderRadius: '20px',
+              }}
+            >
+              {company?.shortName || company?.name}
+            </span>
           </div>
         </div>
 
         {/* Body Section - Info Grid */}
-        <div className="p-6">
+        <div className="px-7 py-6">
           <div className="grid grid-cols-2 gap-x-6 gap-y-4">
             {/* Departamento */}
-            <div className="pb-3" style={{ borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
+            <div className="pb-3" style={{ borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
               <p 
                 className="mb-1"
                 style={{ 
-                  fontSize: '0.65rem', 
-                  color: 'rgba(255,255,255,0.5)', 
+                  fontSize: '0.6rem', 
+                  color: 'rgba(255,255,255,0.27)', 
                   textTransform: 'uppercase',
-                  letterSpacing: '0.08em',
+                  letterSpacing: '0.1em',
                 }}
               >
                 Departamento
@@ -293,14 +300,14 @@ function EmployeeDetailContent({ id }: { id: string }) {
             </div>
 
             {/* Empresa */}
-            <div className="pb-3" style={{ borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
+            <div className="pb-3" style={{ borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
               <p 
                 className="mb-1"
                 style={{ 
-                  fontSize: '0.65rem', 
-                  color: 'rgba(255,255,255,0.5)', 
+                  fontSize: '0.6rem', 
+                  color: 'rgba(255,255,255,0.27)', 
                   textTransform: 'uppercase',
-                  letterSpacing: '0.08em',
+                  letterSpacing: '0.1em',
                 }}
               >
                 Empresa
@@ -311,14 +318,14 @@ function EmployeeDetailContent({ id }: { id: string }) {
             </div>
 
             {/* Telefono */}
-            <div className="pb-3" style={{ borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
+            <div className="pb-3" style={{ borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
               <p 
                 className="mb-1"
                 style={{ 
-                  fontSize: '0.65rem', 
-                  color: 'rgba(255,255,255,0.5)', 
+                  fontSize: '0.6rem', 
+                  color: 'rgba(255,255,255,0.27)', 
                   textTransform: 'uppercase',
-                  letterSpacing: '0.08em',
+                  letterSpacing: '0.1em',
                 }}
               >
                 Telefono
@@ -329,32 +336,46 @@ function EmployeeDetailContent({ id }: { id: string }) {
             </div>
 
             {/* Extension */}
-            <div className="pb-3" style={{ borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
+            <div className="pb-3" style={{ borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
               <p 
                 className="mb-1"
                 style={{ 
-                  fontSize: '0.65rem', 
-                  color: 'rgba(255,255,255,0.5)', 
+                  fontSize: '0.6rem', 
+                  color: 'rgba(255,255,255,0.27)', 
                   textTransform: 'uppercase',
-                  letterSpacing: '0.08em',
+                  letterSpacing: '0.1em',
                 }}
               >
                 Extension
               </p>
-              <p style={{ fontSize: '0.9rem', color: '#FFFFFF', fontWeight: 500 }}>
-                {employee.extension || "—"}
-              </p>
+              {employee.extension && employee.extension !== "—" ? (
+                <p style={{ fontSize: '0.9rem', color: '#FFFFFF', fontWeight: 500 }}>
+                  {employee.extension}
+                </p>
+              ) : (
+                <span 
+                  style={{ 
+                    fontSize: '0.75rem', 
+                    color: 'rgba(255,255,255,0.3)',
+                    padding: '2px 8px',
+                    background: 'rgba(255,255,255,0.05)',
+                    borderRadius: '4px',
+                  }}
+                >
+                  Sin extension
+                </span>
+              )}
             </div>
 
             {/* Email - spans both columns */}
-            <div className="col-span-2 pb-3" style={{ borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
+            <div className="col-span-2 pb-3" style={{ borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
               <p 
                 className="mb-1"
                 style={{ 
-                  fontSize: '0.65rem', 
-                  color: 'rgba(255,255,255,0.5)', 
+                  fontSize: '0.6rem', 
+                  color: 'rgba(255,255,255,0.27)', 
                   textTransform: 'uppercase',
-                  letterSpacing: '0.08em',
+                  letterSpacing: '0.1em',
                 }}
               >
                 Email
@@ -368,34 +389,39 @@ function EmployeeDetailContent({ id }: { id: string }) {
 
         {/* Action Row */}
         <div 
-          className="px-6 py-4 flex gap-3"
+          className="px-7 py-4 flex gap-3"
           style={{
-            background: 'rgba(255,255,255,0.02)',
+            background: 'rgba(255,255,255,0.015)',
             borderTop: '1px solid rgba(255,255,255,0.06)',
+            paddingBottom: '20px',
           }}
         >
           {/* Copy Email */}
           <button
             onClick={() => employee.email && copyToClipboard(employee.email, 'email')}
-            className="flex-1 h-9 rounded-lg flex items-center justify-center gap-2 transition-all duration-150"
+            className="flex-1 rounded-[10px] flex items-center justify-center gap-1.5 transition-all duration-[180ms]"
             style={{
-              background: copiedField === 'email' ? config.primary : 'rgba(255,255,255,0.05)',
-              border: `1px solid ${copiedField === 'email' ? config.primary : 'rgba(255,255,255,0.10)'}`,
-              color: copiedField === 'email' ? 'white' : 'rgba(255,255,255,0.6)',
+              height: '38px',
+              background: copiedField === 'email' ? config.primary : 'rgba(255,255,255,0.04)',
+              border: `1px solid ${copiedField === 'email' ? config.primary : 'rgba(255,255,255,0.08)'}`,
+              color: copiedField === 'email' ? 'white' : 'rgba(255,255,255,0.44)',
               fontSize: '0.8rem',
+              boxShadow: copiedField === 'email' ? `0 0 12px ${config.glow}` : 'none',
             }}
             onMouseEnter={(e) => {
               if (copiedField !== 'email') {
-                e.currentTarget.style.background = 'rgba(255,255,255,0.10)';
-                e.currentTarget.style.borderColor = `${config.primary}66`;
+                e.currentTarget.style.background = `color-mix(in srgb, ${config.primary} 15%, transparent)`;
+                e.currentTarget.style.borderColor = `color-mix(in srgb, ${config.primary} 50%, transparent)`;
                 e.currentTarget.style.color = 'white';
+                e.currentTarget.style.boxShadow = `0 0 12px ${config.glow}`;
               }
             }}
             onMouseLeave={(e) => {
               if (copiedField !== 'email') {
-                e.currentTarget.style.background = 'rgba(255,255,255,0.05)';
-                e.currentTarget.style.borderColor = 'rgba(255,255,255,0.10)';
-                e.currentTarget.style.color = 'rgba(255,255,255,0.6)';
+                e.currentTarget.style.background = 'rgba(255,255,255,0.04)';
+                e.currentTarget.style.borderColor = 'rgba(255,255,255,0.08)';
+                e.currentTarget.style.color = 'rgba(255,255,255,0.44)';
+                e.currentTarget.style.boxShadow = 'none';
               }
             }}
           >
@@ -415,22 +441,25 @@ function EmployeeDetailContent({ id }: { id: string }) {
           {/* Teams */}
           <button
             onClick={openTeamsChat}
-            className="flex-1 h-9 rounded-lg flex items-center justify-center gap-2 transition-all duration-150"
+            className="flex-1 rounded-[10px] flex items-center justify-center gap-1.5 transition-all duration-[180ms]"
             style={{
-              background: 'rgba(255,255,255,0.05)',
-              border: '1px solid rgba(255,255,255,0.10)',
-              color: 'rgba(255,255,255,0.6)',
+              height: '38px',
+              background: 'rgba(255,255,255,0.04)',
+              border: '1px solid rgba(255,255,255,0.08)',
+              color: 'rgba(255,255,255,0.44)',
               fontSize: '0.8rem',
             }}
             onMouseEnter={(e) => {
-              e.currentTarget.style.background = 'rgba(255,255,255,0.10)';
-              e.currentTarget.style.borderColor = `${config.primary}66`;
+              e.currentTarget.style.background = `color-mix(in srgb, ${config.primary} 15%, transparent)`;
+              e.currentTarget.style.borderColor = `color-mix(in srgb, ${config.primary} 50%, transparent)`;
               e.currentTarget.style.color = 'white';
+              e.currentTarget.style.boxShadow = `0 0 12px ${config.glow}`;
             }}
             onMouseLeave={(e) => {
-              e.currentTarget.style.background = 'rgba(255,255,255,0.05)';
-              e.currentTarget.style.borderColor = 'rgba(255,255,255,0.10)';
-              e.currentTarget.style.color = 'rgba(255,255,255,0.6)';
+              e.currentTarget.style.background = 'rgba(255,255,255,0.04)';
+              e.currentTarget.style.borderColor = 'rgba(255,255,255,0.08)';
+              e.currentTarget.style.color = 'rgba(255,255,255,0.44)';
+              e.currentTarget.style.boxShadow = 'none';
             }}
           >
             <MessageSquare className="w-3.5 h-3.5" />
@@ -440,25 +469,29 @@ function EmployeeDetailContent({ id }: { id: string }) {
           {/* Copy Phone */}
           <button
             onClick={() => employee.phone && copyToClipboard(employee.phone, 'phone')}
-            className="flex-1 h-9 rounded-lg flex items-center justify-center gap-2 transition-all duration-150"
+            className="flex-1 rounded-[10px] flex items-center justify-center gap-1.5 transition-all duration-[180ms]"
             style={{
-              background: copiedField === 'phone' ? config.primary : 'rgba(255,255,255,0.05)',
-              border: `1px solid ${copiedField === 'phone' ? config.primary : 'rgba(255,255,255,0.10)'}`,
-              color: copiedField === 'phone' ? 'white' : 'rgba(255,255,255,0.6)',
+              height: '38px',
+              background: copiedField === 'phone' ? config.primary : 'rgba(255,255,255,0.04)',
+              border: `1px solid ${copiedField === 'phone' ? config.primary : 'rgba(255,255,255,0.08)'}`,
+              color: copiedField === 'phone' ? 'white' : 'rgba(255,255,255,0.44)',
               fontSize: '0.8rem',
+              boxShadow: copiedField === 'phone' ? `0 0 12px ${config.glow}` : 'none',
             }}
             onMouseEnter={(e) => {
               if (copiedField !== 'phone') {
-                e.currentTarget.style.background = 'rgba(255,255,255,0.10)';
-                e.currentTarget.style.borderColor = `${config.primary}66`;
+                e.currentTarget.style.background = `color-mix(in srgb, ${config.primary} 15%, transparent)`;
+                e.currentTarget.style.borderColor = `color-mix(in srgb, ${config.primary} 50%, transparent)`;
                 e.currentTarget.style.color = 'white';
+                e.currentTarget.style.boxShadow = `0 0 12px ${config.glow}`;
               }
             }}
             onMouseLeave={(e) => {
               if (copiedField !== 'phone') {
-                e.currentTarget.style.background = 'rgba(255,255,255,0.05)';
-                e.currentTarget.style.borderColor = 'rgba(255,255,255,0.10)';
-                e.currentTarget.style.color = 'rgba(255,255,255,0.6)';
+                e.currentTarget.style.background = 'rgba(255,255,255,0.04)';
+                e.currentTarget.style.borderColor = 'rgba(255,255,255,0.08)';
+                e.currentTarget.style.color = 'rgba(255,255,255,0.44)';
+                e.currentTarget.style.boxShadow = 'none';
               }
             }}
           >
@@ -490,239 +523,263 @@ function EmployeeDetailContent({ id }: { id: string }) {
         onDragEnd={(_, info) => {
           if (info.offset.y > 100) handleClose();
         }}
-        className="relative md:hidden w-[92vw] overflow-hidden z-10"
+        className="relative md:hidden w-full overflow-hidden z-10"
         style={{
+          ...companyVars,
           borderRadius: '20px 20px 0 0',
-          background: '#0F1114',
-          border: '1px solid rgba(255,255,255,0.08)',
+          background: '#0C0E11',
+          border: '1px solid rgba(255,255,255,0.07)',
           borderBottom: 'none',
-          boxShadow: '0 -24px 80px rgba(0,0,0,0.6)',
+          boxShadow: `0 -32px 80px rgba(0,0,0,0.7)`,
         }}
       >
-        {/* Top accent line */}
+        {/* Top border accent */}
         <div 
           className="h-[3px] w-full" 
           style={{ backgroundColor: config.primary }} 
         />
 
         {/* Drag handle */}
-        <div className="flex justify-center pt-3 pb-2">
+        <div className="flex justify-center pt-2.5">
           <div 
-            className="w-8 h-1 rounded-full"
-            style={{ background: 'rgba(255,255,255,0.2)' }}
+            className="rounded-full"
+            style={{ 
+              width: '36px', 
+              height: '4px', 
+              background: 'rgba(255,255,255,0.18)' 
+            }}
           />
         </div>
 
         {/* Close button */}
         <button
           onClick={handleClose}
-          className="absolute top-4 right-4 w-8 h-8 rounded-full flex items-center justify-center"
+          className="absolute top-4 right-4 w-[30px] h-[30px] rounded-full flex items-center justify-center z-10"
           style={{
-            background: 'rgba(255,255,255,0.08)',
+            background: 'rgba(0,0,0,0.3)',
+            border: '1px solid rgba(255,255,255,0.12)',
+            color: 'rgba(255,255,255,0.5)',
           }}
         >
-          <X className="w-3.5 h-3.5 text-white/70" />
+          <X className="w-[13px] h-[13px]" />
         </button>
 
-        {/* Header Section */}
+        {/* Header Band */}
         <div 
-          className="relative px-5 pt-3 pb-4 overflow-hidden"
+          className="relative overflow-hidden"
           style={{
-            background: `linear-gradient(135deg, ${config.secondary}15 0%, ${config.primary}12 100%)`,
+            background: `linear-gradient(135deg, ${config.secondary} 0%, color-mix(in srgb, ${config.primary} 40%, #0C0E11) 100%)`,
           }}
         >
           {/* Company watermark */}
           <div 
-            className="absolute -top-4 -right-2 pointer-events-none select-none"
+            className="absolute pointer-events-none select-none"
             style={{ 
+              right: '-10px',
+              top: '-10px',
               fontFamily: "'Neuropol', sans-serif",
-              fontSize: '100px',
-              fontWeight: 700,
-              opacity: 0.06,
+              fontSize: '120px',
+              fontWeight: 900,
+              opacity: 0.08,
               color: config.primary,
               lineHeight: 1,
+              zIndex: 0,
             }}
           >
             {config.initial}
           </div>
 
-          {/* Avatar + Info */}
-          <div className="flex items-start gap-4 relative z-10">
+          {/* Header Content */}
+          <div className="relative z-[1] px-6 pt-4 pb-5 flex flex-col items-center text-center">
             {/* Avatar */}
             <div 
-              className="w-16 h-16 rounded-full flex items-center justify-center shrink-0"
+              className="w-16 h-16 rounded-full flex items-center justify-center"
               style={{ 
                 background: `linear-gradient(135deg, ${config.secondary}, ${config.primary})`,
-                border: `2px solid ${config.primary}`,
-                boxShadow: `0 0 20px ${config.glow}`,
+                border: `2.5px solid ${config.primary}`,
+                boxShadow: `0 0 24px ${config.glow}`,
               }}
             >
               <span 
                 className="text-white font-bold"
                 style={{ 
                   fontFamily: "'Neuropol', sans-serif",
-                  fontSize: '1.25rem',
+                  fontSize: '1.3rem',
                 }}
               >
                 {getInitials(employee.name)}
               </span>
             </div>
 
-            {/* Name + Position + Badge */}
-            <div className="flex-1 min-w-0">
-              <div className="flex items-center gap-2 flex-wrap">
-                <h2 
-                  className="text-white font-bold leading-tight"
-                  style={{ 
-                    fontFamily: "'DM Sans', sans-serif",
-                    fontSize: '1.1rem',
-                  }}
-                >
-                  {employee.name}
-                </h2>
-              </div>
-              <span 
-                className="inline-block mt-1"
-                style={{
-                  background: `${config.primary}15`,
-                  border: `1px solid ${config.primary}59`,
-                  color: config.primary,
-                  fontSize: '0.65rem',
-                  fontFamily: "'Neuropol', sans-serif",
-                  textTransform: 'uppercase',
-                  letterSpacing: '0.05em',
-                  padding: '2px 6px',
-                  borderRadius: '9999px',
-                }}
-              >
-                {company?.shortName || company?.name}
-              </span>
-              <p 
-                className="mt-1 italic"
-                style={{ 
-                  color: config.primary,
-                  fontSize: '0.8rem',
-                  fontFamily: "'DM Sans', sans-serif",
-                }}
-              >
-                {employee.position}
-              </p>
-            </div>
+            {/* Name */}
+            <h2 
+              className="text-white font-bold mt-3"
+              style={{ 
+                fontFamily: "'DM Sans', sans-serif",
+                fontSize: '1.15rem',
+                fontWeight: 700,
+              }}
+            >
+              {employee.name}
+            </h2>
+
+            {/* Position */}
+            <p 
+              className="italic mt-1"
+              style={{ 
+                color: config.primary,
+                fontSize: '0.8rem',
+                fontFamily: "'DM Sans', sans-serif",
+              }}
+            >
+              {employee.position}
+            </p>
+
+            {/* Company badge */}
+            <span 
+              className="mt-2"
+              style={{
+                background: `color-mix(in srgb, ${config.primary} 18%, transparent)`,
+                border: `1px solid color-mix(in srgb, ${config.primary} 45%, transparent)`,
+                color: config.highlight,
+                fontSize: '0.6rem',
+                fontFamily: "'Neuropol', sans-serif",
+                textTransform: 'uppercase',
+                letterSpacing: '0.1em',
+                padding: '3px 10px',
+                borderRadius: '20px',
+              }}
+            >
+              {company?.shortName || company?.name}
+            </span>
           </div>
         </div>
 
         {/* Body Section - Info Grid */}
-        <div className="p-5">
+        <div className="px-6 py-5">
           <div className="grid grid-cols-2 gap-x-4 gap-y-3">
             {/* Departamento */}
-            <div className="pb-2" style={{ borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
+            <div className="pb-2" style={{ borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
               <p 
-                className="mb-1"
+                className="mb-0.5"
                 style={{ 
-                  fontSize: '0.6rem', 
-                  color: 'rgba(255,255,255,0.5)', 
+                  fontSize: '0.55rem', 
+                  color: 'rgba(255,255,255,0.27)', 
                   textTransform: 'uppercase',
-                  letterSpacing: '0.08em',
+                  letterSpacing: '0.1em',
                 }}
               >
                 Departamento
               </p>
-              <p style={{ fontSize: '0.85rem', color: '#FFFFFF', fontWeight: 500 }}>
+              <p style={{ fontSize: '0.8rem', color: '#FFFFFF', fontWeight: 500 }}>
                 {employee.department || "—"}
               </p>
             </div>
 
             {/* Empresa */}
-            <div className="pb-2" style={{ borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
+            <div className="pb-2" style={{ borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
               <p 
-                className="mb-1"
+                className="mb-0.5"
                 style={{ 
-                  fontSize: '0.6rem', 
-                  color: 'rgba(255,255,255,0.5)', 
+                  fontSize: '0.55rem', 
+                  color: 'rgba(255,255,255,0.27)', 
                   textTransform: 'uppercase',
-                  letterSpacing: '0.08em',
+                  letterSpacing: '0.1em',
                 }}
               >
                 Empresa
               </p>
-              <p style={{ fontSize: '0.85rem', color: '#FFFFFF', fontWeight: 500 }}>
+              <p style={{ fontSize: '0.8rem', color: '#FFFFFF', fontWeight: 500 }}>
                 {company?.shortName || "—"}
               </p>
             </div>
 
             {/* Telefono */}
-            <div className="pb-2" style={{ borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
+            <div className="pb-2" style={{ borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
               <p 
-                className="mb-1"
+                className="mb-0.5"
                 style={{ 
-                  fontSize: '0.6rem', 
-                  color: 'rgba(255,255,255,0.5)', 
+                  fontSize: '0.55rem', 
+                  color: 'rgba(255,255,255,0.27)', 
                   textTransform: 'uppercase',
-                  letterSpacing: '0.08em',
+                  letterSpacing: '0.1em',
                 }}
               >
                 Telefono
               </p>
-              <p style={{ fontSize: '0.85rem', color: '#FFFFFF', fontWeight: 500 }}>
+              <p style={{ fontSize: '0.8rem', color: '#FFFFFF', fontWeight: 500 }}>
                 {employee.phone || "—"}
               </p>
             </div>
 
             {/* Extension */}
-            <div className="pb-2" style={{ borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
+            <div className="pb-2" style={{ borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
               <p 
-                className="mb-1"
+                className="mb-0.5"
                 style={{ 
-                  fontSize: '0.6rem', 
-                  color: 'rgba(255,255,255,0.5)', 
+                  fontSize: '0.55rem', 
+                  color: 'rgba(255,255,255,0.27)', 
                   textTransform: 'uppercase',
-                  letterSpacing: '0.08em',
+                  letterSpacing: '0.1em',
                 }}
               >
                 Extension
               </p>
-              <p style={{ fontSize: '0.85rem', color: '#FFFFFF', fontWeight: 500 }}>
-                {employee.extension || "—"}
-              </p>
+              {employee.extension && employee.extension !== "—" ? (
+                <p style={{ fontSize: '0.8rem', color: '#FFFFFF', fontWeight: 500 }}>
+                  {employee.extension}
+                </p>
+              ) : (
+                <span 
+                  style={{ 
+                    fontSize: '0.7rem', 
+                    color: 'rgba(255,255,255,0.3)',
+                  }}
+                >
+                  Sin ext.
+                </span>
+              )}
             </div>
 
             {/* Email - spans both columns */}
-            <div className="col-span-2 pb-2" style={{ borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
+            <div className="col-span-2 pb-2" style={{ borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
               <p 
-                className="mb-1"
+                className="mb-0.5"
                 style={{ 
-                  fontSize: '0.6rem', 
-                  color: 'rgba(255,255,255,0.5)', 
+                  fontSize: '0.55rem', 
+                  color: 'rgba(255,255,255,0.27)', 
                   textTransform: 'uppercase',
-                  letterSpacing: '0.08em',
+                  letterSpacing: '0.1em',
                 }}
               >
                 Email
               </p>
-              <p style={{ fontSize: '0.85rem', color: '#FFFFFF', fontWeight: 500, wordBreak: 'break-all' }}>
+              <p style={{ fontSize: '0.8rem', color: '#FFFFFF', fontWeight: 500, wordBreak: 'break-all' }}>
                 {employee.email || "—"}
               </p>
             </div>
           </div>
         </div>
 
-        {/* Action Row - Stacked on mobile */}
+        {/* Action Row - Stacked for mobile */}
         <div 
-          className="px-5 py-4 flex flex-col gap-2"
+          className="px-6 py-4 flex flex-col gap-2"
           style={{
-            background: 'rgba(255,255,255,0.02)',
+            background: 'rgba(255,255,255,0.015)',
             borderTop: '1px solid rgba(255,255,255,0.06)',
+            paddingBottom: '24px',
           }}
         >
           {/* Copy Email */}
           <button
             onClick={() => employee.email && copyToClipboard(employee.email, 'email')}
-            className="w-full h-11 rounded-lg flex items-center justify-center gap-2 transition-all duration-150"
+            className="w-full rounded-[10px] flex items-center justify-center gap-1.5 transition-all duration-[180ms]"
             style={{
-              background: copiedField === 'email' ? config.primary : 'rgba(255,255,255,0.05)',
-              border: `1px solid ${copiedField === 'email' ? config.primary : 'rgba(255,255,255,0.10)'}`,
-              color: copiedField === 'email' ? 'white' : 'rgba(255,255,255,0.6)',
-              fontSize: '0.85rem',
+              height: '44px',
+              background: copiedField === 'email' ? config.primary : 'rgba(255,255,255,0.04)',
+              border: `1px solid ${copiedField === 'email' ? config.primary : 'rgba(255,255,255,0.08)'}`,
+              color: copiedField === 'email' ? 'white' : 'rgba(255,255,255,0.44)',
+              fontSize: '0.8rem',
             }}
           >
             {copiedField === 'email' ? (
@@ -741,27 +798,29 @@ function EmployeeDetailContent({ id }: { id: string }) {
           {/* Teams */}
           <button
             onClick={openTeamsChat}
-            className="w-full h-11 rounded-lg flex items-center justify-center gap-2 transition-all duration-150"
+            className="w-full rounded-[10px] flex items-center justify-center gap-1.5 transition-all duration-[180ms]"
             style={{
-              background: 'rgba(255,255,255,0.05)',
-              border: '1px solid rgba(255,255,255,0.10)',
-              color: 'rgba(255,255,255,0.6)',
-              fontSize: '0.85rem',
+              height: '44px',
+              background: 'rgba(255,255,255,0.04)',
+              border: '1px solid rgba(255,255,255,0.08)',
+              color: 'rgba(255,255,255,0.44)',
+              fontSize: '0.8rem',
             }}
           >
             <MessageSquare className="w-4 h-4" />
-            <span>Enviar mensaje en Teams</span>
+            <span>Abrir en Teams</span>
           </button>
 
           {/* Copy Phone */}
           <button
             onClick={() => employee.phone && copyToClipboard(employee.phone, 'phone')}
-            className="w-full h-11 rounded-lg flex items-center justify-center gap-2 transition-all duration-150"
+            className="w-full rounded-[10px] flex items-center justify-center gap-1.5 transition-all duration-[180ms]"
             style={{
-              background: copiedField === 'phone' ? config.primary : 'rgba(255,255,255,0.05)',
-              border: `1px solid ${copiedField === 'phone' ? config.primary : 'rgba(255,255,255,0.10)'}`,
-              color: copiedField === 'phone' ? 'white' : 'rgba(255,255,255,0.6)',
-              fontSize: '0.85rem',
+              height: '44px',
+              background: copiedField === 'phone' ? config.primary : 'rgba(255,255,255,0.04)',
+              border: `1px solid ${copiedField === 'phone' ? config.primary : 'rgba(255,255,255,0.08)'}`,
+              color: copiedField === 'phone' ? 'white' : 'rgba(255,255,255,0.44)',
+              fontSize: '0.8rem',
             }}
           >
             {copiedField === 'phone' ? (
@@ -782,36 +841,36 @@ function EmployeeDetailContent({ id }: { id: string }) {
   );
 }
 
-// Error fallback component
 function ErrorFallback() {
   const router = useRouter();
-
+  
   return (
-    <div className="min-h-screen bg-[--bg-base] flex items-center justify-center p-4">
-      <div className="max-w-sm w-full p-6 text-center rounded-2xl" style={{ background: '#0F1114', border: '1px solid rgba(255,255,255,0.08)' }}>
-        <div className="w-16 h-16 rounded-full bg-red-500/10 flex items-center justify-center mx-auto mb-4">
-          <AlertTriangle className="w-8 h-8 text-red-500" />
-        </div>
-        <h2 className="text-xl font-bold text-white mb-2">
-          Error al cargar
-        </h2>
-        <p className="text-sm text-white/60 mb-6">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
+      <div className="bg-card p-6 rounded-xl max-w-md mx-4 text-center border border-border">
+        <AlertTriangle className="w-12 h-12 mx-auto mb-4 text-yellow-500" />
+        <h2 className="text-lg font-semibold mb-2">Error al cargar</h2>
+        <p className="text-muted-foreground mb-4">
           No se pudo cargar la informacion del empleado.
         </p>
-        <Button onClick={() => router.push("/directorio")} className="w-full">
+        <button 
+          onClick={() => router.push("/directorio")}
+          className="px-4 py-2 bg-primary text-primary-foreground rounded-lg"
+        >
           Volver al directorio
-        </Button>
+        </button>
       </div>
     </div>
   );
 }
 
 export default function EmployeeDetailPage({ params }: Props) {
-  const { id } = use(params);
-
+  const resolvedParams = use(params);
+  
   return (
-    <EmployeeDetailErrorBoundary fallback={<ErrorFallback />}>
-      <EmployeeDetailContent id={id} />
-    </EmployeeDetailErrorBoundary>
+    <AnimatePresence mode="wait">
+      <EmployeeDetailErrorBoundary fallback={<ErrorFallback />}>
+        <EmployeeDetailContent id={resolvedParams.id} />
+      </EmployeeDetailErrorBoundary>
+    </AnimatePresence>
   );
 }

@@ -10,6 +10,7 @@ import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import type { Employee, Company } from "@/types";
 import { cn } from "@/lib/utils";
+import { getCompanyConfig } from "@/lib/companyConfig";
 
 interface EmployeeCardProps {
   employee: Employee;
@@ -39,13 +40,7 @@ const truncateEmail = (email: string, maxLength = 20) => {
   return `${truncatedUser}...@${domain}`;
 };
 
-// Company config for hover colors based on company id
-const companyConfigMap: Record<string, { primary: string; secondary: string; glow: string; accent?: string; accentGlow?: string; textColor?: string }> = {
-  comercializadora: { primary: '#0047AB', secondary: '#002D6E', glow: 'rgba(0,71,171,0.25)' },
-  acabados: { primary: '#C0152A', secondary: '#8B0000', glow: 'rgba(192,21,42,0.25)' },
-  ferrecapital: { primary: '#2C3338', secondary: '#1A1E21', glow: 'rgba(44,51,56,0.35)', accent: '#CC0000', accentGlow: 'rgba(204,0,0,0.18)', textColor: '#E8EAED' },
-  arkiramica: { primary: '#F5C400', secondary: '#C49A00', glow: 'rgba(245,196,0,0.22)' },
-};
+
 
 
 
@@ -59,12 +54,8 @@ export function EmployeeCard({
   const [copiedField, setCopiedField] = useState<string | null>(null);
   const [isHovered, setIsHovered] = useState(false);
   
-  // Get company-specific config from the map
-  const companyConfig = companyConfigMap[employee.company] || {
-    primary: company.colors.primary,
-    secondary: company.colors.secondary || '#1A1A1A',
-    glow: company.colors.glow || 'rgba(201,168,76,0.25)'
-  };
+  // Get company-specific config using the shared module
+  const companyConfig = getCompanyConfig(employee.company);
 
   const getInitials = (name: string) => {
     return name

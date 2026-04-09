@@ -6,6 +6,7 @@ import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import type { Employee, Company } from "@/types";
 import { cn } from "@/lib/utils";
+import { getCompanyConfig } from "@/lib/companyConfig";
 
 interface OrgNodeData {
   employee: Employee;
@@ -36,40 +37,7 @@ function OrgChartNodeComponent({ data }: OrgChartNodeProps) {
   const { employee, company, onSelect } = data;
   const [isHovered, setIsHovered] = useState(false);
   
-  const companyColors = {
-    comercializadora: {
-      primary: "#0047AB",
-      secondary: "#002D6E",
-      glow: "rgba(0,71,171,0.25)",
-      initial: "C"
-    },
-    acabados: {
-      primary: "#C0152A",
-      secondary: "#8B0000",
-      glow: "rgba(192,21,42,0.25)",
-      initial: "A"
-    },
-    ferrecapital: {
-      primary: "#2C3338",
-      secondary: "#1A1E21",
-      glow: "rgba(44,51,56,0.35)",
-      accent: "#CC0000",
-      initial: "F"
-    },
-    arkiramica: {
-      primary: "#F5C400",
-      secondary: "#C49A00",
-      glow: "rgba(245,196,0,0.22)",
-      initial: "Ar"
-    }
-  };
-
-  const colors = companyColors[employee.company as keyof typeof companyColors] || {
-    primary: "#C9A84C",
-    secondary: "#A68A3A",
-    glow: "rgba(201,168,76,0.25)",
-    initial: employee.company[0].toUpperCase()
-  };
+  const colors = getCompanyConfig(employee.company);
 
   const getInitials = (name: string) => {
     return name

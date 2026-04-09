@@ -21,14 +21,7 @@ import {
 } from "@/components/ui/sheet";
 import { MobileFiltersBottomSheet } from "./mobile-filters-bottom-sheet";
 import type { Company, Employee } from "@/types";
-
-// Company config for consistent colors
-const companyConfigMap: Record<string, { primary: string; accent?: string }> = {
-  comercializadora: { primary: '#0047AB' },
-  acabados: { primary: '#C0152A' },
-  ferrecapital: { primary: '#2C3338', accent: '#CC0000' },
-  arkiramica: { primary: '#F5C400' },
-};
+import { getCompanyConfig } from "@/lib/companyConfig";
 
 // Spring animation for filter panel
 const springTransition = {
@@ -118,7 +111,8 @@ export function DirectoryFilters({
         <h4 className="font-medium text-foreground mb-3" style={{ fontFamily: "'Neuropol', sans-serif" }}>Empresas</h4>
         <div className="space-y-2">
           {companies.filter(c => !c.disabled).map((company) => {
-            const companyColor = companyConfigMap[company.id]?.primary || company.colors.primary;
+            const companyConf = getCompanyConfig(company.id);
+            const companyColor = companyConf.primary;
             const isChecked = selectedCompanies.includes(company.id);
             return (
               <label
@@ -131,12 +125,12 @@ export function DirectoryFilters({
                   onCheckedChange={() => toggleCompany(company.id)}
                   style={{
                     borderColor: isChecked ? companyColor : undefined,
-                    backgroundColor: isChecked ? (companyConfigMap[company.id]?.accent ? companyColor : companyColor) : undefined,
+                    backgroundColor: isChecked ? companyColor : undefined,
                   }}
                 />
                 <div className="flex items-center gap-2">
                   {/* Two-tone dot for Ferrecapital (industrial feel), solid dot for others */}
-                  {companyConfigMap[company.id]?.accent ? (
+                  {companyConf.accent ? (
                     <div 
                       className="w-3 h-3 rounded-full flex items-center justify-center"
                       style={{ 
@@ -146,7 +140,7 @@ export function DirectoryFilters({
                     >
                       <div 
                         className="w-1.5 h-1.5 rounded-full"
-                        style={{ backgroundColor: companyConfigMap[company.id].accent }}
+                        style={{ backgroundColor: companyConf.accent }}
                       />
                     </div>
                   ) : (

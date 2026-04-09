@@ -3,6 +3,7 @@ import { DM_Sans } from 'next/font/google'
 import localFont from 'next/font/local'
 import { Analytics } from '@vercel/analytics/next'
 import { ThemeProvider } from '@/components/theme-provider'
+import { RgbSignature } from '@/components/rgb-signature'
 import { Toaster } from 'sonner'
 import './globals.css'
 
@@ -44,7 +45,10 @@ export default function RootLayout({
           enableSystem={false}
         >
           <div className="dot-grid-overlay" />
-          {children}
+          <div className="pb-7">
+            {children}
+          </div>
+          <RgbSignature />
           <Toaster position="bottom-right" richColors />
         </ThemeProvider>
         <Analytics />
