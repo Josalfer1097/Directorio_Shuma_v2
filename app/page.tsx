@@ -6,6 +6,7 @@ import Link from "next/link";
 import { Navbar } from "@/components/navbar";
 import { FeaturedEmployees } from "@/components/featured-employees";
 import { getEmployees, getCompanies, getCompanyStats } from "@/lib/data";
+import { getCompanyConfig } from "@/lib/companyConfig";
 import { AdminTrigger } from "@/components/admin/admin-trigger";
 import { AdminToolbar } from "@/components/admin/admin-toolbar";
 import { PinModal } from "@/components/admin/pin-modal";
@@ -110,11 +111,12 @@ export default function HomePage() {
                   arkiramica: { primary: "#F5C400", glow: "rgba(245,196,0,0.22)", highlight: "#FFE566", initial: "Ar" },
                 };
                 
+                const fallbackConfig = getCompanyConfig(company.id);
                 const config = colorConfig[company.id] || {
-                  primary: company.colors?.primary || "#C9A84C",
-                  glow: "rgba(201,168,76,0.25)",
-                  highlight: company.colors?.accent || "#E0C060",
-                  initial: company.shortName?.[0] || "S"
+                  primary: fallbackConfig.primary,
+                  glow: fallbackConfig.glow,
+                  highlight: fallbackConfig.highlight,
+                  initial: fallbackConfig.initial
                 };
 
                 return (

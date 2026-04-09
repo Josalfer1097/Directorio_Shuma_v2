@@ -17,6 +17,7 @@ import {
 import { getEmployeeById, getEmployees, getCompanies, getDepartments } from "@/lib/data";
 import type { Employee } from "@/types";
 import { cn } from "@/lib/utils";
+import { getCompanyConfig } from "@/lib/companyConfig";
 
 interface EmployeeFormModalProps {
   isOpen: boolean;
@@ -245,7 +246,7 @@ export function EmployeeFormModal({
                         <div className="flex items-center gap-2">
                           <div
                             className="w-2 h-2 rounded-full"
-                            style={{ backgroundColor: company.colors.primary }}
+                            style={{ backgroundColor: getCompanyConfig(company.id).primary }}
                           />
                           {company.shortName || company.name}
                         </div>
