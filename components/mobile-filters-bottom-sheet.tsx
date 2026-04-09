@@ -45,9 +45,9 @@ export function MobileFiltersBottomSheet({
   onClearFilters,
   onApply,
 }: MobileFiltersBottomSheetProps) {
-  const [localCompanies, setLocalCompanies] = useState(selectedCompanies);
-  const [localDepartment, setLocalDepartment] = useState(selectedDepartment);
-  const [localLocations, setLocalLocations] = useState(selectedLocations);
+  const [localCompanies, setLocalCompanies] = useState(selectedCompanies || []);
+  const [localDepartment, setLocalDepartment] = useState(selectedDepartment || "all");
+  const [localLocations, setLocalLocations] = useState(selectedLocations || []);
 
   useEffect(() => {
     setLocalCompanies(selectedCompanies);
@@ -56,9 +56,9 @@ export function MobileFiltersBottomSheet({
   }, [selectedCompanies, selectedDepartment, selectedLocations]);
 
   const activeFilterCount =
-    localCompanies.length +
+    (localCompanies?.length || 0) +
     (localDepartment !== "all" ? 1 : 0) +
-    localLocations.length;
+    (localLocations?.length || 0);
 
   const toggleCompany = (companyId: string) => {
     setLocalCompanies((prev) =>
