@@ -233,7 +233,7 @@
 
 /* ═══════════════════════════════════════════════════════════════════
    BACKGROUND EFFECTS
-   ═════════════════════════════════���═════════════════════════════════ */
+   ═════════════════════════════════�����═════════════════════════════════ */
 
 /* Dot grid pattern */
 .dot-grid {
@@ -1007,7 +1007,7 @@
   }
   
   /* Avoid breaking company groups across pages */
-  tbody.print\\:break-inside-avoid {
+  tbody.print-no-break {
     break-inside: avoid;
     page-break-inside: avoid;
   }
