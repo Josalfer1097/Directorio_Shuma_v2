@@ -1,11 +1,12 @@
 "use client";
 
+import { useMemo } from "react";
 import { motion } from "framer-motion";
-import { ArrowRight, Building2, Users, GitBranch, Layers } from "lucide-react";
+import { ArrowRight, Building2, Users, GitBranch, Layers, MapPin } from "lucide-react";
 import Link from "next/link";
 import { Navbar } from "@/components/navbar";
 import { FeaturedEmployees } from "@/components/featured-employees";
-import { getEmployees, getCompanies, getCompanyStats } from "@/lib/data";
+import { getEmployees, getCompanies, getCompanyStats, getDepartments } from "@/lib/data";
 import { getCompanyConfig } from "@/lib/companyConfig";
 import { AdminTrigger } from "@/components/admin/admin-trigger";
 import { AdminToolbar } from "@/components/admin/admin-toolbar";
@@ -15,10 +16,25 @@ import { AdminProvider } from "@/components/admin/admin-context";
 export default function HomePage() {
   const employees = getEmployees();
   const companies = getCompanies().filter(c => !c.disabled);
+  const departments = getDepartments();
   const companyStats = getCompanyStats().filter(c => {
     const company = companies.find(comp => comp.id === c.id);
     return company && !company.disabled;
   });
+
+  // Calculate stats for the stats bar
+  const stats = useMemo(() => {
+    const locations = new Set<string>();
+    employees.forEach(emp => {
+      if (emp.location) locations.add(emp.location);
+    });
+    return {
+      employeeCount: employees.length,
+      companyCount: companies.length,
+      departmentCount: departments.length,
+      locationCount: locations.size,
+    };
+  }, [employees, companies, departments]);
 
   const featuredEmployees = employees.filter(emp => {
     const company = companies.find(c => c.id === emp.company);
@@ -220,6 +236,35 @@ export default function HomePage() {
                 );
               })}
             </div>
+
+            {/* Stats Bar */}
+            <motion.div
+              initial={{ opacity: 0, y: 10 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ delay: 0.3 }}
+              className="mt-12 flex flex-wrap items-center justify-center gap-x-6 gap-y-2 text-sm text-white/40"
+            >
+              <span className="flex items-center gap-1.5">
+                <Users className="w-4 h-4" />
+                {stats.employeeCount} colaboradores
+              </span>
+              <span className="hidden sm:inline text-white/20">|</span>
+              <span className="flex items-center gap-1.5">
+                <Building2 className="w-4 h-4" />
+                {stats.companyCount} empresas
+              </span>
+              <span className="hidden sm:inline text-white/20">|</span>
+              <span className="flex items-center gap-1.5">
+                <Layers className="w-4 h-4" />
+                {stats.departmentCount} departamentos
+              </span>
+              <span className="hidden sm:inline text-white/20">|</span>
+              <span className="flex items-center gap-1.5">
+                <MapPin className="w-4 h-4" />
+                {stats.locationCount} sucursales
+              </span>
+            </motion.div>
           </div>
         </section>
 
