@@ -180,7 +180,7 @@ function EmployeeDetailContent({ id }: { id: string }) {
             style={{ 
               right: '-10px',
               top: '-20px',
-              fontFamily: "'Neuropol', sans-serif",
+              fontFamily: "var(--font-neuropol), var(--font-orbitron), 'Orbitron', 'Courier New', monospace",
               fontSize: '160px',
               fontWeight: 900,
               opacity: 0.08,
@@ -227,7 +227,7 @@ function EmployeeDetailContent({ id }: { id: string }) {
               <span 
                 className="text-white font-bold"
                 style={{ 
-                  fontFamily: "'Neuropol', sans-serif",
+                  fontFamily: "var(--font-neuropol), var(--font-orbitron), 'Orbitron', 'Courier New', monospace",
                   fontSize: '1.6rem',
                 }}
               >
@@ -267,7 +267,7 @@ function EmployeeDetailContent({ id }: { id: string }) {
                 border: `1px solid color-mix(in srgb, ${config.primary} 45%, transparent)`,
                 color: config.highlight,
                 fontSize: '0.65rem',
-                fontFamily: "'Neuropol', sans-serif",
+                fontFamily: "var(--font-neuropol), var(--font-orbitron), 'Orbitron', 'Courier New', monospace",
                 textTransform: 'uppercase',
                 letterSpacing: '0.1em',
                 padding: '3px 10px',
@@ -613,7 +613,7 @@ function EmployeeDetailContent({ id }: { id: string }) {
             style={{ 
               right: '-10px',
               top: '-10px',
-              fontFamily: "'Neuropol', sans-serif",
+              fontFamily: "var(--font-neuropol), var(--font-orbitron), 'Orbitron', 'Courier New', monospace",
               fontSize: '120px',
               fontWeight: 900,
               opacity: 0.08,
@@ -639,7 +639,7 @@ function EmployeeDetailContent({ id }: { id: string }) {
               <span 
                 className="text-white font-bold"
                 style={{ 
-                  fontFamily: "'Neuropol', sans-serif",
+                  fontFamily: "var(--font-neuropol), var(--font-orbitron), 'Orbitron', 'Courier New', monospace",
                   fontSize: '1.3rem',
                 }}
               >
@@ -679,7 +679,7 @@ function EmployeeDetailContent({ id }: { id: string }) {
                 border: `1px solid color-mix(in srgb, ${config.primary} 45%, transparent)`,
                 color: config.highlight,
                 fontSize: '0.6rem',
-                fontFamily: "'Neuropol', sans-serif",
+                fontFamily: "var(--font-neuropol), var(--font-orbitron), 'Orbitron', 'Courier New', monospace",
                 textTransform: 'uppercase',
                 letterSpacing: '0.1em',
                 padding: '3px 10px',

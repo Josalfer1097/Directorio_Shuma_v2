@@ -3,7 +3,6 @@
 import { Suspense, useEffect, useRef } from "react";
 import dynamic from "next/dynamic";
 import { Navbar } from "@/components/navbar";
-import { Skeleton } from "@/components/ui/skeleton";
 import { ErrorBoundary } from "@/components/error-boundary";
 
 const OrgChart = dynamic(
@@ -13,12 +12,31 @@ const OrgChart = dynamic(
 
 function OrgChartLoading() {
   return (
-    <div className="h-full w-full flex items-center justify-center">
-      <div className="text-center">
-        <Skeleton className="w-16 h-16 rounded-full mx-auto mb-4 bg-bg-elevated" />
-        <Skeleton className="w-48 h-4 mb-2 bg-bg-elevated" />
-        <Skeleton className="w-32 h-3 bg-bg-elevated" />
-      </div>
+    <div 
+      style={{
+        height: '60vh',
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        justifyContent: 'center',
+        gap: '12px',
+        color: 'rgba(255,255,255,0.2)',
+      }}
+    >
+      <div 
+        style={{ 
+          width: '32px', 
+          height: '32px',
+          border: '2px solid rgba(255,255,255,0.08)',
+          borderTop: '2px solid #0047AB',
+          borderRadius: '50%',
+          animation: 'spin 1s linear infinite'
+        }} 
+      />
+      <span style={{ fontSize: '0.8rem', letterSpacing: '0.1em' }}>
+        Cargando organigrama...
+      </span>
+      <style>{`@keyframes spin { to { transform: rotate(360deg) } }`}</style>
     </div>
   );
 }

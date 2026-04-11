@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useCallback, useMemo, useEffect, useRef } from "react";
+import { useState, useMemo, useEffect } from "react";
 import {
   ReactFlow,
   Controls,
@@ -25,7 +25,11 @@ const nodeTypes = {
   orgNode: OrgChartNode,
 };
 
-const getLayoutedElements = (nodes: Node[], edges: Edge[], direction = 'TB') => {
+const getLayoutedElements = (nodes: Node[], edges: Edge[], direction = 'TB', isMobile = false) => {
+  if (nodes.length === 0) {
+    return { nodes: [], edges: [] };
+  }
+
   const g = new dagre.graphlib.Graph();
   g.setDefaultEdgeLabel(() => ({}));
   g.setGraph({ 
@@ -37,16 +41,32 @@ const getLayoutedElements = (nodes: Node[], edges: Edge[], direction = 'TB') => 
   });
 
   // Node dimensions based on screen size
-  const nodeWidth = typeof window !== 'undefined' && window.innerWidth < 768 ? 170 : 220;
-  const nodeHeight = typeof window !== 'undefined' && window.innerWidth < 768 ? 70 : 80;
+  const nodeWidth = isMobile ? 170 : 220;
+  const nodeHeight = isMobile ? 70 : 80;
 
   nodes.forEach(node => g.setNode(node.id, { width: nodeWidth, height: nodeHeight }));
   edges.forEach(edge => g.setEdge(edge.source, edge.target));
-  dagre.layout(g);
+  
+  try {
+    dagre.layout(g);
+  } catch (e) {
+    console.warn('[v0] dagre layout failed:', e);
+    // Return nodes with basic positioning if layout fails
+    return {
+      nodes: nodes.map((node, i) => ({
+        ...node,
+        position: { x: (i % 4) * 250, y: Math.floor(i / 4) * 120 }
+      })),
+      edges
+    };
+  }
 
   return {
     nodes: nodes.map(node => {
       const pos = g.node(node.id);
+      if (!pos) {
+        return { ...node, position: { x: 0, y: 0 } };
+      }
       return { ...node, position: { x: pos.x - nodeWidth / 2, y: pos.y - nodeHeight / 2 } };
     }),
     edges
@@ -67,9 +87,18 @@ interface OrgChartInnerProps {
 }
 
 function OrgChartInner({ selectedCompany, layout }: OrgChartInnerProps) {
-  const { fitView } = useReactFlow();
+  const reactFlowInstance = useReactFlow();
   const employees = getEmployees();
   const companies = getCompanies().filter(c => !c.disabled);
+  const [isMobile, setIsMobile] = useState(false);
+
+  // Detect mobile on client side only
+  useEffect(() => {
+    setIsMobile(window.innerWidth < 768);
+    const handleResize = () => setIsMobile(window.innerWidth < 768);
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
 
   // Filter employees by company
   const filteredEmployees = useMemo(() => {
@@ -84,15 +113,19 @@ function OrgChartInner({ selectedCompany, layout }: OrgChartInnerProps) {
     return activeEmps.filter(emp => emp.company === selectedCompany);
   }, [selectedCompany, employees, companies]);
 
-  // Create nodes and edges
+  // Create nodes and edges with validation
   const hierarchyData = useMemo(() => {
     const nodes: Node[] = [];
     const edges: Edge[] = [];
 
+    // Create a Set of valid employee IDs in the current filtered set
     const empIds = new Set(filteredEmployees.map((e) => e.id));
     
     filteredEmployees.forEach((emp) => {
-      const company = companies.find(c => c.id === emp.company)!;
+      const company = companies.find(c => c.id === emp.company);
+      // Skip if company not found (defensive)
+      if (!company) return;
+
       nodes.push({
         id: emp.id,
         type: "orgNode",
@@ -100,12 +133,16 @@ function OrgChartInner({ selectedCompany, layout }: OrgChartInnerProps) {
         data: {
           employee: emp,
           company,
+          label: emp.name ?? 'Sin nombre',
+          position: emp.position ?? '',
         },
       });
 
-      if (emp.reportsTo && empIds.has(emp.reportsTo)) {
+      // Only create edge if BOTH source and target exist in the current filtered set
+      // This prevents cross-company edges when filtering by a single company
+      if (emp.reportsTo && empIds.has(emp.reportsTo) && empIds.has(emp.id)) {
         edges.push({
-          id: `${emp.reportsTo}-${emp.id}`,
+          id: `edge-${emp.id}-${emp.reportsTo}`,
           source: emp.reportsTo,
           target: emp.id,
           type: "smoothstep",
@@ -118,18 +155,20 @@ function OrgChartInner({ selectedCompany, layout }: OrgChartInnerProps) {
       }
     });
 
-    return getLayoutedElements(nodes, edges, layout === 'horizontal' ? 'LR' : 'TB');
-  }, [filteredEmployees, companies, layout]);
+    return getLayoutedElements(nodes, edges, layout === 'horizontal' ? 'LR' : 'TB', isMobile);
+  }, [filteredEmployees, companies, layout, isMobile]);
 
-  // Fit view on layout/filter changes
+  // Fit view on layout/filter changes with defensive try-catch
   useEffect(() => {
     const timer = setTimeout(() => {
-      fitView({ padding: 0.12, duration: 400 });
-    }, 100);
+      try {
+        reactFlowInstance.fitView({ padding: 0.15, duration: 400 });
+      } catch (e) {
+        console.warn('[v0] fitView failed:', e);
+      }
+    }, 200);
     return () => clearTimeout(timer);
-  }, [selectedCompany, layout, fitView]);
-
-  const isMobile = typeof window !== 'undefined' && window.innerWidth < 768;
+  }, [selectedCompany, layout, reactFlowInstance, hierarchyData.nodes]);
 
   return (
     <ReactFlow

@@ -148,7 +148,7 @@ export function DirectoryFilters({
     <div className="space-y-6">
       {/* Companies */}
       <div>
-        <h4 className="font-medium text-foreground mb-3" style={{ fontFamily: "'Neuropol', sans-serif" }}>Empresas</h4>
+        <h4 className="font-medium text-foreground mb-3" style={{ fontFamily: "var(--font-neuropol), var(--font-orbitron), 'Orbitron', 'Courier New', monospace" }}>Empresas</h4>
         <div className="space-y-2">
           {companies.filter(c => !c.disabled).map((company) => {
             const companyConf = getCompanyConfig(company.id);
@@ -158,7 +158,7 @@ export function DirectoryFilters({
               <label
                 key={company.id}
                 className="flex items-center gap-3 cursor-pointer group"
-                style={{ fontFamily: "'Neuropol', sans-serif" }}
+                style={{ fontFamily: "var(--font-neuropol), var(--font-orbitron), 'Orbitron', 'Courier New', monospace" }}
               >
                 <Checkbox
                   checked={isChecked}
@@ -189,7 +189,7 @@ export function DirectoryFilters({
                       style={{ backgroundColor: companyColor }}
                     />
                   )}
-                  <span className="text-sm text-muted-foreground group-hover:text-foreground transition-colors" style={{ fontFamily: "'Neuropol', sans-serif" }}>
+                  <span className="text-sm text-muted-foreground group-hover:text-foreground transition-colors" style={{ fontFamily: "var(--font-neuropol), var(--font-orbitron), 'Orbitron', 'Courier New', monospace" }}>
                     {company.shortName || company.name}
                     <span className="ml-1 text-xs text-white/30">[{filterCounts.companyCounts[company.id] || 0}]</span>
                   </span>
@@ -202,15 +202,15 @@ export function DirectoryFilters({
 
       {/* Departments */}
       <div>
-        <h4 className="font-medium text-foreground mb-3" style={{ fontFamily: "'Neuropol', sans-serif" }}>Departamento</h4>
+        <h4 className="font-medium text-foreground mb-3" style={{ fontFamily: "var(--font-neuropol), var(--font-orbitron), 'Orbitron', 'Courier New', monospace" }}>Departamento</h4>
         <Select value={selectedDepartment} onValueChange={onDepartmentChange}>
-          <SelectTrigger style={{ fontFamily: "'Neuropol', sans-serif" }}>
+          <SelectTrigger style={{ fontFamily: "var(--font-neuropol), var(--font-orbitron), 'Orbitron', 'Courier New', monospace" }}>
             <SelectValue placeholder="Todos los departamentos" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="all" style={{ fontFamily: "'Neuropol', sans-serif" }}>Todos los departamentos</SelectItem>
+            <SelectItem value="all" style={{ fontFamily: "var(--font-neuropol), var(--font-orbitron), 'Orbitron', 'Courier New', monospace" }}>Todos los departamentos</SelectItem>
             {departments.map((dept) => (
-              <SelectItem key={dept} value={dept} style={{ fontFamily: "'Neuropol', sans-serif" }}>
+              <SelectItem key={dept} value={dept} style={{ fontFamily: "var(--font-neuropol), var(--font-orbitron), 'Orbitron', 'Courier New', monospace" }}>
                 {dept} [{filterCounts.deptCounts[dept] || 0}]
               </SelectItem>
             ))}
@@ -221,7 +221,7 @@ export function DirectoryFilters({
       {/* Locations */}
       {locations.length > 0 && (
         <div>
-          <h4 className="font-medium text-foreground mb-3" style={{ fontFamily: "'Neuropol', sans-serif" }}>Sucursal</h4>
+          <h4 className="font-medium text-foreground mb-3" style={{ fontFamily: "var(--font-neuropol), var(--font-orbitron), 'Orbitron', 'Courier New', monospace" }}>Sucursal</h4>
           <div className="space-y-2">
             {locations.map((location) => {
               const isChecked = selectedLocations.includes(location);
@@ -229,13 +229,13 @@ export function DirectoryFilters({
                 <label
                   key={location}
                   className="flex items-center gap-3 cursor-pointer group"
-                  style={{ fontFamily: "'Neuropol', sans-serif" }}
+                  style={{ fontFamily: "var(--font-neuropol), var(--font-orbitron), 'Orbitron', 'Courier New', monospace" }}
                 >
                   <Checkbox
                     checked={isChecked}
                     onCheckedChange={() => toggleLocation(location)}
                   />
-                  <span className="text-sm text-muted-foreground group-hover:text-foreground transition-colors" style={{ fontFamily: "'Neuropol', sans-serif" }}>
+                  <span className="text-sm text-muted-foreground group-hover:text-foreground transition-colors" style={{ fontFamily: "var(--font-neuropol), var(--font-orbitron), 'Orbitron', 'Courier New', monospace" }}>
                     {location}
                     <span className="ml-1 text-xs text-white/30">[{filterCounts.locationCounts[location] || 0}]</span>
                   </span>

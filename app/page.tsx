@@ -66,14 +66,14 @@ export default function HomePage() {
               <h1 
                 className="mb-6 tracking-tight"
                 style={{ 
-                  fontFamily: "'Neuropol', sans-serif",
+                  fontFamily: "var(--font-neuropol), var(--font-orbitron), 'Orbitron', 'Courier New', monospace",
                   fontSize: "clamp(2.5rem, 10vw, 5rem)",
                   letterSpacing: "-0.03em"
                 }}
               >
-                <span className="text-[#F2F0EC]" style={{ fontFamily: "'Neuropol', sans-serif" }}>SHU</span>
+                <span className="text-[#F2F0EC]" style={{ fontFamily: "var(--font-neuropol), var(--font-orbitron), 'Orbitron', 'Courier New', monospace" }}>SHU</span>
                 <span style={{
-                  fontFamily: "'Neuropol', sans-serif",
+                  fontFamily: "var(--font-neuropol), var(--font-orbitron), 'Orbitron', 'Courier New', monospace",
                   background: 'linear-gradient(135deg, #3B82F6, #8B5CF6, #EC4899)',
                   backgroundSize: '300% 300%',
                   animation: 'gradientShift 4s ease infinite',
@@ -95,7 +95,7 @@ export default function HomePage() {
               <Link href="/directorio" className="w-full sm:w-auto">
                 <button 
                   className="w-full group flex items-center justify-center gap-3 px-8 py-4 rounded-full bg-text-primary text-bg-base text-xs tracking-widest transition-all hover:scale-105 active:scale-95"
-                  style={{ fontFamily: "'Neuropol', sans-serif" }}
+                  style={{ fontFamily: "var(--font-neuropol), var(--font-orbitron), 'Orbitron', 'Courier New', monospace" }}
                 >
                   Ver Directorio
                   <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
@@ -104,7 +104,7 @@ export default function HomePage() {
               <Link href="/organigrama" className="w-full sm:w-auto">
                 <button 
                   className="w-full flex items-center justify-center gap-3 px-8 py-4 rounded-full border border-border-strong text-text-primary text-xs tracking-widest transition-all hover:bg-white/5 active:scale-95"
-                  style={{ fontFamily: "'Neuropol', sans-serif" }}
+                  style={{ fontFamily: "var(--font-neuropol), var(--font-orbitron), 'Orbitron', 'Courier New', monospace" }}
                 >
                   <GitBranch className="w-4 h-4" />
                   Estructura
@@ -119,12 +119,36 @@ export default function HomePage() {
           <div className="container mx-auto">
             <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
               {companyStats.map((company, index) => {
-                // Company color config
-                const colorConfig: Record<string, { primary: string; glow: string; highlight: string; initial: string }> = {
-                  comercializadora: { primary: "#0047AB", glow: "rgba(0,71,171,0.25)", highlight: "#4D9FFF", initial: "C" },
-                  acabados: { primary: "#C0152A", glow: "rgba(192,21,42,0.25)", highlight: "#FF4D5E", initial: "A" },
-                  ferrecapital: { primary: "#2C3338", glow: "rgba(44,51,56,0.35)", highlight: "#CC0000", initial: "F" },
-                  arkiramica: { primary: "#F5C400", glow: "rgba(245,196,0,0.22)", highlight: "#FFE566", initial: "Ar" },
+                // Company color config - reduced saturation for non-Retina displays
+                const colorConfig: Record<string, { primary: string; glow: string; highlight: string; initial: string; shadow: string }> = {
+                  comercializadora: { 
+                    primary: "#0047AB", 
+                    glow: "rgba(0,71,171,0.12)", 
+                    highlight: "#4D9FFF", 
+                    initial: "C",
+                    shadow: "0 0 0 1px rgba(0,71,171,0.25), 0 8px 24px rgba(0,71,171,0.12)"
+                  },
+                  acabados: { 
+                    primary: "#C0152A", 
+                    glow: "rgba(192,21,42,0.12)", 
+                    highlight: "#FF4D5E", 
+                    initial: "A",
+                    shadow: "0 0 0 1px rgba(192,21,42,0.25), 0 8px 24px rgba(192,21,42,0.12)"
+                  },
+                  ferrecapital: { 
+                    primary: "#2C3338", 
+                    glow: "rgba(44,51,56,0.20)", 
+                    highlight: "#CC0000", 
+                    initial: "F",
+                    shadow: "0 0 0 1px rgba(44,51,56,0.40), 0 8px 24px rgba(44,51,56,0.20)"
+                  },
+                  arkiramica: { 
+                    primary: "#F5C400", 
+                    glow: "rgba(245,196,0,0.10)", 
+                    highlight: "#FFE566", 
+                    initial: "Ar",
+                    shadow: "0 0 0 1px rgba(245,196,0,0.22), 0 8px 24px rgba(245,196,0,0.10)"
+                  },
                 };
                 
                 const fallbackConfig = getCompanyConfig(company.id);
@@ -132,7 +156,8 @@ export default function HomePage() {
                   primary: fallbackConfig.primary,
                   glow: fallbackConfig.glow,
                   highlight: fallbackConfig.highlight,
-                  initial: fallbackConfig.initial
+                  initial: fallbackConfig.initial,
+                  shadow: `0 0 0 1px ${fallbackConfig.glow}, 0 8px 24px ${fallbackConfig.glow}`
                 };
 
                 return (
@@ -148,6 +173,7 @@ export default function HomePage() {
                       <div 
                         className="relative p-6 sm:p-8 rounded-[14px] overflow-hidden transition-all duration-[250ms] ease-out"
                         style={{ 
+                          minHeight: '180px',
                           borderLeft: `4px solid ${config.primary}`,
                           background: 'rgba(255,255,255,0.03)',
                           border: '1px solid var(--border-subtle)',
@@ -156,8 +182,8 @@ export default function HomePage() {
                         }}
                         onMouseEnter={(e) => {
                           e.currentTarget.style.transform = 'translateY(-4px)';
-                          e.currentTarget.style.boxShadow = `0 0 40px ${config.glow}`;
-                          e.currentTarget.style.background = 'rgba(255,255,255,0.06)';
+                          e.currentTarget.style.boxShadow = config.shadow;
+                          e.currentTarget.style.background = `linear-gradient(135deg, color-mix(in srgb, ${config.primary} 8%, transparent) 0%, transparent 60%), #0F1114`;
                           e.currentTarget.style.borderLeftColor = config.highlight;
                         }}
                         onMouseLeave={(e) => {
@@ -179,7 +205,7 @@ export default function HomePage() {
                         <div 
                           className="absolute -top-4 -right-2 pointer-events-none select-none"
                           style={{ 
-                            fontFamily: "'Neuropol', sans-serif",
+                            fontFamily: "var(--font-neuropol), var(--font-orbitron), 'Orbitron', 'Courier New', monospace",
                             fontSize: '80px',
                             fontWeight: 700,
                             opacity: 0.07,
@@ -194,15 +220,22 @@ export default function HomePage() {
                           {/* Company icon */}
                           <div 
                             className="w-12 h-12 rounded-xl flex items-center justify-center mb-5"
-                            style={{ backgroundColor: `${config.primary}20` }}
+                            style={{ 
+                              backgroundColor: `color-mix(in srgb, ${config.primary} 15%, transparent)`,
+                              border: `1px solid color-mix(in srgb, ${config.primary} 30%, transparent)`
+                            }}
                           >
                             <Building2 className="w-6 h-6" style={{ color: config.primary }} />
                           </div>
                           
                           {/* Company name */}
                           <h3 
-                            className="text-base sm:text-lg text-text-primary mb-3 leading-tight font-bold"
-                            style={{ fontFamily: "'Neuropol', sans-serif" }}
+                            className="text-text-primary mb-3 leading-tight font-bold line-clamp-2"
+                            style={{ 
+                              fontFamily: "var(--font-neuropol), var(--font-orbitron), 'Orbitron', monospace",
+                              fontSize: "clamp(0.85rem, 1.5vw, 1rem)",
+                              minHeight: "2.5em",
+                            }}
                           >
                             {company.shortName || company.name}
                           </h3>
@@ -224,7 +257,7 @@ export default function HomePage() {
                             className="flex items-center gap-1 text-sm font-medium transition-all group-hover:gap-2"
                             style={{ color: config.primary }}
                           >
-                            <span style={{ fontFamily: "'Neuropol', sans-serif", fontSize: '11px', letterSpacing: '0.05em' }}>
+                            <span style={{ fontFamily: "var(--font-neuropol), var(--font-orbitron), 'Orbitron', 'Courier New', monospace", fontSize: '11px', letterSpacing: '0.05em' }}>
                               Ver equipo
                             </span>
                             <ArrowRight className="w-3.5 h-3.5 transition-transform group-hover:translate-x-0.5" />

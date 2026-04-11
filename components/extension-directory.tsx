@@ -2,12 +2,17 @@
 
 import { useState, useMemo, useCallback, memo, useRef, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { Printer, Download, MapPin, Search, X, ClipboardList, Phone } from "lucide-react";
+import { Printer, Download, MapPin, Search, X, ClipboardList, Phone, RotateCcw } from "lucide-react";
 import { getEmployees, getCompanies } from "@/lib/data";
 import { getCompanyConfig } from "@/lib/companyConfig";
 import type { Employee } from "@/types";
 
 type SubMode = "completo" | "solo-extensiones";
+
+// Default column widths (in pixels for fixed, percentage for relative)
+const DEFAULT_COL_WIDTHS = [72, 220, 180, 140, 120]; // EXT, NOMBRE, PUESTO, DEPT, SUCURSAL
+const MIN_COL_WIDTHS = [50, 180, 100, 100, 80];
+const STORAGE_KEY = "directorio-quick-col-widths";
 
 // Memoized row component for performance
 const ExtensionRow = memo(function ExtensionRow({
@@ -15,23 +20,30 @@ const ExtensionRow = memo(function ExtensionRow({
   companyConfig,
   onClick,
   isOdd,
+  colWidths,
 }: {
   employee: Employee;
   companyConfig: ReturnType<typeof getCompanyConfig>;
   onClick: () => void;
   isOdd: boolean;
+  colWidths: number[];
 }) {
   return (
     <tr
       onClick={onClick}
-      className="cursor-pointer transition-all duration-150 hover:bg-white/[0.04] group active:scale-[0.98]"
+      className="cursor-pointer transition-all duration-150 hover:bg-white/[0.04] group active:scale-[0.99]"
       style={{
-        height: "40px",
+        height: "44px",
+        minHeight: "44px",
+        maxHeight: "44px",
         background: isOdd ? "rgba(255,255,255,0.015)" : "transparent",
       }}
     >
       {/* Extension */}
-      <td className="px-3 text-center" style={{ width: "80px" }}>
+      <td 
+        className="px-3 text-center" 
+        style={{ width: colWidths[0], minWidth: MIN_COL_WIDTHS[0] }}
+      >
         {employee.extension ? (
           <span
             className="inline-block font-mono font-bold"
@@ -52,28 +64,64 @@ const ExtensionRow = memo(function ExtensionRow({
       {/* Name */}
       <td
         className="px-3 font-medium text-white group-hover:text-white/90"
-        style={{ fontSize: "0.85rem", width: "220px", fontWeight: 500 }}
+        style={{ 
+          width: colWidths[1], 
+          minWidth: MIN_COL_WIDTHS[1],
+          fontSize: "0.85rem", 
+          fontWeight: 500,
+          whiteSpace: "nowrap",
+          overflow: "hidden",
+          textOverflow: "ellipsis",
+        }}
+        title={employee.name}
       >
         {employee.name}
       </td>
       {/* Position */}
       <td
         className="px-3 hidden md:table-cell"
-        style={{ fontSize: "0.78rem", color: "rgba(255,255,255,0.65)", width: "200px" }}
+        style={{ 
+          width: colWidths[2], 
+          minWidth: MIN_COL_WIDTHS[2],
+          fontSize: "0.78rem", 
+          color: "rgba(255,255,255,0.65)",
+          whiteSpace: "nowrap",
+          overflow: "hidden",
+          textOverflow: "ellipsis",
+        }}
+        title={employee.position ?? ""}
       >
         {employee.position ?? "--"}
       </td>
       {/* Department */}
       <td
         className="px-3 hidden lg:table-cell"
-        style={{ fontSize: "0.75rem", color: "rgba(255,255,255,0.45)", width: "160px" }}
+        style={{ 
+          width: colWidths[3], 
+          minWidth: MIN_COL_WIDTHS[3],
+          fontSize: "0.75rem", 
+          color: "rgba(255,255,255,0.45)",
+          whiteSpace: "nowrap",
+          overflow: "hidden",
+          textOverflow: "ellipsis",
+        }}
+        title={employee.department ?? ""}
       >
         {employee.department ?? "--"}
       </td>
       {/* Location */}
       <td
         className="px-3 hidden xl:table-cell"
-        style={{ fontSize: "0.72rem", color: "rgba(255,255,255,0.35)", width: "130px" }}
+        style={{ 
+          width: colWidths[4], 
+          minWidth: MIN_COL_WIDTHS[4],
+          fontSize: "0.72rem", 
+          color: "rgba(255,255,255,0.35)",
+          whiteSpace: "nowrap",
+          overflow: "hidden",
+          textOverflow: "ellipsis",
+        }}
+        title={employee.location ?? ""}
       >
         {employee.location ?? "--"}
       </td>
@@ -104,7 +152,7 @@ const CompanyHeader = memo(function CompanyHeader({
           <span
             className="font-neuropol uppercase tracking-wider"
             style={{
-              fontFamily: "'Neuropol', sans-serif",
+              fontFamily: "var(--font-neuropol), var(--font-orbitron), 'Orbitron', monospace",
               fontSize: "0.7rem",
               letterSpacing: "0.15em",
               color: companyConfig.primary,
@@ -195,6 +243,33 @@ const ExtensionCard = memo(function ExtensionCard({
   );
 });
 
+// Resize handle component
+const ResizeHandle = memo(function ResizeHandle({
+  onMouseDown,
+  isResizing,
+}: {
+  onMouseDown: (e: React.MouseEvent) => void;
+  isResizing: boolean;
+}) {
+  return (
+    <div
+      onMouseDown={onMouseDown}
+      className="absolute right-0 top-0 bottom-0 w-[6px] cursor-col-resize group/resize"
+      style={{ 
+        background: isResizing ? "rgba(0,71,171,0.4)" : "transparent",
+        transition: "background 150ms ease",
+      }}
+    >
+      <div 
+        className="absolute right-[2px] top-1/4 bottom-1/4 w-[2px] rounded-full transition-all duration-150"
+        style={{
+          background: isResizing ? "rgba(0,71,171,0.8)" : "rgba(255,255,255,0.1)",
+        }}
+      />
+    </div>
+  );
+});
+
 interface ExtensionDirectoryProps {
   selectedCompanies: string[];
   selectedDepartment: string;
@@ -214,6 +289,35 @@ export function ExtensionDirectory({
   const [subMode, setSubMode] = useState<SubMode>("completo");
   const [internalSearch, setInternalSearch] = useState("");
   const searchInputRef = useRef<HTMLInputElement>(null);
+  const tableRef = useRef<HTMLTableElement>(null);
+  
+  // Column widths state - load from localStorage on mount
+  const [colWidths, setColWidths] = useState<number[]>(DEFAULT_COL_WIDTHS);
+  const [resizingCol, setResizingCol] = useState<number | null>(null);
+  const startXRef = useRef<number>(0);
+  const startWidthRef = useRef<number>(0);
+
+  // Load column widths from localStorage on mount
+  useEffect(() => {
+    try {
+      const saved = localStorage.getItem(STORAGE_KEY);
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        if (Array.isArray(parsed) && parsed.length === 5) {
+          setColWidths(parsed);
+        }
+      }
+    } catch (e) {
+      // Ignore parsing errors
+    }
+  }, []);
+
+  // Save column widths to localStorage when they change
+  useEffect(() => {
+    if (colWidths !== DEFAULT_COL_WIDTHS) {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(colWidths));
+    }
+  }, [colWidths]);
 
   // Auto-focus search in solo-extensiones mode
   useEffect(() => {
@@ -222,8 +326,41 @@ export function ExtensionDirectory({
     }
   }, [subMode]);
 
-  // Use internal search for quick extensions, external for completo
-  const searchQuery = subMode === "solo-extensiones" ? internalSearch : externalSearchQuery;
+  // Use internal search for both modes now
+  const searchQuery = internalSearch || externalSearchQuery;
+
+  // Handle resize start
+  const handleResizeStart = useCallback((e: React.MouseEvent, colIndex: number) => {
+    e.preventDefault();
+    setResizingCol(colIndex);
+    startXRef.current = e.clientX;
+    startWidthRef.current = colWidths[colIndex];
+
+    const handleMouseMove = (moveEvent: MouseEvent) => {
+      const diff = moveEvent.clientX - startXRef.current;
+      const newWidth = Math.max(MIN_COL_WIDTHS[colIndex], startWidthRef.current + diff);
+      setColWidths(prev => {
+        const updated = [...prev];
+        updated[colIndex] = newWidth;
+        return updated;
+      });
+    };
+
+    const handleMouseUp = () => {
+      setResizingCol(null);
+      document.removeEventListener("mousemove", handleMouseMove);
+      document.removeEventListener("mouseup", handleMouseUp);
+    };
+
+    document.addEventListener("mousemove", handleMouseMove);
+    document.addEventListener("mouseup", handleMouseUp);
+  }, [colWidths]);
+
+  // Reset columns to default
+  const handleResetColumns = useCallback(() => {
+    setColWidths(DEFAULT_COL_WIDTHS);
+    localStorage.removeItem(STORAGE_KEY);
+  }, []);
 
   // Filter and group employees
   const filteredEmployees = useMemo(() => {
@@ -333,14 +470,16 @@ export function ExtensionDirectory({
     [router]
   );
 
+  const columnHeaders = ["Ext.", "Nombre", "Puesto", "Departamento", "Sucursal"];
+
   return (
     <div className="w-full" style={{ background: "#0A0C0F" }}>
       {/* Header Bar */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 px-4 py-3 border-b border-white/5 print-hidden">
         <span
-          className="font-neuropol uppercase tracking-widest shrink-0"
+          className="uppercase tracking-widest shrink-0"
           style={{
-            fontFamily: "'Neuropol', sans-serif",
+            fontFamily: "var(--font-neuropol), var(--font-orbitron), 'Orbitron', monospace",
             fontSize: "0.7rem",
             letterSpacing: "0.2em",
             color: "rgba(255,255,255,0.5)",
@@ -375,6 +514,21 @@ export function ExtensionDirectory({
               Solo Ext.
             </button>
           </div>
+
+          {/* Reset columns button - only in completo mode */}
+          {subMode === "completo" && (
+            <button
+              onClick={handleResetColumns}
+              className="flex items-center gap-1 px-2 py-1 text-xs transition-colors"
+              style={{ color: "rgba(255,255,255,0.4)" }}
+              onMouseEnter={(e) => e.currentTarget.style.color = "rgba(255,255,255,0.7)"}
+              onMouseLeave={(e) => e.currentTarget.style.color = "rgba(255,255,255,0.4)"}
+              title="Resetear anchos de columnas"
+            >
+              <RotateCcw className="w-3 h-3" />
+              <span className="hidden sm:inline" style={{ fontSize: "0.7rem" }}>Reset columnas</span>
+            </button>
+          )}
 
           {/* Print/Export buttons */}
           <button
@@ -476,121 +630,114 @@ export function ExtensionDirectory({
         </div>
       </div>
 
-      {/* COMPLETO MODE - Table View */}
+      {/* COMPLETO MODE - Table View with Resizable Columns */}
       {subMode === "completo" && (
-        <table className="w-full border-collapse">
-          <thead className="print-thead">
-            <tr
-              className="text-left border-b border-white/5 print-thead-row"
-              style={{ height: "32px" }}
-            >
-              <th
-                className="px-3 text-center font-neuropol uppercase"
-                style={{
-                  fontFamily: "'Neuropol', sans-serif",
-                  fontSize: "0.6rem",
-                  letterSpacing: "0.1em",
-                  color: "rgba(255,255,255,0.35)",
-                  width: "80px",
-                }}
+        <div 
+          className="overflow-x-auto overflow-y-auto"
+          style={{ 
+            maxHeight: "calc(100vh - 220px)",
+            scrollbarWidth: "thin",
+            scrollbarColor: "rgba(255,255,255,0.15) transparent",
+          }}
+        >
+          <table 
+            ref={tableRef}
+            className="w-full border-collapse"
+            style={{ tableLayout: "fixed", minWidth: "600px" }}
+          >
+            <colgroup>
+              {colWidths.map((width, i) => (
+                <col 
+                  key={i} 
+                  style={{ 
+                    width: `${width}px`,
+                    minWidth: `${MIN_COL_WIDTHS[i]}px`,
+                  }} 
+                />
+              ))}
+            </colgroup>
+            <thead className="print-thead sticky top-0 z-10" style={{ background: "#0A0C0F" }}>
+              <tr
+                className="text-left border-b border-white/5 print-thead-row"
+                style={{ height: "36px" }}
               >
-                Ext.
-              </th>
-              <th
-                className="px-3 font-neuropol uppercase"
-                style={{
-                  fontFamily: "'Neuropol', sans-serif",
-                  fontSize: "0.6rem",
-                  letterSpacing: "0.1em",
-                  color: "rgba(255,255,255,0.35)",
-                  width: "220px",
-                }}
-              >
-                Nombre
-              </th>
-              <th
-                className="px-3 font-neuropol uppercase hidden md:table-cell"
-                style={{
-                  fontFamily: "'Neuropol', sans-serif",
-                  fontSize: "0.6rem",
-                  letterSpacing: "0.1em",
-                  color: "rgba(255,255,255,0.35)",
-                  width: "200px",
-                }}
-              >
-                Puesto
-              </th>
-              <th
-                className="px-3 font-neuropol uppercase hidden lg:table-cell"
-                style={{
-                  fontFamily: "'Neuropol', sans-serif",
-                  fontSize: "0.6rem",
-                  letterSpacing: "0.1em",
-                  color: "rgba(255,255,255,0.35)",
-                  width: "160px",
-                }}
-              >
-                Departamento
-              </th>
-              <th
-                className="px-3 font-neuropol uppercase hidden xl:table-cell"
-                style={{
-                  fontFamily: "'Neuropol', sans-serif",
-                  fontSize: "0.6rem",
-                  letterSpacing: "0.1em",
-                  color: "rgba(255,255,255,0.35)",
-                  width: "130px",
-                }}
-              >
-                Sucursal
-              </th>
-            </tr>
-          </thead>
-          <tbody>
-            {groupedEmployees.map((group) => {
-              const companyConfig = getCompanyConfig(group.company);
-              const employeeCount = group.locations.reduce((a, l) => a + l.employees.length, 0);
-              let rowIndex = 0;
-
-              return (
-                <tbody
-                  key={group.company}
-                  className="print-no-break"
-                >
-                  <CompanyHeader
-                    companyName={group.companyName}
-                    companyConfig={companyConfig}
-                    employeeCount={employeeCount}
-                  />
-                  {group.locations.map((locationGroup, locIdx) => (
-                    <>
-                      {/* Show location sub-header only if multiple locations exist and location is defined */}
-                      {group.locations.length > 1 && locationGroup.location && locIdx > 0 && (
-                        <LocationSubHeader
-                          key={`loc-${locationGroup.location}`}
-                          location={locationGroup.location}
+                {columnHeaders.map((header, idx) => {
+                  const hiddenClasses = idx === 2 ? "hidden md:table-cell" : 
+                                        idx === 3 ? "hidden lg:table-cell" : 
+                                        idx === 4 ? "hidden xl:table-cell" : "";
+                  return (
+                    <th
+                      key={header}
+                      className={`px-3 relative select-none ${hiddenClasses} ${idx === 0 ? "text-center" : ""}`}
+                      style={{
+                        fontFamily: "var(--font-neuropol), var(--font-orbitron), 'Orbitron', monospace",
+                        fontSize: "0.6rem",
+                        letterSpacing: "0.1em",
+                        color: "rgba(255,255,255,0.35)",
+                        textTransform: "uppercase",
+                        width: colWidths[idx],
+                        minWidth: MIN_COL_WIDTHS[idx],
+                      }}
+                    >
+                      {header}
+                      {idx < 4 && (
+                        <ResizeHandle
+                          onMouseDown={(e) => handleResizeStart(e, idx)}
+                          isResizing={resizingCol === idx}
                         />
                       )}
-                      {locationGroup.employees.map((employee) => {
-                        const isOdd = rowIndex % 2 === 1;
-                        rowIndex++;
-                        return (
-                          <ExtensionRow
-                            key={employee.id}
-                            employee={employee}
-                            companyConfig={companyConfig}
-                            onClick={() => handleRowClick(employee.id)}
-                            isOdd={isOdd}
+                    </th>
+                  );
+                })}
+              </tr>
+            </thead>
+            <tbody>
+              {groupedEmployees.map((group) => {
+                const companyConfig = getCompanyConfig(group.company);
+                const employeeCount = group.locations.reduce((a, l) => a + l.employees.length, 0);
+                let rowIndex = 0;
+
+                return (
+                  <tbody
+                    key={group.company}
+                    className="print-no-break"
+                  >
+                    <CompanyHeader
+                      companyName={group.companyName}
+                      companyConfig={companyConfig}
+                      employeeCount={employeeCount}
+                    />
+                    {group.locations.map((locationGroup, locIdx) => (
+                      <>
+                        {/* Show location sub-header only if multiple locations exist and location is defined */}
+                        {group.locations.length > 1 && locationGroup.location && locIdx > 0 && (
+                          <LocationSubHeader
+                            key={`loc-${locationGroup.location}`}
+                            location={locationGroup.location}
                           />
-                        );
-                      })}
-                    </>
-                  ))}
-                </tbody>
-              );
-            })}
-          </tbody>
-        </table>
+                        )}
+                        {locationGroup.employees.map((employee) => {
+                          const isOdd = rowIndex % 2 === 1;
+                          rowIndex++;
+                          return (
+                            <ExtensionRow
+                              key={employee.id}
+                              employee={employee}
+                              companyConfig={companyConfig}
+                              onClick={() => handleRowClick(employee.id)}
+                              isOdd={isOdd}
+                              colWidths={colWidths}
+                            />
+                          );
+                        })}
+                      </>
+                    ))}
+                  </tbody>
+                );
+              })}
+            </tbody>
+          </table>
+        </div>
       )}
 
       {/* SOLO EXTENSIONES MODE - Card Grid */}

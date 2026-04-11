@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from 'next'
-import { DM_Sans } from 'next/font/google'
+import { DM_Sans, Orbitron } from 'next/font/google'
 import localFont from 'next/font/local'
 import { Analytics } from '@vercel/analytics/next'
 import { ThemeProvider } from '@/components/theme-provider'
@@ -14,10 +14,17 @@ const dmSans = DM_Sans({
   display: 'swap',
 });
 
+const orbitron = Orbitron({
+  subsets: ["latin"],
+  variable: '--font-orbitron',
+  display: 'swap',
+});
+
 const neuropol = localFont({
   src: '../public/fonts/Neuropol.otf',
   variable: '--font-neuropol',
-  display: 'block',
+  display: 'swap',
+  preload: true,
 })
 
 export const metadata: Metadata = {
@@ -28,8 +35,9 @@ export const metadata: Metadata = {
 export type ViewMode = "grid" | "list";
 
 export const viewport: Viewport = {
-  themeColor: '#080810',
+  themeColor: '#0C0E11',
   viewportFit: 'cover',
+  colorScheme: 'dark',
 }
 
 export default function RootLayout({
@@ -38,7 +46,11 @@ export default function RootLayout({
   children: React.ReactNode
 }>) {
   return (
-    <html lang="es" className={neuropol.variable} suppressHydrationWarning>
+    <html lang="es" className={`${neuropol.variable} ${orbitron.variable} dark`} style={{ colorScheme: 'dark' }} suppressHydrationWarning>
+      <head>
+        <meta name="color-scheme" content="dark" />
+        <meta name="robots" content="noindex, nofollow" />
+      </head>
       <body className={`${dmSans.variable} font-dm-sans antialiased`}>
         <ThemeProvider
           attribute="class"

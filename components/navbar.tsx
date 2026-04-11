@@ -65,15 +65,15 @@ export function Navbar() {
       <nav className="container mx-auto px-4 flex items-center justify-between">
           <Link
             href="/"
-            style={{ fontFamily: "'Neuropol', sans-serif" }}
+            style={{ fontFamily: "var(--font-neuropol), var(--font-orbitron), 'Orbitron', 'Courier New', monospace" }}
             className="text-lg tracking-wider"
             onTouchStart={handleTouchStart}
             onTouchEnd={handleTouchEnd}
             onMouseDown={handleTouchStart}
             onMouseUp={handleTouchEnd}
           >
-            <span className="text-[#F2F0EC]" style={{ fontFamily: "'Neuropol', sans-serif" }}>DIRECTO</span>
-            <span className="animate-gradient-text" style={{ fontFamily: "'Neuropol', sans-serif" }}>RIO</span>
+            <span className="text-[#F2F0EC]" style={{ fontFamily: "var(--font-neuropol), var(--font-orbitron), 'Orbitron', 'Courier New', monospace" }}>DIRECTO</span>
+            <span className="animate-gradient-text" style={{ fontFamily: "var(--font-neuropol), var(--font-orbitron), 'Orbitron', 'Courier New', monospace" }}>RIO</span>
           </Link>
 
         <div className="flex items-center gap-6">
