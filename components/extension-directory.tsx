@@ -15,18 +15,17 @@ const MIN_COL_WIDTHS = [50, 180, 100, 100, 80];
 const STORAGE_KEY = "directorio-quick-col-widths";
 
 // Memoized row component for performance
+// Note: Column widths are controlled by <colgroup> + <col> elements, NOT by td styles
 const ExtensionRow = memo(function ExtensionRow({
   employee,
   companyConfig,
   onClick,
   isOdd,
-  colWidths,
 }: {
   employee: Employee;
   companyConfig: ReturnType<typeof getCompanyConfig>;
   onClick: () => void;
   isOdd: boolean;
-  colWidths: number[];
 }) {
   return (
     <tr
@@ -41,8 +40,8 @@ const ExtensionRow = memo(function ExtensionRow({
     >
       {/* Extension */}
       <td 
-        className="px-3 text-center" 
-        style={{ width: colWidths[0], minWidth: MIN_COL_WIDTHS[0] }}
+        className="px-3 text-center"
+        style={{ overflow: "hidden" }}
       >
         {employee.extension ? (
           <span
@@ -65,8 +64,6 @@ const ExtensionRow = memo(function ExtensionRow({
       <td
         className="px-3 font-medium text-white group-hover:text-white/90"
         style={{ 
-          width: colWidths[1], 
-          minWidth: MIN_COL_WIDTHS[1],
           fontSize: "0.85rem", 
           fontWeight: 500,
           whiteSpace: "nowrap",
@@ -81,8 +78,6 @@ const ExtensionRow = memo(function ExtensionRow({
       <td
         className="px-3 hidden md:table-cell"
         style={{ 
-          width: colWidths[2], 
-          minWidth: MIN_COL_WIDTHS[2],
           fontSize: "0.78rem", 
           color: "rgba(255,255,255,0.65)",
           whiteSpace: "nowrap",
@@ -97,8 +92,6 @@ const ExtensionRow = memo(function ExtensionRow({
       <td
         className="px-3 hidden lg:table-cell"
         style={{ 
-          width: colWidths[3], 
-          minWidth: MIN_COL_WIDTHS[3],
           fontSize: "0.75rem", 
           color: "rgba(255,255,255,0.45)",
           whiteSpace: "nowrap",
@@ -113,8 +106,6 @@ const ExtensionRow = memo(function ExtensionRow({
       <td
         className="px-3 hidden xl:table-cell"
         style={{ 
-          width: colWidths[4], 
-          minWidth: MIN_COL_WIDTHS[4],
           fontSize: "0.72rem", 
           color: "rgba(255,255,255,0.35)",
           whiteSpace: "nowrap",
@@ -314,7 +305,9 @@ export function ExtensionDirectory({
 
   // Save column widths to localStorage when they change
   useEffect(() => {
-    if (colWidths !== DEFAULT_COL_WIDTHS) {
+    // Only save if different from defaults (compare values, not reference)
+    const isDefault = colWidths.every((w, i) => w === DEFAULT_COL_WIDTHS[i]);
+    if (!isDefault) {
       localStorage.setItem(STORAGE_KEY, JSON.stringify(colWidths));
     }
   }, [colWidths]);
@@ -675,8 +668,9 @@ export function ExtensionDirectory({
                         letterSpacing: "0.1em",
                         color: "rgba(255,255,255,0.35)",
                         textTransform: "uppercase",
-                        width: colWidths[idx],
-                        minWidth: MIN_COL_WIDTHS[idx],
+                        overflow: "hidden",
+                        textOverflow: "ellipsis",
+                        whiteSpace: "nowrap",
                       }}
                     >
                       {header}
@@ -726,7 +720,6 @@ export function ExtensionDirectory({
                               companyConfig={companyConfig}
                               onClick={() => handleRowClick(employee.id)}
                               isOdd={isOdd}
-                              colWidths={colWidths}
                             />
                           );
                         })}
