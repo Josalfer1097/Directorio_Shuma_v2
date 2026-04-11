@@ -13,7 +13,7 @@ export const companyConfig: Record<string, {
     secondary: '#002D6E',
     glow: 'rgba(0,71,171,0.28)',
     highlight: '#4D9FFF',
-    name: 'Comercializadora y Ferreteria Shuma',
+    name: 'Comercializadora y Ferretería Shuma',
     initial: 'C',
   },
   acabados: {
@@ -39,7 +39,7 @@ export const companyConfig: Record<string, {
     secondary: '#C49A00',
     glow: 'rgba(245,196,0,0.25)',
     highlight: '#FFD93D',
-    name: 'Arkiramica',
+    name: 'Arkirámica',
     initial: 'K',
   },
 };
