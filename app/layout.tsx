@@ -5,6 +5,7 @@ import { Analytics } from '@vercel/analytics/next'
 import { ThemeProvider } from '@/components/theme-provider'
 import { RgbSignature } from '@/components/rgb-signature'
 import { Toaster } from 'sonner'
+import { ScrollToTop } from '@/components/scroll-to-top'
 import './globals.css'
 
 const dmSans = DM_Sans({ 
@@ -49,6 +50,7 @@ export default function RootLayout({
             {children}
           </div>
           <RgbSignature />
+          <ScrollToTop />
           <Toaster position="bottom-right" richColors />
         </ThemeProvider>
         <Analytics />

@@ -24,7 +24,8 @@ interface EmployeeCardProps {
 const premiumEase = [0.25, 0.46, 0.45, 0.94];
 
 // Format phone number for display
-const formatPhone = (phone: string) => {
+const formatPhone = (phone: string | null | undefined) => {
+  if (!phone) return "—";
   const digits = phone.replace(/\D/g, "");
   if (digits.length === 10) {
     return `+52 ${digits.slice(0, 2)} ${digits.slice(2, 6)} ${digits.slice(6)}`;
@@ -33,9 +34,11 @@ const formatPhone = (phone: string) => {
 };
 
 // Truncate email for display
-const truncateEmail = (email: string, maxLength = 20) => {
+const truncateEmail = (email: string | null | undefined, maxLength = 20) => {
+  if (!email) return "—";
   if (email.length <= maxLength) return email;
   const [user, domain] = email.split("@");
+  if (!domain) return email;
   const truncatedUser = user.slice(0, Math.max(6, maxLength - domain.length - 4));
   return `${truncatedUser}...@${domain}`;
 };
@@ -66,9 +69,10 @@ export function EmployeeCard({
       .toUpperCase();
   };
 
-  const copyToClipboard = (e: React.MouseEvent, text: string, field: string) => {
+  const copyToClipboard = (e: React.MouseEvent, text: string | null | undefined, field: string) => {
     e.preventDefault();
     e.stopPropagation();
+    if (!text) return;
     navigator.clipboard.writeText(text);
     setCopiedField(field);
     toast.success("Copiado al portapapeles", { duration: 2000 });
@@ -78,18 +82,21 @@ export function EmployeeCard({
   const openTeamsChat = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
+    if (!employee.email) return;
     window.open(`https://teams.microsoft.com/l/chat/0/0?users=${employee.email}`, "_blank");
   };
 
   const handleEmailClick = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
+    if (!employee.email) return;
     window.location.href = `mailto:${employee.email}`;
   };
 
   const handlePhoneClick = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
+    if (!employee.phone) return;
     window.location.href = `tel:${employee.phone}`;
   };
 

@@ -1,10 +1,10 @@
 "use client";
 
-import { useState, useMemo, useEffect, Suspense } from "react";
+import { useState, useMemo, useEffect, Suspense, useRef, useCallback, useDeferredValue } from "react";
 import { useSearchParams } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import Fuse from "fuse.js";
-import { Search, LayoutGrid, List, Users, Filter } from "lucide-react";
+import { Search, LayoutGrid, List, Users, Filter, Phone } from "lucide-react";
 import { Navbar } from "@/components/navbar";
 import { EmployeeCard } from "@/components/employee-card";
 import { DirectoryFilters } from "@/components/directory-filters";
@@ -19,6 +19,7 @@ import {
   getCompanyById,
 } from "@/lib/data";
 import { MobileFiltersBottomSheet } from "@/components/mobile-filters-bottom-sheet";
+import { ExtensionDirectory } from "@/components/extension-directory";
 import type { ViewMode, Employee } from "@/types";
 
 const ITEMS_PER_PAGE = 12;
@@ -32,6 +33,7 @@ function DirectoryContent() {
   const initialCompany = searchParams.get("empresa") || "";
 
   const [searchQuery, setSearchQuery] = useState(initialQuery);
+  const deferredSearchQuery = useDeferredValue(searchQuery);
   const [viewMode, setViewMode] = useState<ViewMode>("grid");
   const [currentPage, setCurrentPage] = useState(1);
   const [selectedCompanies, setSelectedCompanies] = useState<string[]>(
@@ -41,6 +43,22 @@ function DirectoryContent() {
   const [selectedLocations, setSelectedLocations] = useState<string[]>([]);
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
   const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
+  const searchInputRef = useRef<HTMLInputElement>(null);
+
+  // Cmd+K / Ctrl+K keyboard shortcut to focus search
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if ((e.metaKey || e.ctrlKey) && e.key === "k") {
+        e.preventDefault();
+        searchInputRef.current?.focus();
+      }
+      if (e.key === "Escape") {
+        setMobileFiltersOpen(false);
+      }
+    };
+    document.addEventListener("keydown", handleKeyDown);
+    return () => document.removeEventListener("keydown", handleKeyDown);
+  }, []);
 
   const employees = getEmployees();
   const companies = getCompanies();
@@ -67,12 +85,12 @@ function DirectoryContent() {
       [employees]
   );
 
-  // Filter employees
+  // Filter employees using deferred search for performance
   const filteredEmployees = useMemo(() => {
     let results: Employee[] = employees;
 
-    if (searchQuery.trim()) {
-      const searchResults = fuse.search(searchQuery);
+    if (deferredSearchQuery.trim()) {
+      const searchResults = fuse.search(deferredSearchQuery);
       results = searchResults.map((result) => result.item);
     }
 
@@ -90,12 +108,12 @@ function DirectoryContent() {
       results = results.filter((emp) => emp.location && selectedLocations.includes(emp.location));
     }
 
-    if (!searchQuery.trim()) {
+    if (!deferredSearchQuery.trim()) {
       results = [...results].sort((a, b) => a.name.localeCompare(b.name, "es"));
     }
 
     return results;
-  }, [employees, searchQuery, selectedCompanies, selectedDepartment, selectedLocations, fuse]);
+  }, [employees, deferredSearchQuery, selectedCompanies, selectedDepartment, selectedLocations, fuse]);
 
   // Pagination
   const totalPages = Math.ceil(filteredEmployees.length / ITEMS_PER_PAGE);
@@ -163,21 +181,29 @@ function DirectoryContent() {
                 {/* Search Bar - Sticky on mobile */}
                 <div className="sticky top-[64px] z-30 bg-background/95 backdrop-blur-sm pb-4 -mx-4 px-4 lg:static lg:bg-transparent lg:backdrop-blur-none lg:pb-0 lg:mx-0 lg:px-0">
                   <div className="flex flex-col sm:flex-row gap-4 mb-4 lg:mb-6">
-                    <div className="relative flex-1">
-                      <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                    <div className="relative flex-1" role="search">
+                      <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" aria-hidden="true" />
+                      <label htmlFor="employee-search" className="sr-only">Buscar empleados</label>
                       <Input
-                          type="text"
-                          placeholder="Buscar por nombre, puesto, extensión..."
+                          ref={searchInputRef}
+                          id="employee-search"
+                          type="search"
+                          placeholder="Buscar por nombre, puesto, extensión... (Cmd+K)"
                           value={searchQuery}
                           onChange={(e) => setSearchQuery(e.target.value)}
                           className="pl-10 w-full"
+                          aria-describedby="search-description"
                       />
+                      <span id="search-description" className="sr-only">
+                        Escribe para buscar empleados por nombre, puesto, departamento o extensión
+                      </span>
                     </div>
                     <div className="hidden sm:flex items-center gap-2">
                       <Button
                           variant={viewMode === "grid" ? "secondary" : "ghost"}
                           size="icon"
                           onClick={() => setViewMode("grid")}
+                          aria-label="Vista de tarjetas"
                       >
                         <LayoutGrid className="w-4 h-4" />
                       </Button>
@@ -185,21 +211,41 @@ function DirectoryContent() {
                           variant={viewMode === "list" ? "secondary" : "ghost"}
                           size="icon"
                           onClick={() => setViewMode("list")}
+                          aria-label="Vista de lista"
                       >
                         <List className="w-4 h-4" />
+                      </Button>
+                      <Button
+                          variant={viewMode === "extensions" ? "secondary" : "ghost"}
+                          size="icon"
+                          onClick={() => setViewMode("extensions")}
+                          aria-label="Vista de extensiones"
+                          title="Directorio Rapido"
+                      >
+                        <Phone className="w-4 h-4" />
                       </Button>
                     </div>
                   </div>
                 </div>
 
-                {/* Results count */}
-                <p className="text-sm text-muted-foreground mb-4">
-                  Mostrando {paginatedEmployees.length} de{" "}
-                  {filteredEmployees.length} empleados
-                </p>
+                {/* Extensions View - Full width table */}
+                {viewMode === "extensions" ? (
+                  <ExtensionDirectory
+                    selectedCompanies={selectedCompanies}
+                    selectedDepartment={selectedDepartment}
+                    selectedLocations={selectedLocations}
+                    searchQuery={searchQuery}
+                  />
+                ) : (
+                  <>
+                    {/* Results count - with live region for screen readers */}
+                    <p className="text-sm text-muted-foreground mb-4" role="status" aria-live="polite" aria-atomic="true">
+                      Mostrando {paginatedEmployees.length} de{" "}
+                      {filteredEmployees.length} empleados
+                    </p>
 
-                {/* Employee Grid/List - Single column on mobile */}
-                {paginatedEmployees.length > 0 ? (
+                    {/* Employee Grid/List - Single column on mobile */}
+                    {paginatedEmployees.length > 0 ? (
                     <div
                         className={
                           viewMode === "grid"
@@ -296,6 +342,8 @@ function DirectoryContent() {
                         Siguiente
                       </Button>
                     </div>
+                )}
+                  </>
                 )}
               </div>
             </div>

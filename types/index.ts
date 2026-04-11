@@ -35,6 +35,6 @@ export interface EmployeeData {
   employees: Employee[];
 }
 
-export type ViewMode = "grid" | "list";
+export type ViewMode = "grid" | "list" | "extensions";
 
 export type OrgChartLayout = "horizontal" | "vertical";
