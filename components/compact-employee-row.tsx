@@ -71,7 +71,7 @@ export function CompactEmployeeRow({
           border: isFerrecapital ? "1.5px solid #CC0000" : "none"
         }}
       >
-        <span style={{ fontFamily: "'Neuropol', sans-serif" }}>
+        <span style={{ fontFamily: "var(--font-neuropol), var(--font-orbitron), 'Orbitron', 'Courier New', monospace" }}>
           {getInitials(employee.name)}
         </span>
       </div>
@@ -80,7 +80,7 @@ export function CompactEmployeeRow({
       <div className="flex flex-col min-w-0 flex-1">
         <h4 
           className="text-[14px] text-text-primary truncate"
-          style={{ fontFamily: "'Neuropol', sans-serif" }}
+          style={{ fontFamily: "var(--font-neuropol), var(--font-orbitron), 'Orbitron', 'Courier New', monospace" }}
         >
           {employee.name}
         </h4>
@@ -93,7 +93,7 @@ export function CompactEmployeeRow({
       <div 
         className="hidden sm:flex px-2 py-0.5 rounded-full border text-[11px] shrink-0"
         style={{ 
-          fontFamily: "'Neuropol', sans-serif",
+          fontFamily: "var(--font-neuropol), var(--font-orbitron), 'Orbitron', 'Courier New', monospace",
           borderColor: `${colors.primary}40`,
           color: colors.primary,
           backgroundColor: `${colors.primary}12`
@@ -106,7 +106,7 @@ export function CompactEmployeeRow({
       <div 
         className="hidden md:flex px-2 py-0.5 rounded-full border text-[9px] uppercase tracking-wider shrink-0"
         style={{ 
-          fontFamily: "'Neuropol', sans-serif",
+          fontFamily: "var(--font-neuropol), var(--font-orbitron), 'Orbitron', 'Courier New', monospace",
           ...badgeStyles
         }}
       >

@@ -110,7 +110,7 @@ function OrgChartNodeComponent({ data }: OrgChartNodeProps) {
                   <h4 
                     className="text-[0.7rem] md:text-[12px] text-text-primary leading-tight line-clamp-2"
                     style={{ 
-                      fontFamily: "'Neuropol', sans-serif",
+                      fontFamily: "var(--font-neuropol), var(--font-orbitron), 'Orbitron', 'Courier New', monospace",
                       wordWrap: 'break-word',
                       whiteSpace: 'normal',
                     }}

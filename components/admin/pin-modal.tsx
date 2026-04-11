@@ -134,7 +134,7 @@ export function PinModal() {
                     else handleDigitPress(digit);
                   }}
                   className="h-20 w-full flex items-center justify-center rounded-2xl bg-white/5 border border-white/10 text-2xl text-text-primary hover:bg-white/10 transition-colors"
-                  style={{ fontFamily: "'Neuropol', sans-serif" }}
+                  style={{ fontFamily: "var(--font-neuropol), var(--font-orbitron), 'Orbitron', 'Courier New', monospace" }}
                 >
                   {digit === "DEL" ? <Delete className="w-6 h-6" /> : digit}
                 </motion.button>
