@@ -1,22 +1,19 @@
 "use client";
 
-import { Suspense, useState, useEffect } from "react";
+import { Suspense, useEffect, useRef } from "react";
 import dynamic from "next/dynamic";
-import { motion, AnimatePresence } from "framer-motion";
 import { Navbar } from "@/components/navbar";
 import { Skeleton } from "@/components/ui/skeleton";
-import { GitBranch, Maximize2 } from "lucide-react";
 import { ErrorBoundary } from "@/components/error-boundary";
-import { toast } from "sonner";
 
 const OrgChart = dynamic(
   () => import("@/components/org-chart").then(mod => mod.OrgChart),
-  { ssr: false, loading: () => <p className="text-text-muted font-dm-sans text-center py-20">Cargando...</p> }
+  { ssr: false, loading: () => <OrgChartLoading /> }
 );
 
 function OrgChartLoading() {
   return (
-    <div className="h-[calc(100vh-8rem)] w-full rounded-xl border border-border-subtle bg-bg-surface flex items-center justify-center">
+    <div className="h-full w-full flex items-center justify-center">
       <div className="text-center">
         <Skeleton className="w-16 h-16 rounded-full mx-auto mb-4 bg-bg-elevated" />
         <Skeleton className="w-48 h-4 mb-2 bg-bg-elevated" />
@@ -27,91 +24,70 @@ function OrgChartLoading() {
 }
 
 export default function OrganigramaPage() {
-  const [showMobileOrg, setShowMobileOrg] = useState(false);
-  const [hasShownHint, setHasShownHint] = useState(false);
-
-  // Show zoom hint toast on mobile when org chart is shown
+  // Check if we've shown the zoom hint before
   useEffect(() => {
-    if (showMobileOrg && !hasShownHint) {
-      const isMobile = window.innerWidth < 768;
-      if (isMobile) {
-        toast("Pellizca para zoom", {
-          description: "Usa dos dedos para hacer zoom y navegar",
-          duration: 3000,
-          position: "bottom-center",
-        });
-        setHasShownHint(true);
-      }
+    const hasShownHint = localStorage.getItem("orgchart-zoom-hint-shown");
+    if (!hasShownHint && typeof window !== "undefined" && window.innerWidth < 768) {
+      // Import toast dynamically to avoid SSR issues
+      import("sonner").then(({ toast }) => {
+        setTimeout(() => {
+          toast("Pellizca para hacer zoom", {
+            description: "Usa dos dedos para navegar el organigrama",
+            duration: 3000,
+            position: "bottom-center",
+          });
+          localStorage.setItem("orgchart-zoom-hint-shown", "true");
+        }, 500);
+      });
     }
-  }, [showMobileOrg, hasShownHint]);
+  }, []);
 
   return (
-    <div className="min-h-screen bg-bg-base relative page-transition">
+    <div className="h-screen flex flex-col bg-bg-base relative overflow-hidden">
       <div className="dot-grid fixed inset-0" />
       
-      <Navbar />
+      {/* Navbar - fixed height */}
+      <div className="relative z-20">
+        <Navbar />
+      </div>
 
-      <main className="md:pt-24 pt-20 pb-24 md:pb-8 px-4 relative z-10">
-        <div className="container mx-auto">
-          {/* Header */}
-          <div className="mb-8 font-neuropol">
-            <h1 className="font-neuropol text-2xl text-text-primary mb-2 font-neuropol">
-              Organigrama
-            </h1>
-            <p className="font-dm-sans text-text-muted">
-              Estructura organizacional de las empresas Shuma
-            </p>
-          </div>
+      {/* Main content - fills remaining space */}
+      <main className="flex-1 flex flex-col relative z-10 pt-16 md:pt-20 overflow-hidden">
+        {/* Mobile Header - compact rows */}
+        <div className="md:hidden flex flex-col shrink-0">
+          {/* Row 1: Title */}
+          <h1 
+            className="font-neuropol text-text-primary px-4 pt-3 pb-1"
+            style={{ fontSize: "clamp(1.2rem, 5vw, 1.5rem)" }}
+          >
+            Organigrama
+          </h1>
+          
+          {/* Row 2: Subtitle */}
+          <p 
+            className="text-[0.75rem] text-white/50 px-4 pb-3 truncate"
+          >
+            Estructura organizacional de las empresas Shuma
+          </p>
+        </div>
 
-          {/* Mobile restricted view */}
-          <div className="md:hidden">
-            {!showMobileOrg ? (
-              <div className="flex flex-col items-center justify-center py-20 px-6 text-center bg-bg-surface rounded-2xl border border-border-subtle shadow-xl">
-                <div className="w-16 h-16 rounded-full bg-bg-elevated flex items-center justify-center mb-6">
-                  <GitBranch className="w-8 h-8 text-irid-a" />
-                </div>
-                <h3 className="font-neuropol text-lg text-text-primary mb-2">Experiencia Optimizada</h3>
-                <p className="font-dm-sans text-sm text-text-muted mb-8">
-                  El organigrama se visualiza mejor en pantallas grandes. ¿Deseas continuar en pantalla completa?
-                </p>
-                <button 
-                  onClick={() => setShowMobileOrg(true)}
-                  className="flex items-center gap-2 px-6 py-3 rounded-full bg-gradient-to-r from-irid-a to-irid-b text-white font-neuropol text-xs tracking-wider"
-                >
-                  <Maximize2 className="w-4 h-4" />
-                  Ver organigrama
-                </button>
-              </div>
-            ) : (
-              <div className="fixed inset-0 z-[60] bg-bg-base flex flex-col">
-                <div className="flex items-center justify-between p-4 border-b border-border-subtle bg-bg-surface/80 backdrop-blur-md">
-                  <span className="font-neuropol text-xs uppercase tracking-widest text-text-primary">Vista Organigrama</span>
-                  <button 
-                    onClick={() => setShowMobileOrg(false)}
-                    className="p-2 text-text-muted hover:text-text-primary"
-                  >
-                    Cerrar
-                  </button>
-                </div>
-                <div className="flex-1">
-                  <ErrorBoundary>
-                    <Suspense fallback={<OrgChartLoading />}>
-                      <OrgChart />
-                    </Suspense>
-                  </ErrorBoundary>
-                </div>
-              </div>
-            )}
-          </div>
+        {/* Desktop Header */}
+        <div className="hidden md:block px-6 pb-4">
+          <h1 className="font-neuropol text-2xl text-text-primary mb-2">
+            Organigrama
+          </h1>
+          <p className="font-dm-sans text-text-muted">
+            Estructura organizacional de las empresas Shuma
+          </p>
+        </div>
 
-          {/* Desktop view */}
-          <div className="hidden md:block">
-            <ErrorBoundary>
-              <Suspense fallback={<OrgChartLoading />}>
-                <OrgChart />
-              </Suspense>
-            </ErrorBoundary>
-          </div>
+        {/* Org Chart Container - takes remaining height */}
+        <div className="flex-1 relative overflow-hidden md:px-6 md:pb-6">
+          <ErrorBoundary>
+            <Suspense fallback={<OrgChartLoading />}>
+              <OrgChart />
+            </Suspense>
+          </ErrorBoundary>
         </div>
       </main>
     </div>

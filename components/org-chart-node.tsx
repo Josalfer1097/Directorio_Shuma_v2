@@ -64,11 +64,13 @@ function OrgChartNodeComponent({ data }: OrgChartNodeProps) {
               onMouseEnter={() => setIsHovered(true)}
               onMouseLeave={() => setIsHovered(false)}
               className={cn(
-                "relative overflow-hidden bg-[--bg-elevated] rounded-xl p-4 transition-all duration-[180ms] group cursor-pointer",
-                "shadow-xl shadow-black/20"
+                "relative overflow-hidden bg-[--bg-elevated] rounded-xl transition-all duration-[180ms] group cursor-pointer",
+                "shadow-xl shadow-black/20",
+                "p-2 md:p-4"
               )}
               style={{ 
-                minWidth: '220px',
+                minWidth: '150px',
+                maxWidth: '200px',
                 borderWidth: '1px',
                 borderStyle: 'solid',
                 borderLeftWidth: '3px',
@@ -106,7 +108,7 @@ function OrgChartNodeComponent({ data }: OrgChartNodeProps) {
 
                 <div className="min-w-0 flex-1">
                   <h4 
-                    className="text-[12px] text-text-primary leading-tight"
+                    className="text-[0.7rem] md:text-[12px] text-text-primary leading-tight line-clamp-2"
                     style={{ 
                       fontFamily: "'Neuropol', sans-serif",
                       wordWrap: 'break-word',
@@ -115,7 +117,7 @@ function OrgChartNodeComponent({ data }: OrgChartNodeProps) {
                   >
                     {employee.name}
                   </h4>
-                  <p className="font-dm-sans italic text-[10px] text-text-muted mt-0.5 leading-tight">
+                  <p className="font-dm-sans italic text-[0.6rem] md:text-[10px] text-text-muted mt-0.5 leading-tight">
                     {employee.position}
                   </p>
                 </div>

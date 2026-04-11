@@ -101,6 +101,19 @@
       "avatar": null
     },
     {
+      "id": "emp008",
+      "name": "Concepción Castañeda Santa Cruz",
+      "department": "Contabilidad",
+      "position": "Gerente De Contabilidad",
+      "phone": "55 55498999",
+      "extension": "229",
+      "email": "conyc@shuma.com.mx",
+      "company": "comercializadora",
+      "location": "División",
+      "reportsTo": "emp001",
+      "avatar": null
+    },
+    {
       "id": "emp004",
       "name": "Josue Alejandro Ferreira Díaz",
       "department": "Sistemas IT",
@@ -150,19 +163,6 @@
       "company": "comercializadora",
       "location": "División",
       "reportsTo": "emp004",
-      "avatar": null
-    },
-    {
-      "id": "emp008",
-      "name": "Concepción Castañeda Santa Cruz",
-      "department": "Contabilidad",
-      "position": "Gerente De Contabilidad",
-      "phone": "55 55498999",
-      "extension": "229",
-      "email": "conyc@shuma.com.mx",
-      "company": "comercializadora",
-      "location": "División",
-      "reportsTo": "emp001",
       "avatar": null
     },
     {

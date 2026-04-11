@@ -22,6 +22,8 @@ import {
 import { MobileFiltersBottomSheet } from "./mobile-filters-bottom-sheet";
 import type { Company, Employee } from "@/types";
 import { getCompanyConfig } from "@/lib/companyConfig";
+import { getEmployees } from "@/lib/data";
+import { useMemo } from "react";
 
 // Spring animation for filter panel
 const springTransition = {
@@ -58,6 +60,26 @@ export function DirectoryFilters({
   filteredEmployees,
 }: DirectoryFiltersProps) {
   const [mobileSheetOpen, setMobileSheetOpen] = useState(false);
+  const allEmployees = getEmployees();
+
+  // Calculate counts for each filter option
+  const filterCounts = useMemo(() => {
+    const companyCounts: Record<string, number> = {};
+    const deptCounts: Record<string, number> = {};
+    const locationCounts: Record<string, number> = {};
+
+    allEmployees.forEach(emp => {
+      companyCounts[emp.company] = (companyCounts[emp.company] || 0) + 1;
+      if (emp.department) {
+        deptCounts[emp.department] = (deptCounts[emp.department] || 0) + 1;
+      }
+      if (emp.location) {
+        locationCounts[emp.location] = (locationCounts[emp.location] || 0) + 1;
+      }
+    });
+
+    return { companyCounts, deptCounts, locationCounts };
+  }, [allEmployees]);
   
   const hasActiveFilters =
     selectedCompanies.length > 0 ||
@@ -169,6 +191,7 @@ export function DirectoryFilters({
                   )}
                   <span className="text-sm text-muted-foreground group-hover:text-foreground transition-colors" style={{ fontFamily: "'Neuropol', sans-serif" }}>
                     {company.shortName || company.name}
+                    <span className="ml-1 text-xs text-white/30">[{filterCounts.companyCounts[company.id] || 0}]</span>
                   </span>
                 </div>
               </label>
@@ -188,7 +211,7 @@ export function DirectoryFilters({
             <SelectItem value="all" style={{ fontFamily: "'Neuropol', sans-serif" }}>Todos los departamentos</SelectItem>
             {departments.map((dept) => (
               <SelectItem key={dept} value={dept} style={{ fontFamily: "'Neuropol', sans-serif" }}>
-                {dept}
+                {dept} [{filterCounts.deptCounts[dept] || 0}]
               </SelectItem>
             ))}
           </SelectContent>
@@ -214,6 +237,7 @@ export function DirectoryFilters({
                   />
                   <span className="text-sm text-muted-foreground group-hover:text-foreground transition-colors" style={{ fontFamily: "'Neuropol', sans-serif" }}>
                     {location}
+                    <span className="ml-1 text-xs text-white/30">[{filterCounts.locationCounts[location] || 0}]</span>
                   </span>
                 </label>
               );

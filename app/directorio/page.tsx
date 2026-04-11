@@ -34,7 +34,20 @@ function DirectoryContent() {
 
   const [searchQuery, setSearchQuery] = useState(initialQuery);
   const deferredSearchQuery = useDeferredValue(searchQuery);
-  const [viewMode, setViewMode] = useState<ViewMode>("grid");
+  const [viewMode, setViewMode] = useState<ViewMode>(() => {
+    if (typeof window !== "undefined") {
+      const saved = localStorage.getItem("directorio-viewMode");
+      if (saved === "grid" || saved === "list" || saved === "extensions") {
+        return saved;
+      }
+    }
+    return "grid";
+  });
+
+  // Persist viewMode to localStorage
+  useEffect(() => {
+    localStorage.setItem("directorio-viewMode", viewMode);
+  }, [viewMode]);
   const [currentPage, setCurrentPage] = useState(1);
   const [selectedCompanies, setSelectedCompanies] = useState<string[]>(
       initialCompany ? [initialCompany] : []
