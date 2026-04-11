@@ -39,13 +39,11 @@ interface FormData {
 }
 
 const LOCATION_OPTIONS = [
-  "Oficina Central",
-  "Sucursal Puebla",
-  "Sucursal CDMX",
-  "Sucursal Monterrey",
-  "Sucursal Guadalajara",
-  "Almacén Central",
-  "Bodega Norte",
+  "División",
+  "FerreDivisión",
+  "San Pablo",
+  "Acabados Puebla",
+  "Cholula",
 ];
 
 const initialFormData: FormData = {
@@ -53,7 +51,7 @@ const initialFormData: FormData = {
   name: "",
   position: "",
   department: "",
-  company: "comercializadora-shuma",
+  company: "comercializadora",
   email: "",
   phone: "",
   location: "",

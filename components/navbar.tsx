@@ -2,11 +2,12 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useMemo } from "react";
 import { LayoutGrid, List, Menu, X } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import type { ViewMode } from "@/types";
 import { cn } from "@/lib/utils";
+import { getEmployees } from "@/lib/data";
 
 export function Navbar() {
   const pathname = usePathname();
@@ -15,6 +16,8 @@ export function Navbar() {
   const [viewMode, setViewMode] = useState<ViewMode>("grid");
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const longPressTimer = useRef<NodeJS.Timeout | null>(null);
+  
+  const employeeCount = useMemo(() => getEmployees().length, []);
 
   useEffect(() => {
     setMounted(true);
@@ -78,20 +81,29 @@ export function Navbar() {
           <Link 
             href="/directorio" 
             className={cn(
-              "hidden md:block font-neuropol text-[12px] uppercase tracking-wider transition-colors active:scale-95",
+              "hidden md:flex items-center gap-2 font-neuropol text-[12px] uppercase tracking-wider transition-colors active:scale-95 relative",
               pathname === "/directorio" ? "text-text-primary" : "text-text-muted hover:text-text-primary"
             )}
           >
             Directorio
+            <span className="px-1.5 py-0.5 rounded-full text-[9px] bg-white/8 border border-white/12 text-white/60">
+              {employeeCount}
+            </span>
+            {pathname === "/directorio" && (
+              <span className="absolute -bottom-1.5 left-0 right-0 h-0.5 bg-gradient-to-r from-[#C9A84C] to-[#E0C060] rounded-full" />
+            )}
           </Link>
           <Link 
             href="/organigrama" 
             className={cn(
-              "hidden md:block font-neuropol text-[12px] uppercase tracking-wider transition-colors active:scale-95",
+              "hidden md:block font-neuropol text-[12px] uppercase tracking-wider transition-colors active:scale-95 relative",
               pathname === "/organigrama" ? "text-text-primary" : "text-text-muted hover:text-text-primary"
             )}
           >
             Organigrama
+            {pathname === "/organigrama" && (
+              <span className="absolute -bottom-1.5 left-0 right-0 h-0.5 bg-gradient-to-r from-[#C9A84C] to-[#E0C060] rounded-full" />
+            )}
           </Link>
 
           {/* View Toggle - Always visible */}

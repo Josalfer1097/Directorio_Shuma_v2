@@ -19,14 +19,14 @@ export interface Employee {
   id: string;
   name: string;
   position: string;
-  department: string;
-  company: string;
-  email: string;
-  phone: string;
-  extension?: string;
-  location?: string;
-  reportsTo?: string | null;
-  avatar?: string | null;
+  department: string | null;
+  company: 'comercializadora' | 'ferrecapital' | 'acabados' | 'arkiramica';
+  email: string | null;
+  phone: string | null;
+  extension: string | null;
+  location: string | null;
+  reportsTo: string | null;
+  avatar: string | null;
 }
 
 export interface EmployeeData {
@@ -35,6 +35,6 @@ export interface EmployeeData {
   employees: Employee[];
 }
 
-export type ViewMode = "grid" | "list";
+export type ViewMode = "grid" | "list" | "extensions";
 
 export type OrgChartLayout = "horizontal" | "vertical";

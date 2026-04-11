@@ -40,7 +40,8 @@ const itemVariants = {
 };
 
 // Format phone number for display
-const formatPhone = (phone: string) => {
+const formatPhone = (phone: string | null | undefined) => {
+  if (!phone) return "—";
   const digits = phone.replace(/\D/g, "");
   if (digits.length === 10) {
     return `+52 ${digits.slice(0, 2)} ${digits.slice(2, 6)} ${digits.slice(6)}`;
@@ -49,9 +50,11 @@ const formatPhone = (phone: string) => {
 };
 
 // Truncate email for display
-const truncateEmail = (email: string, maxLength = 18) => {
+const truncateEmail = (email: string | null | undefined, maxLength = 18) => {
+  if (!email) return "—";
   if (email.length <= maxLength) return email;
   const [user, domain] = email.split("@");
+  if (!domain) return email;
   const truncatedUser = user.slice(0, Math.max(5, maxLength - domain.length - 4));
   return `${truncatedUser}...@${domain}`;
 };
@@ -173,7 +176,7 @@ function FeaturedEmployeeCard({
             <button
               onClick={(e: MouseEvent) => {
                 e.stopPropagation();
-                window.location.href = `mailto:${employee.email}`;
+                if (employee.email) window.location.href = `mailto:${employee.email}`;
               }}
               className="flex items-center gap-1.5 text-muted-foreground hover:text-foreground transition-colors flex-1 min-w-0"
             >
@@ -204,7 +207,7 @@ function FeaturedEmployeeCard({
             <button
               onClick={(e: MouseEvent) => {
                 e.stopPropagation();
-                window.location.href = `tel:${employee.phone}`;
+                if (employee.phone) window.location.href = `tel:${employee.phone}`;
               }}
               className="flex items-center gap-1.5 text-muted-foreground hover:text-foreground transition-colors"
             >
@@ -288,8 +291,9 @@ export function FeaturedEmployees({
     router.push(`/directorio/${employeeId}`);
   };
 
-  const copyToClipboard = (e: MouseEvent, text: string, field: string) => {
+  const copyToClipboard = (e: MouseEvent, text: string | null | undefined, field: string) => {
     e.stopPropagation();
+    if (!text) return;
     navigator.clipboard.writeText(text);
     setCopiedField(field);
     toast.success("Copiado al portapapeles", { duration: 2000 });
