@@ -101,6 +101,15 @@ export function Navbar() {
         backdropFilter: scrolled ? 'blur(20px) saturate(180%)' : undefined,
       }}
     >
+      {/* Company Theme Tint Overlay */}
+      <div
+        className="absolute inset-0 pointer-events-none"
+        style={{
+          background: 'var(--theme-navbar-tint, rgba(0,0,0,0))',
+          transition: 'background 600ms ease',
+        }}
+        aria-hidden="true"
+      />
       <nav className="container mx-auto px-4 flex items-center justify-between">
           <Link
             href="/"

@@ -19,6 +19,14 @@
   --font-2xl:  calc(1.5rem * var(--font-scale));
   --font-3xl:  calc(2rem * var(--font-scale));
   
+  /* Company Theme Variables - Default (Iridescent) */
+  --theme-primary: #00C9A7;
+  --theme-secondary: #845EC2;
+  --theme-glow: rgba(0,201,167,0.12);
+  --theme-navbar-tint: rgba(0,0,0,0);
+  --theme-bg-glow-a: rgba(0,201,167,0.06);
+  --theme-bg-glow-b: rgba(132,94,194,0.05);
+  
   /* Base Colors */
   --bg-base: #080810;
   --bg-surface: #0F0F1A;
@@ -208,6 +216,41 @@
 
 .scrollbar-hide::-webkit-scrollbar {
   display: none;
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   CARD CASCADE ANIMATION
+   ═══════════════════════════════════════════════════════════════════ */
+
+@keyframes cardRain {
+  0% {
+    opacity: 0;
+    transform: translateY(-16px) scale(0.96);
+    filter: blur(4px);
+  }
+  60% {
+    opacity: 1;
+    filter: blur(0);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+    filter: blur(0);
+  }
+}
+
+.card-rain {
+  animation: cardRain 400ms cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .card-rain {
+    animation: fadeInSimple 200ms ease both;
+  }
+  @keyframes fadeInSimple {
+    from { opacity: 0; }
+    to   { opacity: 1; }
+  }
 }
 
 /* ═══════════════════════════════════════════════════════════════════
@@ -509,7 +552,7 @@
   }
 }
 
-/* ══════════════════════════════════════════════════════════════��════
+/* ══════════════════════════════════════════════════════════════���════
    MONOGRAM AVATAR
    ═══════════════════════════════════════════════════════════════════ */
 

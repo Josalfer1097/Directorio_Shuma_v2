@@ -23,6 +23,7 @@ import { ExtensionDirectory } from "@/components/extension-directory";
 import { DepartmentView } from "@/components/department-view";
 import type { ViewMode, Employee } from "@/types";
 import { useFavorites } from "@/lib/useFavorites";
+import { useCompanyTheme, ActiveTheme } from "@/lib/CompanyThemeContext";
 
 const ITEMS_PER_PAGE = 12;
 
@@ -69,8 +70,39 @@ function DirectoryContent() {
   const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
   const [showFavoritesOnly, setShowFavoritesOnly] = useState(false);
   const [deptView, setDeptView] = useState<string | null>(null);
+  const [showCardAnimation, setShowCardAnimation] = useState(true);
+  const hasAnimated = useRef(false);
   const searchInputRef = useRef<HTMLInputElement>(null);
   const { favorites } = useFavorites();
+  const { setActiveTheme } = useCompanyTheme();
+
+  // Company theme immersion - single company filter triggers theme change
+  useEffect(() => {
+    if (selectedCompanies.length === 1) {
+      const companyId = selectedCompanies[0];
+      // Map company IDs to theme names
+      const themeMap: Record<string, ActiveTheme> = {
+        'comercializadora': 'comercializadora',
+        'acabados': 'acabados',
+        'ferrecapital': 'ferrecapital',
+        'arkiramica': 'arkiramica',
+      };
+      setActiveTheme(themeMap[companyId] || 'default');
+    } else {
+      setActiveTheme('default');
+    }
+  }, [selectedCompanies, setActiveTheme]);
+
+  // First load animation - only on initial mount
+  useEffect(() => {
+    if (employees.length > 0 && !hasAnimated.current) {
+      hasAnimated.current = true;
+      setShowCardAnimation(true);
+      // After cards animate, disable for subsequent renders
+      const timer = setTimeout(() => setShowCardAnimation(false), 1200);
+      return () => clearTimeout(timer);
+    }
+  }, [employees.length]);
 
   // Cmd+K / Ctrl+K keyboard shortcut to focus search
   useEffect(() => {
@@ -307,7 +339,7 @@ function DirectoryContent() {
                                 employee={employee}
                                 company={company}
                                 view={viewMode}
-                                index={index}
+                                index={showCardAnimation ? index : -1}
                                 hideCompanyBadge={hideCompanyBadge}
                             />
                         );

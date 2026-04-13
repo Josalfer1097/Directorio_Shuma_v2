@@ -285,13 +285,20 @@ export function EmployeeCard({
     );
   }
 
+  // Card cascade animation - only on first load (index >= 0)
+  const shouldAnimate = index >= 0;
+  const animationDelay = shouldAnimate ? `${Math.min(index * 30, 600)}ms` : '0ms';
+
   // Grid view - reduced height ~200px
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.18, delay: index * 0.04, ease: premiumEase }}
-      className="will-change-transform gpu-accelerated"
+    <div
+      className={cn(
+        "will-change-transform gpu-accelerated",
+        shouldAnimate && "card-rain"
+      )}
+      style={{
+        animationDelay: shouldAnimate ? animationDelay : undefined,
+      }}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
@@ -523,6 +530,6 @@ export function EmployeeCard({
           </div>
         </div>
       </Link>
-    </motion.div>
+    </div>
   );
 }
