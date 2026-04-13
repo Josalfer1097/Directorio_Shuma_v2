@@ -18,8 +18,19 @@
   --font-xl:   calc(1.25rem * var(--font-scale));
   --font-2xl:  calc(1.5rem * var(--font-scale));
   --font-3xl:  calc(2rem * var(--font-scale));
-  
-  /* Company Theme Variables - Default (Iridescent) */
+}
+
+/* Font Scale Utility Classes - Turbopack compatible */
+.text-scale-xs   { font-size: var(--font-xs);   }
+.text-scale-sm   { font-size: var(--font-sm);   }
+.text-scale-base { font-size: var(--font-base); }
+.text-scale-md   { font-size: var(--font-md);   }
+.text-scale-lg   { font-size: var(--font-lg);   }
+.text-scale-xl   { font-size: var(--font-xl);   }
+.text-scale-2xl  { font-size: var(--font-2xl);  }
+.text-scale-3xl  { font-size: var(--font-3xl);  }
+
+:root {
   --theme-primary: #00C9A7;
   --theme-secondary: #845EC2;
   --theme-glow: rgba(0,201,167,0.12);

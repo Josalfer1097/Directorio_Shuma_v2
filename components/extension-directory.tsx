@@ -45,9 +45,8 @@ const ExtensionRow = memo(function ExtensionRow({
       >
         {employee.extension ? (
           <span
-            className="inline-block font-mono font-bold"
+            className="inline-block font-mono font-bold text-scale-base"
             style={{
-              fontSize: "var(--font-base)",
               color: companyConfig.primary,
               background: `${companyConfig.primary}1f`,
               borderRadius: "6px",
@@ -57,7 +56,7 @@ const ExtensionRow = memo(function ExtensionRow({
             {employee.extension}
           </span>
         ) : (
-          <span className="text-white/20" style={{ fontSize: "var(--font-xs)" }}>--</span>
+          <span className="text-white/20 text-scale-xs">--</span>
         )}
       </td>
       {/* Name */}

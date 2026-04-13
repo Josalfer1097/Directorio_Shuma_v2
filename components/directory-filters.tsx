@@ -269,9 +269,8 @@ export function DirectoryFilters({
         {selectedDepartment !== "all" && (
           <button
             onClick={() => onDeptViewOpen(selectedDepartment)}
-            className="mt-2 w-full flex items-center justify-center gap-1.5 transition-colors cursor-pointer group"
+            className="mt-2 w-full flex items-center justify-center gap-1.5 transition-colors cursor-pointer group text-scale-xs"
             style={{
-              fontSize: "var(--font-xs)",
               color: "#00C9A7",
               background: "rgba(0,201,167,0.06)",
               border: "1px solid rgba(0,201,167,0.20)",
@@ -303,17 +302,16 @@ export function DirectoryFilters({
                   onCheckedChange={() => onDepartmentChange(selectedDepartment === dept ? "all" : dept)}
                 />
                 <span 
-                  className="text-white/60 hover:text-white/80 truncate transition-colors"
-                  style={{ fontSize: "var(--font-xs)", maxWidth: "120px" }}
+                  className="text-white/60 hover:text-white/80 truncate transition-colors text-scale-xs"
+                  style={{ maxWidth: "120px" }}
                 >
                   {dept}
                 </span>
               </label>
               <button
                 onClick={() => onDeptViewOpen(dept)}
-                className="flex items-center gap-1 transition-all shrink-0"
+                className="flex items-center gap-1 transition-all shrink-0 text-scale-xs"
                 style={{
-                  fontSize: "var(--font-xs)",
                   color: "rgba(255,255,255,0.35)",
                   background: "rgba(255,255,255,0.04)",
                   border: "1px solid rgba(255,255,255,0.08)",

@@ -130,9 +130,8 @@ export default function HomePage() {
                   }
                 `}</style>
                 <p 
-                  className="font-dm-sans"
+                  className="font-dm-sans text-scale-xl"
                   style={{
-                    fontSize: "var(--font-xl)",
                     fontWeight: 600,
                     color: "#FFFFFF",
                     letterSpacing: "0.01em",
@@ -155,9 +154,8 @@ export default function HomePage() {
                   <span style={{ color: "#00C2FF" }}>.</span>
                 </p>
                 <p 
-                  className="font-dm-sans"
+                  className="font-dm-sans text-scale-base"
                   style={{
-                    fontSize: "var(--font-base)",
                     fontWeight: 400,
                     color: "rgba(255,255,255,0.55)",
                     marginTop: "8px",
@@ -177,8 +175,8 @@ export default function HomePage() {
             >
               <Link href="/directorio" className="w-full sm:w-auto">
                 <button 
-                  className="w-full group flex items-center justify-center gap-3 px-8 py-4 rounded-full bg-text-primary text-bg-base tracking-widest transition-all hover:scale-105 active:scale-95"
-                  style={{ fontFamily: "var(--font-neuropol), var(--font-orbitron), 'Orbitron', 'Courier New', monospace", fontSize: "var(--font-base)" }}
+                  className="w-full group flex items-center justify-center gap-3 px-8 py-4 rounded-full bg-text-primary text-bg-base tracking-widest transition-all hover:scale-105 active:scale-95 text-scale-base"
+                  style={{ fontFamily: "var(--font-neuropol), var(--font-orbitron), 'Orbitron', 'Courier New', monospace" }}
                 >
                   Ver Directorio
                   <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
@@ -186,8 +184,8 @@ export default function HomePage() {
               </Link>
               <Link href="/organigrama" className="w-full sm:w-auto">
                 <button 
-                  className="w-full flex items-center justify-center gap-3 px-8 py-4 rounded-full border border-border-strong text-text-primary tracking-widest transition-all hover:bg-white/5 active:scale-95"
-                  style={{ fontFamily: "var(--font-neuropol), var(--font-orbitron), 'Orbitron', 'Courier New', monospace", fontSize: "var(--font-base)" }}
+                  className="w-full flex items-center justify-center gap-3 px-8 py-4 rounded-full border border-border-strong text-text-primary tracking-widest transition-all hover:bg-white/5 active:scale-95 text-scale-base"
+                  style={{ fontFamily: "var(--font-neuropol), var(--font-orbitron), 'Orbitron', 'Courier New', monospace" }}
                 >
                   <GitBranch className="w-4 h-4" />
                   Estructura
@@ -313,10 +311,9 @@ export default function HomePage() {
                           
                           {/* Company name */}
                           <h3 
-                            className="text-text-primary mb-3 leading-tight font-bold line-clamp-2"
+                            className="text-text-primary mb-3 leading-tight font-bold line-clamp-2 text-scale-md"
                             style={{ 
                               fontFamily: "var(--font-neuropol), var(--font-orbitron), 'Orbitron', monospace",
-                              fontSize: "var(--font-md)",
                               minHeight: "2.5em",
                             }}
                           >
@@ -327,11 +324,11 @@ export default function HomePage() {
                           <div className="space-y-1.5 mb-4">
                             <div className="flex items-center gap-2 text-text-muted">
                               <Users className="w-3.5 h-3.5" />
-                              <span className="font-dm-sans" style={{ fontSize: "var(--font-sm)" }}>{company.employeeCount} colaboradores</span>
+                              <span className="font-dm-sans text-scale-sm">{company.employeeCount} colaboradores</span>
                             </div>
                             <div className="flex items-center gap-2 text-text-muted">
                               <Layers className="w-3.5 h-3.5" />
-                              <span className="font-dm-sans" style={{ fontSize: "var(--font-sm)" }}>{company.departmentCount} departamentos</span>
+                              <span className="font-dm-sans text-scale-sm">{company.departmentCount} departamentos</span>
                             </div>
                           </div>
                           
@@ -359,8 +356,7 @@ export default function HomePage() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ delay: 0.3 }}
-              className="mt-12 flex flex-wrap items-center justify-center gap-x-6 gap-y-2 text-white/40"
-              style={{ fontSize: "var(--font-sm)" }}
+              className="mt-12 flex flex-wrap items-center justify-center gap-x-6 gap-y-2 text-white/40 text-scale-sm"
             >
               <span className="flex items-center gap-1.5">
                 <Users className="w-4 h-4" />
