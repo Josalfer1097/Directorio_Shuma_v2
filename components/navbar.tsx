@@ -1,9 +1,9 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
-import { useState, useEffect, useRef, useMemo } from "react";
-import { LayoutGrid, List, Menu, X } from "lucide-react";
+import { usePathname, useRouter } from "next/navigation";
+import { useState, useEffect, useRef, useMemo, useCallback } from "react";
+import { LayoutGrid, List, Menu, X, Phone } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import type { ViewMode } from "@/types";
 import { cn } from "@/lib/utils";
@@ -11,13 +11,47 @@ import { getEmployees } from "@/lib/data";
 
 export function Navbar() {
   const pathname = usePathname();
+  const router = useRouter();
   const [scrolled, setScrolled] = useState(false);
   const [mounted, setMounted] = useState(false);
   const [viewMode, setViewMode] = useState<ViewMode>("grid");
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [phoneTooltipVisible, setPhoneTooltipVisible] = useState(false);
   const longPressTimer = useRef<NodeJS.Timeout | null>(null);
   
   const employeeCount = useMemo(() => getEmployees().length, []);
+
+  // Check if currently on directory with quick+solo mode
+  const isQuickSoloActive = pathname === "/directorio" && typeof window !== "undefined" && 
+    localStorage.getItem("directorio-viewMode") === "extensions" &&
+    localStorage.getItem("directorio-quick-subMode") === "solo-extensiones";
+
+  // Navigate to extensions quick view
+  const handlePhoneClick = useCallback(() => {
+    // Set the view mode and sub-mode in localStorage
+    localStorage.setItem("directorio-viewMode", "extensions");
+    localStorage.setItem("directorio-quick-subMode", "solo-extensiones");
+    
+    if (pathname === "/directorio") {
+      // Already on directory - dispatch events to update view
+      window.dispatchEvent(new CustomEvent("view-mode-change", { detail: "extensions" }));
+      window.dispatchEvent(new CustomEvent("quick-submode-change", { detail: "solo-extensiones" }));
+      window.scrollTo({ top: 0, behavior: "smooth" });
+      // Focus search bar after a delay
+      setTimeout(() => {
+        const searchInput = document.querySelector('input[placeholder*="Buscar nombre o extension"]') as HTMLInputElement;
+        if (searchInput) searchInput.focus();
+      }, 300);
+    } else {
+      // Navigate to directory
+      router.push("/directorio");
+      // Focus search bar after navigation completes
+      setTimeout(() => {
+        const searchInput = document.querySelector('input[placeholder*="Buscar nombre o extension"]') as HTMLInputElement;
+        if (searchInput) searchInput.focus();
+      }, 500);
+    }
+  }, [pathname, router]);
 
   useEffect(() => {
     setMounted(true);
@@ -56,17 +90,21 @@ export function Navbar() {
     <>
     <header
       className={cn(
-        "fixed top-0 left-0 right-0 z-50 transition-all duration-300 h-[64px] flex items-center",
+        "fixed top-0 left-0 right-0 z-50 transition-all duration-300 h-[56px] md:h-[64px] flex items-center safe-top",
         scrolled
-          ? "bg-[--bg-base]/88 backdrop-blur-xl border-b border-white/8 saturate-[180%]"
+          ? "bg-[--bg-base]/88 -webkit-backdrop-filter-blur-xl backdrop-blur-xl border-b border-white/8 saturate-[180%]"
           : "bg-transparent border-b border-transparent"
       )}
+      style={{
+        WebkitBackdropFilter: scrolled ? 'blur(20px) saturate(180%)' : undefined,
+        backdropFilter: scrolled ? 'blur(20px) saturate(180%)' : undefined,
+      }}
     >
       <nav className="container mx-auto px-4 flex items-center justify-between">
           <Link
             href="/"
             style={{ fontFamily: "var(--font-neuropol), var(--font-orbitron), 'Orbitron', 'Courier New', monospace" }}
-            className="text-lg tracking-wider"
+            className="text-base md:text-lg tracking-wider max-w-[50%] truncate"
             onTouchStart={handleTouchStart}
             onTouchEnd={handleTouchEnd}
             onMouseDown={handleTouchStart}
@@ -105,6 +143,70 @@ export function Navbar() {
               <span className="absolute -bottom-1.5 left-0 right-0 h-0.5 bg-gradient-to-r from-[#C9A84C] to-[#E0C060] rounded-full" />
             )}
           </Link>
+
+          {/* Quick Extensions Button */}
+          <div className="relative">
+            <button
+              onClick={handlePhoneClick}
+              onMouseEnter={() => setPhoneTooltipVisible(true)}
+              onMouseLeave={() => setPhoneTooltipVisible(false)}
+              className="relative flex items-center justify-center transition-all duration-150 active:scale-95"
+              style={{
+                width: "36px",
+                height: "36px",
+                borderRadius: "8px",
+                background: isQuickSoloActive ? "rgba(0,201,167,0.15)" : "rgba(255,255,255,0.05)",
+                border: isQuickSoloActive ? "1px solid #00C9A7" : "1px solid rgba(255,255,255,0.08)",
+                boxShadow: isQuickSoloActive ? "0 0 8px rgba(0,201,167,0.25)" : "none",
+              }}
+              onMouseOver={(e) => {
+                if (!isQuickSoloActive) {
+                  e.currentTarget.style.background = "rgba(0,201,167,0.12)";
+                  e.currentTarget.style.borderColor = "rgba(0,201,167,0.35)";
+                  const icon = e.currentTarget.querySelector("svg");
+                  if (icon) (icon as SVGElement).style.color = "#00C9A7";
+                }
+              }}
+              onMouseOut={(e) => {
+                if (!isQuickSoloActive) {
+                  e.currentTarget.style.background = "rgba(255,255,255,0.05)";
+                  e.currentTarget.style.borderColor = "rgba(255,255,255,0.08)";
+                  const icon = e.currentTarget.querySelector("svg");
+                  if (icon) (icon as SVGElement).style.color = "rgba(255,255,255,0.6)";
+                }
+              }}
+            >
+              <Phone 
+                className="w-4 h-4" 
+                style={{ color: isQuickSoloActive ? "#00C9A7" : "rgba(255,255,255,0.6)" }} 
+              />
+            </button>
+            
+            {/* Tooltip */}
+            {phoneTooltipVisible && (
+              <div
+                className="absolute top-full left-1/2 -translate-x-1/2 mt-2 px-2 py-1 whitespace-nowrap pointer-events-none z-50"
+                style={{
+                  background: "#1A1A1A",
+                  border: "1px solid rgba(255,255,255,0.10)",
+                  borderRadius: "6px",
+                  fontSize: "0.7rem",
+                  color: "rgba(255,255,255,0.8)",
+                }}
+              >
+                Extensiones rapidas
+                {/* Arrow */}
+                <div
+                  className="absolute -top-1 left-1/2 -translate-x-1/2 w-2 h-2 rotate-45"
+                  style={{
+                    background: "#1A1A1A",
+                    borderTop: "1px solid rgba(255,255,255,0.10)",
+                    borderLeft: "1px solid rgba(255,255,255,0.10)",
+                  }}
+                />
+              </div>
+            )}
+          </div>
 
           {/* View Toggle - Always visible */}
           <button
@@ -161,14 +263,20 @@ export function Navbar() {
             animate={{ y: 0, opacity: 1 }}
             exit={{ y: -20, opacity: 0 }}
             transition={{ duration: 0.25, ease: [0.25, 0.46, 0.45, 0.94] }}
-            className="fixed top-[64px] left-0 right-0 z-50 md:hidden bg-[--bg-surface]/95 backdrop-blur-xl border-b border-white/8"
+            className="fixed top-[56px] md:top-[64px] left-0 right-0 z-50 md:hidden"
+            style={{
+              background: "rgba(15, 15, 26, 0.95)",
+              WebkitBackdropFilter: "blur(20px)",
+              backdropFilter: "blur(20px)",
+              borderBottom: "1px solid rgba(255,255,255,0.08)",
+            }}
           >
-            <nav className="container mx-auto px-4 py-6 flex flex-col gap-4">
+            <nav className="container mx-auto px-4 py-4 flex flex-col gap-2">
               <Link 
                 href="/directorio"
                 onClick={() => setMobileMenuOpen(false)}
                 className={cn(
-                  "font-neuropol text-base uppercase tracking-wider py-3 px-4 rounded-lg transition-all",
+                  "font-neuropol text-base uppercase tracking-wider py-3 px-4 rounded-lg transition-all min-h-[52px] flex items-center touch-manipulation",
                   pathname === "/directorio" 
                     ? "text-text-primary bg-white/5" 
                     : "text-text-muted hover:text-text-primary hover:bg-white/5"
@@ -180,7 +288,7 @@ export function Navbar() {
                 href="/organigrama"
                 onClick={() => setMobileMenuOpen(false)}
                 className={cn(
-                  "font-neuropol text-base uppercase tracking-wider py-3 px-4 rounded-lg transition-all",
+                  "font-neuropol text-base uppercase tracking-wider py-3 px-4 rounded-lg transition-all min-h-[52px] flex items-center touch-manipulation",
                   pathname === "/organigrama" 
                     ? "text-text-primary bg-white/5" 
                     : "text-text-muted hover:text-text-primary hover:bg-white/5"

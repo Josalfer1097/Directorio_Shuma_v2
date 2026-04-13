@@ -305,10 +305,10 @@ export function FeaturedEmployees({
       <div className="flex items-center justify-between">
         <div>
           <h2 className="text-2xl font-bold text-foreground">
-            Equipo Directivo
+            Liderazgo Shuma
           </h2>
           <p className="text-muted-foreground">
-            Conoce a los líderes de Grupo Shuma
+            Las personas que guían el camino de nuestras empresas
           </p>
         </div>
         <div className="flex items-center gap-2">
@@ -341,6 +341,11 @@ export function FeaturedEmployees({
         initial="hidden"
         animate="visible"
         className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4"
+        style={{
+          // On mobile, show partial peek of next card
+          gridTemplateColumns: itemsPerPage === 1 ? 'minmax(0, 85vw)' : undefined,
+          justifyContent: itemsPerPage === 1 ? 'center' : undefined,
+        }}
       >
         {currentEmployees.map((employee) => {
           const companyConfig = getCompanyConfig(employee.company);
@@ -359,18 +364,20 @@ export function FeaturedEmployees({
         })}
       </motion.div>
 
-      {/* Pagination indicators */}
+      {/* Pagination indicators - always visible on mobile */}
       {totalPages > 1 && (
-        <div className="flex justify-center gap-2">
+        <div className="flex justify-center gap-2 py-2">
           {Array.from({ length: totalPages }).map((_, i) => (
             <button
               key={i}
               onClick={() => setCurrentIndex(i)}
-              className={`w-2 h-2 rounded-full transition-all duration-[180ms] ${
+              className={`h-2 rounded-full transition-all duration-[180ms] touch-manipulation ${
                 i === currentIndex
                   ? "w-6 bg-primary"
-                  : "bg-muted-foreground/30 hover:bg-muted-foreground/50"
+                  : "w-2 bg-muted-foreground/30 hover:bg-muted-foreground/50"
               }`}
+              style={{ minWidth: '8px' }}
+              aria-label={`Go to slide ${i + 1}`}
             />
           ))}
         </div>

@@ -48,6 +48,15 @@ function DirectoryContent() {
   useEffect(() => {
     localStorage.setItem("directorio-viewMode", viewMode);
   }, [viewMode]);
+
+  // Listen for view mode changes from navbar
+  useEffect(() => {
+    const handleViewModeChange = (e: CustomEvent<ViewMode>) => {
+      setViewMode(e.detail);
+    };
+    window.addEventListener("view-mode-change", handleViewModeChange as EventListener);
+    return () => window.removeEventListener("view-mode-change", handleViewModeChange as EventListener);
+  }, []);
   const [currentPage, setCurrentPage] = useState(1);
   const [selectedCompanies, setSelectedCompanies] = useState<string[]>(
       initialCompany ? [initialCompany] : []
@@ -206,6 +215,7 @@ function DirectoryContent() {
                           onChange={(e) => setSearchQuery(e.target.value)}
                           className="pl-10 w-full"
                           aria-describedby="search-description"
+                          style={{ fontSize: '16px' }} // 16px minimum prevents iOS Safari auto-zoom on focus
                       />
                       <span id="search-description" className="sr-only">
                         Escribe para buscar empleados por nombre, puesto, departamento o extensión
