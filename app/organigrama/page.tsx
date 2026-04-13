@@ -33,7 +33,7 @@ function OrgChartLoading() {
           animation: 'spin 1s linear infinite'
         }} 
       />
-      <span style={{ fontSize: '0.8rem', letterSpacing: '0.1em' }}>
+      <span style={{ fontSize: 'var(--font-sm)', letterSpacing: '0.1em' }}>
         Cargando organigrama...
       </span>
       <style>{`@keyframes spin { to { transform: rotate(360deg) } }`}</style>

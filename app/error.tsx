@@ -30,7 +30,7 @@ export default function Error({
     >
       <div
         style={{
-          fontSize: '0.7rem',
+          fontSize: 'var(--font-xs)',
           letterSpacing: '0.2em',
           color: 'rgba(255,255,255,0.3)',
           textTransform: 'uppercase',
@@ -38,7 +38,7 @@ export default function Error({
       >
         Error del sistema
       </div>
-      <div style={{ fontSize: '1.1rem', color: 'rgba(255,255,255,0.5)' }}>
+      <div style={{ fontSize: 'var(--font-lg)', color: 'rgba(255,255,255,0.5)' }}>
         Algo salio mal. Por favor intenta de nuevo.
       </div>
       <button
@@ -51,7 +51,7 @@ export default function Error({
           borderRadius: '10px',
           color: 'white',
           cursor: 'pointer',
-          fontSize: '0.85rem',
+          fontSize: 'var(--font-base)',
         }}
       >
         Reintentar

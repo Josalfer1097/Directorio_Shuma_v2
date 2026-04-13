@@ -3,7 +3,7 @@
 import React from "react";
 
 const SIGNATURE_TEXT = "DESIGNED & POWERED BY SHUMA SISTEMAS IT";
-const VERSION = "v1.2.1";
+const VERSION = "v2.3.2";
 
 export function RgbSignature() {
   return (

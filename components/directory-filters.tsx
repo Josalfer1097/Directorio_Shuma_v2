@@ -1,7 +1,7 @@
 "use client";
 
 import { motion, AnimatePresence } from "framer-motion";
-import { X, Filter, Download, Star } from "lucide-react";
+import { X, Filter, Download, Star, ChevronRight } from "lucide-react";
 import { useFavorites } from "@/lib/useFavorites";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
@@ -45,6 +45,7 @@ interface DirectoryFiltersProps {
   onDepartmentChange: (department: string) => void;
   onLocationChange: (locations: string[]) => void;
   onFavoritesToggle: (show: boolean) => void;
+  onDeptViewOpen: (department: string) => void;
   onClearFilters: () => void;
   filteredEmployees: Employee[];
 }
@@ -61,6 +62,7 @@ export function DirectoryFilters({
   onDepartmentChange,
   onLocationChange,
   onFavoritesToggle,
+  onDeptViewOpen,
   onClearFilters,
   filteredEmployees,
 }: DirectoryFiltersProps) {
@@ -262,6 +264,67 @@ export function DirectoryFilters({
             ))}
           </SelectContent>
         </Select>
+        
+        {/* Department View Link - only when a specific department is selected */}
+        {selectedDepartment !== "all" && (
+          <button
+            onClick={() => onDeptViewOpen(selectedDepartment)}
+            className="mt-2 flex items-center gap-1 transition-colors cursor-pointer group"
+            style={{
+              fontSize: "var(--font-xs)",
+              color: "rgba(255,255,255,0.35)",
+            }}
+            onMouseEnter={(e) => e.currentTarget.style.color = "#00C9A7"}
+            onMouseLeave={(e) => e.currentTarget.style.color = "rgba(255,255,255,0.35)"}
+          >
+            <span>Ver vista de departamento</span>
+            <ChevronRight className="w-3 h-3 transition-transform group-hover:translate-x-0.5" />
+          </button>
+        )}
+
+        {/* Department Quick List with arrows */}
+        <div className="mt-4 space-y-1">
+          {departments.slice(0, 8).map((dept) => (
+            <div 
+              key={dept}
+              className="flex items-center justify-between group"
+            >
+              <label 
+                className="flex items-center gap-2 cursor-pointer flex-1 py-1"
+              >
+                <Checkbox
+                  checked={selectedDepartment === dept}
+                  onCheckedChange={() => onDepartmentChange(selectedDepartment === dept ? "all" : dept)}
+                />
+                <span 
+                  className="text-xs text-white/60 group-hover:text-white/80 truncate transition-colors"
+                  style={{ maxWidth: "140px" }}
+                >
+                  {dept}
+                </span>
+              </label>
+              <button
+                onClick={() => onDeptViewOpen(dept)}
+                className="w-6 h-6 flex items-center justify-center rounded transition-all"
+                style={{
+                  color: "rgba(255,255,255,0.25)",
+                  background: "transparent",
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.color = "#00C9A7";
+                  e.currentTarget.style.background = "rgba(255,255,255,0.06)";
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.color = "rgba(255,255,255,0.25)";
+                  e.currentTarget.style.background = "transparent";
+                }}
+                title="Ver departamento"
+              >
+                <ChevronRight className="w-3.5 h-3.5" />
+              </button>
+            </div>
+          ))}
+        </div>
       </div>
 
       {/* Locations */}

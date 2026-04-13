@@ -194,7 +194,7 @@ export function Navbar() {
                   background: "#1A1A1A",
                   border: "1px solid rgba(255,255,255,0.10)",
                   borderRadius: "6px",
-                  fontSize: "0.7rem",
+                  fontSize: "var(--font-xs)",
                   color: "rgba(255,255,255,0.8)",
                 }}
               >

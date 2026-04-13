@@ -1,6 +1,6 @@
 "use client";
 
-import { use, useState, useRef, useEffect, Component, ReactNode } from "react";
+import { use, useState, Component, ReactNode } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { notFound, useRouter } from "next/navigation";
 import { toast } from "sonner";
@@ -15,9 +15,6 @@ import {
   MapPin,
   Star,
   ClipboardList,
-  QrCode,
-  Download,
-  ChevronDown,
 } from "lucide-react";
 import {
   getEmployeeById,
@@ -26,7 +23,6 @@ import {
 import { getCompanyConfig } from "@/lib/companyConfig";
 import { useFavorites } from "@/lib/useFavorites";
 import { haptics } from "@/lib/haptics";
-import QRCode from "qrcode";
 
 interface Props {
   params: Promise<{ id: string }>;
@@ -72,8 +68,6 @@ class EmployeeDetailErrorBoundary extends Component<
 function EmployeeDetailContent({ id }: { id: string }) {
   const router = useRouter();
   const [copiedField, setCopiedField] = useState<string | null>(null);
-  const [showQr, setShowQr] = useState(false);
-  const [qrDataUrl, setQrDataUrl] = useState<string | null>(null);
   const [copyAllState, setCopyAllState] = useState<'idle' | 'copied'>('idle');
   const { isFavorite, toggleFavorite } = useFavorites();
 
@@ -85,24 +79,6 @@ function EmployeeDetailContent({ id }: { id: string }) {
   const isEmployeeFavorite = isFavorite(employee.id);
   const company = getCompanyById(employee.company);
   const config = getCompanyConfig(employee.company);
-
-  // Generate QR code when showQr is toggled on
-  useEffect(() => {
-    if (showQr && !qrDataUrl) {
-      const url = `${window.location.origin}/directorio/${id}`;
-      QRCode.toDataURL(url, {
-        width: 280,
-        margin: 2,
-        color: {
-          dark: '#000000',
-          light: '#FFFFFF',
-        },
-        errorCorrectionLevel: 'M',
-      })
-        .then((dataUrl: string) => setQrDataUrl(dataUrl))
-        .catch(() => toast.error("Error generando QR"));
-    }
-  }, [showQr, qrDataUrl, id]);
 
   const handleClose = () => {
     haptics.soft();
@@ -153,15 +129,6 @@ function EmployeeDetailContent({ id }: { id: string }) {
     } catch {
       toast.error("Error al copiar");
     }
-  };
-
-  const downloadQr = () => {
-    if (!qrDataUrl) return;
-    const link = document.createElement('a');
-    link.href = qrDataUrl;
-    const slug = employee.name.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '');
-    link.download = `qr-${slug}.png`;
-    link.click();
   };
 
   const handleToggleFavorite = () => {
@@ -309,7 +276,7 @@ function EmployeeDetailContent({ id }: { id: string }) {
                 className="text-white font-bold"
                 style={{ 
                   fontFamily: "var(--font-neuropol), var(--font-orbitron), 'Orbitron', 'Courier New', monospace",
-                  fontSize: '1.6rem',
+                  fontSize: 'var(--font-2xl)',
                 }}
               >
                 {getInitials(employee.name)}
@@ -347,7 +314,7 @@ function EmployeeDetailContent({ id }: { id: string }) {
                 background: `color-mix(in srgb, ${config.primary} 18%, transparent)`,
                 border: `1px solid color-mix(in srgb, ${config.primary} 45%, transparent)`,
                 color: config.highlight,
-                fontSize: '0.65rem',
+                fontSize: 'var(--font-xs)',
                 fontFamily: "var(--font-neuropol), var(--font-orbitron), 'Orbitron', 'Courier New', monospace",
                 textTransform: 'uppercase',
                 letterSpacing: '0.1em',
@@ -368,7 +335,7 @@ function EmployeeDetailContent({ id }: { id: string }) {
               <p 
                 className="mb-1"
                 style={{ 
-                  fontSize: '0.6rem', 
+                  fontSize: 'var(--font-xs)', 
                   color: 'rgba(255,255,255,0.27)', 
                   textTransform: 'uppercase',
                   letterSpacing: '0.1em',
@@ -386,7 +353,7 @@ function EmployeeDetailContent({ id }: { id: string }) {
               <p 
                 className="mb-1"
                 style={{ 
-                  fontSize: '0.6rem', 
+                  fontSize: 'var(--font-xs)', 
                   color: 'rgba(255,255,255,0.27)', 
                   textTransform: 'uppercase',
                   letterSpacing: '0.1em',
@@ -404,7 +371,7 @@ function EmployeeDetailContent({ id }: { id: string }) {
               <p 
                 className="mb-1"
                 style={{ 
-                  fontSize: '0.6rem', 
+                  fontSize: 'var(--font-xs)', 
                   color: 'rgba(255,255,255,0.27)', 
                   textTransform: 'uppercase',
                   letterSpacing: '0.1em',
@@ -422,7 +389,7 @@ function EmployeeDetailContent({ id }: { id: string }) {
               <p 
                 className="mb-1"
                 style={{ 
-                  fontSize: '0.6rem', 
+                  fontSize: 'var(--font-xs)', 
                   color: 'rgba(255,255,255,0.27)', 
                   textTransform: 'uppercase',
                   letterSpacing: '0.1em',
@@ -454,7 +421,7 @@ function EmployeeDetailContent({ id }: { id: string }) {
               <p 
                 className="mb-1"
                 style={{ 
-                  fontSize: '0.6rem', 
+                  fontSize: 'var(--font-xs)', 
                   color: 'rgba(255,255,255,0.27)', 
                   textTransform: 'uppercase',
                   letterSpacing: '0.1em',
@@ -489,7 +456,7 @@ function EmployeeDetailContent({ id }: { id: string }) {
               <p 
                 className="mb-1"
                 style={{ 
-                  fontSize: '0.6rem', 
+                  fontSize: 'var(--font-xs)', 
                   color: 'rgba(255,255,255,0.27)', 
                   textTransform: 'uppercase',
                   letterSpacing: '0.1em',
@@ -666,74 +633,6 @@ function EmployeeDetailContent({ id }: { id: string }) {
             )}
           </button>
         </div>
-
-        {/* QR Code Section */}
-        <div className="px-7 pb-5">
-          <button
-            onClick={() => setShowQr(!showQr)}
-            className="w-full rounded-[10px] flex items-center justify-center gap-1.5 transition-all duration-[180ms]"
-            style={{
-              height: '36px',
-              background: 'rgba(255,255,255,0.02)',
-              border: '1px solid rgba(255,255,255,0.06)',
-              color: 'rgba(255,255,255,0.35)',
-              fontSize: 'var(--font-sm)',
-            }}
-          >
-            <QrCode className="w-3.5 h-3.5" />
-            <span>{showQr ? 'Cerrar QR' : 'Ver QR'}</span>
-            <ChevronDown className={`w-3.5 h-3.5 transition-transform ${showQr ? 'rotate-180' : ''}`} />
-          </button>
-
-          {/* QR Expanded */}
-          <AnimatePresence>
-            {showQr && (
-              <motion.div
-                initial={{ height: 0, opacity: 0 }}
-                animate={{ height: 'auto', opacity: 1 }}
-                exit={{ height: 0, opacity: 0 }}
-                transition={{ duration: 0.2 }}
-                className="overflow-hidden"
-              >
-                <div className="pt-4 flex flex-col items-center">
-                  {qrDataUrl ? (
-                    <>
-                      <div 
-                        className="p-2 rounded-lg"
-                        style={{ background: 'white' }}
-                      >
-                        <img src={qrDataUrl} alt="QR Code" style={{ width: '140px', height: '140px' }} />
-                      </div>
-                      <p 
-                        className="mt-2 text-center"
-                        style={{ fontSize: 'var(--font-xs)', color: 'rgba(255,255,255,0.4)' }}
-                      >
-                        Escanea para abrir esta tarjeta
-                      </p>
-                      <button
-                        onClick={downloadQr}
-                        className="mt-3 flex items-center gap-1.5 px-4 py-2 rounded-lg transition-colors"
-                        style={{
-                          background: 'rgba(255,255,255,0.04)',
-                          border: '1px solid rgba(255,255,255,0.08)',
-                          color: 'rgba(255,255,255,0.6)',
-                          fontSize: 'var(--font-sm)',
-                        }}
-                      >
-                        <Download className="w-3.5 h-3.5" />
-                        Descargar QR
-                      </button>
-                    </>
-                  ) : (
-                    <div className="py-4 text-center" style={{ color: 'rgba(255,255,255,0.4)' }}>
-                      Generando QR...
-                    </div>
-                  )}
-                </div>
-              </motion.div>
-            )}
-          </AnimatePresence>
-        </div>
       </motion.div>
 
       {/* Mobile Modal - Bottom Sheet */}
@@ -830,7 +729,7 @@ function EmployeeDetailContent({ id }: { id: string }) {
                 className="text-white font-bold"
                 style={{ 
                   fontFamily: "var(--font-neuropol), var(--font-orbitron), 'Orbitron', 'Courier New', monospace",
-                  fontSize: '1.3rem',
+                  fontSize: 'var(--font-xl)',
                 }}
               >
                 {getInitials(employee.name)}
@@ -842,7 +741,7 @@ function EmployeeDetailContent({ id }: { id: string }) {
               className="text-white font-bold mt-3"
               style={{ 
                 fontFamily: "'DM Sans', sans-serif",
-                fontSize: '1.15rem',
+                fontSize: 'var(--font-lg)',
                 fontWeight: 700,
               }}
             >
@@ -854,7 +753,7 @@ function EmployeeDetailContent({ id }: { id: string }) {
               className="italic mt-1"
               style={{ 
                 color: config.primary,
-                fontSize: '0.8rem',
+                fontSize: 'var(--font-sm)',
                 fontFamily: "'DM Sans', sans-serif",
               }}
             >
@@ -868,7 +767,7 @@ function EmployeeDetailContent({ id }: { id: string }) {
                 background: `color-mix(in srgb, ${config.primary} 18%, transparent)`,
                 border: `1px solid color-mix(in srgb, ${config.primary} 45%, transparent)`,
                 color: config.highlight,
-                fontSize: '0.6rem',
+                fontSize: 'var(--font-xs)',
                 fontFamily: "var(--font-neuropol), var(--font-orbitron), 'Orbitron', 'Courier New', monospace",
                 textTransform: 'uppercase',
                 letterSpacing: '0.1em',
@@ -889,7 +788,7 @@ function EmployeeDetailContent({ id }: { id: string }) {
               <p 
                 className="mb-0.5"
                 style={{ 
-                  fontSize: '0.55rem', 
+                  fontSize: 'var(--font-xs)', 
                   color: 'rgba(255,255,255,0.27)', 
                   textTransform: 'uppercase',
                   letterSpacing: '0.1em',
@@ -897,7 +796,7 @@ function EmployeeDetailContent({ id }: { id: string }) {
               >
                 Departamento
               </p>
-              <p style={{ fontSize: '0.8rem', color: '#FFFFFF', fontWeight: 500 }}>
+              <p style={{ fontSize: 'var(--font-sm)', color: '#FFFFFF', fontWeight: 500 }}>
                 {employee.department || "—"}
               </p>
             </div>
@@ -907,7 +806,7 @@ function EmployeeDetailContent({ id }: { id: string }) {
               <p 
                 className="mb-0.5"
                 style={{ 
-                  fontSize: '0.55rem', 
+                  fontSize: 'var(--font-xs)', 
                   color: 'rgba(255,255,255,0.27)', 
                   textTransform: 'uppercase',
                   letterSpacing: '0.1em',
@@ -915,7 +814,7 @@ function EmployeeDetailContent({ id }: { id: string }) {
               >
                 Empresa
               </p>
-              <p style={{ fontSize: '0.8rem', color: '#FFFFFF', fontWeight: 500 }}>
+              <p style={{ fontSize: 'var(--font-sm)', color: '#FFFFFF', fontWeight: 500 }}>
                 {company?.shortName || "—"}
               </p>
             </div>
@@ -925,7 +824,7 @@ function EmployeeDetailContent({ id }: { id: string }) {
               <p 
                 className="mb-0.5"
                 style={{ 
-                  fontSize: '0.55rem', 
+                  fontSize: 'var(--font-xs)', 
                   color: 'rgba(255,255,255,0.27)', 
                   textTransform: 'uppercase',
                   letterSpacing: '0.1em',
@@ -933,7 +832,7 @@ function EmployeeDetailContent({ id }: { id: string }) {
               >
                 Telefono
               </p>
-              <p style={{ fontSize: '0.8rem', color: '#FFFFFF', fontWeight: 500 }}>
+              <p style={{ fontSize: 'var(--font-sm)', color: '#FFFFFF', fontWeight: 500 }}>
                 {employee.phone || "—"}
               </p>
             </div>
@@ -943,7 +842,7 @@ function EmployeeDetailContent({ id }: { id: string }) {
               <p 
                 className="mb-0.5"
                 style={{ 
-                  fontSize: '0.55rem', 
+                  fontSize: 'var(--font-xs)', 
                   color: 'rgba(255,255,255,0.27)', 
                   textTransform: 'uppercase',
                   letterSpacing: '0.1em',
@@ -952,13 +851,13 @@ function EmployeeDetailContent({ id }: { id: string }) {
                 Extension
               </p>
               {employee.extension && employee.extension !== "—" ? (
-                <p style={{ fontSize: '0.8rem', color: '#FFFFFF', fontWeight: 500 }}>
+                <p style={{ fontSize: 'var(--font-sm)', color: '#FFFFFF', fontWeight: 500 }}>
                   {employee.extension}
                 </p>
               ) : (
                 <span 
                   style={{ 
-                    fontSize: '0.7rem', 
+                    fontSize: 'var(--font-xs)', 
                     color: 'rgba(255,255,255,0.3)',
                   }}
                 >
@@ -972,7 +871,7 @@ function EmployeeDetailContent({ id }: { id: string }) {
               <p 
                 className="mb-0.5"
                 style={{ 
-                  fontSize: '0.55rem', 
+                  fontSize: 'var(--font-xs)', 
                   color: 'rgba(255,255,255,0.27)', 
                   textTransform: 'uppercase',
                   letterSpacing: '0.1em',
@@ -980,7 +879,7 @@ function EmployeeDetailContent({ id }: { id: string }) {
               >
                 Email
               </p>
-              <p style={{ fontSize: '0.8rem', color: '#FFFFFF', fontWeight: 500, wordBreak: 'break-all' }}>
+              <p style={{ fontSize: 'var(--font-sm)', color: '#FFFFFF', fontWeight: 500, wordBreak: 'break-all' }}>
                 {employee.email || "—"}
               </p>
             </div>
@@ -1005,7 +904,7 @@ function EmployeeDetailContent({ id }: { id: string }) {
               background: copiedField === 'email' ? config.primary : 'rgba(255,255,255,0.04)',
               border: `1px solid ${copiedField === 'email' ? config.primary : 'rgba(255,255,255,0.08)'}`,
               color: copiedField === 'email' ? 'white' : 'rgba(255,255,255,0.44)',
-              fontSize: '0.8rem',
+              fontSize: 'var(--font-sm)',
             }}
           >
             {copiedField === 'email' ? (
@@ -1030,7 +929,7 @@ function EmployeeDetailContent({ id }: { id: string }) {
               background: 'rgba(255,255,255,0.04)',
               border: '1px solid rgba(255,255,255,0.08)',
               color: 'rgba(255,255,255,0.44)',
-              fontSize: '0.8rem',
+              fontSize: 'var(--font-sm)',
             }}
           >
             <MessageSquare className="w-4 h-4" />
@@ -1046,7 +945,7 @@ function EmployeeDetailContent({ id }: { id: string }) {
               background: copiedField === 'phone' ? config.primary : 'rgba(255,255,255,0.04)',
               border: `1px solid ${copiedField === 'phone' ? config.primary : 'rgba(255,255,255,0.08)'}`,
               color: copiedField === 'phone' ? 'white' : 'rgba(255,255,255,0.44)',
-              fontSize: '0.8rem',
+              fontSize: 'var(--font-sm)',
             }}
           >
             {copiedField === 'phone' ? (
@@ -1072,7 +971,7 @@ function EmployeeDetailContent({ id }: { id: string }) {
                 background: isEmployeeFavorite ? 'rgba(245,196,0,0.15)' : 'rgba(255,255,255,0.04)',
                 border: isEmployeeFavorite ? '1px solid rgba(245,196,0,0.4)' : '1px solid rgba(255,255,255,0.08)',
                 color: isEmployeeFavorite ? '#F5C400' : 'rgba(255,255,255,0.44)',
-                fontSize: '0.8rem',
+                fontSize: 'var(--font-sm)',
               }}
             >
               <Star className={`w-4 h-4 ${isEmployeeFavorite ? 'fill-[#F5C400]' : ''}`} />
@@ -1087,7 +986,7 @@ function EmployeeDetailContent({ id }: { id: string }) {
                 background: copyAllState === 'copied' ? '#00C9A7' : 'rgba(255,255,255,0.04)',
                 border: copyAllState === 'copied' ? '1px solid #00C9A7' : '1px solid rgba(255,255,255,0.08)',
                 color: copyAllState === 'copied' ? 'white' : 'rgba(255,255,255,0.44)',
-                fontSize: '0.8rem',
+                fontSize: 'var(--font-sm)',
               }}
             >
               {copyAllState === 'copied' ? (
@@ -1103,72 +1002,6 @@ function EmployeeDetailContent({ id }: { id: string }) {
               )}
             </button>
           </div>
-
-          {/* QR Button */}
-          <button
-            onClick={() => setShowQr(!showQr)}
-            className="w-full rounded-[10px] flex items-center justify-center gap-1.5 transition-all duration-[180ms]"
-            style={{
-              height: '40px',
-              background: 'rgba(255,255,255,0.02)',
-              border: '1px solid rgba(255,255,255,0.06)',
-              color: 'rgba(255,255,255,0.35)',
-              fontSize: '0.8rem',
-            }}
-          >
-            <QrCode className="w-4 h-4" />
-            <span>{showQr ? 'Cerrar QR' : 'Ver QR'}</span>
-            <ChevronDown className={`w-4 h-4 transition-transform ${showQr ? 'rotate-180' : ''}`} />
-          </button>
-
-          {/* QR Expanded */}
-          <AnimatePresence>
-            {showQr && (
-              <motion.div
-                initial={{ height: 0, opacity: 0 }}
-                animate={{ height: 'auto', opacity: 1 }}
-                exit={{ height: 0, opacity: 0 }}
-                transition={{ duration: 0.2 }}
-                className="overflow-hidden"
-              >
-                <div className="pt-2 flex flex-col items-center">
-                  {qrDataUrl ? (
-                    <>
-                      <div 
-                        className="p-2 rounded-lg"
-                        style={{ background: 'white' }}
-                      >
-                        <img src={qrDataUrl} alt="QR Code" style={{ width: '140px', height: '140px' }} />
-                      </div>
-                      <p 
-                        className="mt-2 text-center"
-                        style={{ fontSize: '0.7rem', color: 'rgba(255,255,255,0.4)' }}
-                      >
-                        Escanea para abrir esta tarjeta
-                      </p>
-                      <button
-                        onClick={downloadQr}
-                        className="mt-2 flex items-center gap-1.5 px-4 py-2 rounded-lg"
-                        style={{
-                          background: 'rgba(255,255,255,0.04)',
-                          border: '1px solid rgba(255,255,255,0.08)',
-                          color: 'rgba(255,255,255,0.6)',
-                          fontSize: '0.75rem',
-                        }}
-                      >
-                        <Download className="w-3.5 h-3.5" />
-                        Descargar QR
-                      </button>
-                    </>
-                  ) : (
-                    <div className="py-4 text-center" style={{ color: 'rgba(255,255,255,0.4)', fontSize: '0.75rem' }}>
-                      Generando QR...
-                    </div>
-                  )}
-                </div>
-              </motion.div>
-            )}
-          </AnimatePresence>
         </div>
       </motion.div>
     </div>

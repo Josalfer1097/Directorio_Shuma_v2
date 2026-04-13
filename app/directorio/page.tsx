@@ -20,6 +20,7 @@ import {
 } from "@/lib/data";
 import { MobileFiltersBottomSheet } from "@/components/mobile-filters-bottom-sheet";
 import { ExtensionDirectory } from "@/components/extension-directory";
+import { DepartmentView } from "@/components/department-view";
 import type { ViewMode, Employee } from "@/types";
 import { useFavorites } from "@/lib/useFavorites";
 
@@ -67,6 +68,7 @@ function DirectoryContent() {
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
   const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
   const [showFavoritesOnly, setShowFavoritesOnly] = useState(false);
+  const [deptView, setDeptView] = useState<string | null>(null);
   const searchInputRef = useRef<HTMLInputElement>(null);
   const { favorites } = useFavorites();
 
@@ -204,6 +206,7 @@ function DirectoryContent() {
                     onDepartmentChange={setSelectedDepartment}
                     onLocationChange={setSelectedLocations}
                     onFavoritesToggle={setShowFavoritesOnly}
+                    onDeptViewOpen={setDeptView}
                     onClearFilters={clearFilters}
                     filteredEmployees={filteredEmployees}
                 />
@@ -441,6 +444,12 @@ function DirectoryLoading() {
             </div>
           </div>
         </main>
+
+      {/* Department View Panel */}
+      <DepartmentView 
+        department={deptView} 
+        onClose={() => setDeptView(null)} 
+      />
       </div>
   );
 }
