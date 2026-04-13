@@ -48,6 +48,15 @@ function DirectoryContent() {
   useEffect(() => {
     localStorage.setItem("directorio-viewMode", viewMode);
   }, [viewMode]);
+
+  // Listen for view mode changes from navbar
+  useEffect(() => {
+    const handleViewModeChange = (e: CustomEvent<ViewMode>) => {
+      setViewMode(e.detail);
+    };
+    window.addEventListener("view-mode-change", handleViewModeChange as EventListener);
+    return () => window.removeEventListener("view-mode-change", handleViewModeChange as EventListener);
+  }, []);
   const [currentPage, setCurrentPage] = useState(1);
   const [selectedCompanies, setSelectedCompanies] = useState<string[]>(
       initialCompany ? [initialCompany] : []

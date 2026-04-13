@@ -194,7 +194,7 @@ const LocationSubHeader = memo(function LocationSubHeader({
   );
 });
 
-// Extension Card for Solo Extensiones mode
+// Extension Card for Solo Extensiones mode - redesigned
 const ExtensionCard = memo(function ExtensionCard({
   employee,
   companyConfig,
@@ -204,35 +204,138 @@ const ExtensionCard = memo(function ExtensionCard({
   companyConfig: ReturnType<typeof getCompanyConfig>;
   onClick: () => void;
 }) {
+  const isLongName = employee.name.length > 28;
+  
   return (
     <button
       onClick={onClick}
-      className="text-left w-full h-[72px] rounded-[10px] p-3 transition-all duration-150 hover:scale-[1.03] active:scale-[0.98] group"
+      className="text-left w-full relative overflow-hidden cursor-pointer group"
       style={{
-        background: "rgba(255,255,255,0.04)",
+        height: "88px",
+        borderRadius: "12px",
+        background: "rgba(255,255,255,0.03)",
         border: "1px solid rgba(255,255,255,0.07)",
-        borderLeftWidth: "3px",
+        borderLeftWidth: "4px",
         borderLeftColor: companyConfig.primary,
+        transition: "all 160ms cubic-bezier(0.25,0.46,0.45,0.94)",
+      }}
+      onMouseEnter={(e) => {
+        const el = e.currentTarget;
+        el.style.transform = "translateY(-2px) scale(1.02)";
+        el.style.borderColor = `rgba(${hexToRgb(companyConfig.primary)}, 0.30)`;
+        el.style.borderLeftColor = companyConfig.primary;
+        el.style.boxShadow = `0 0 0 1px rgba(${hexToRgb(companyConfig.primary)}, 0.20), 0 8px 24px rgba(${hexToRgb(companyConfig.primary)}, 0.12), 0 2px 8px rgba(0,0,0,0.40)`;
+        el.style.background = "rgba(255,255,255,0.055)";
+      }}
+      onMouseLeave={(e) => {
+        const el = e.currentTarget;
+        el.style.transform = "translateY(0) scale(1)";
+        el.style.borderColor = "rgba(255,255,255,0.07)";
+        el.style.borderLeftColor = companyConfig.primary;
+        el.style.boxShadow = "none";
+        el.style.background = "rgba(255,255,255,0.03)";
       }}
     >
-      <p 
-        className="text-[0.8rem] text-white font-semibold line-clamp-2 leading-tight mb-1 group-hover:text-white/90"
+      {/* Decorative watermark */}
+      <div
+        className="absolute pointer-events-none select-none"
+        style={{
+          right: "-8px",
+          top: "-8px",
+          fontFamily: "var(--font-neuropol), var(--font-orbitron), 'Orbitron', monospace",
+          fontSize: "52px",
+          fontWeight: 900,
+          color: companyConfig.primary,
+          opacity: 0.06,
+          zIndex: 0,
+        }}
       >
-        {employee.name}
-      </p>
-      {employee.extension ? (
-        <p 
-          className="font-mono font-bold text-[1.1rem]"
-          style={{ color: companyConfig.primary }}
+        {companyConfig.initial}
+      </div>
+
+      {/* Company dot */}
+      <div
+        className="absolute"
+        style={{
+          top: "10px",
+          right: "12px",
+          width: "6px",
+          height: "6px",
+          borderRadius: "50%",
+          background: companyConfig.primary,
+          opacity: 0.5,
+        }}
+      />
+
+      {/* Card content */}
+      <div
+        className="relative flex flex-col justify-between h-full"
+        style={{
+          padding: "14px 16px",
+          zIndex: 1,
+        }}
+      >
+        {/* Employee name */}
+        <p
+          className="text-white font-semibold leading-tight line-clamp-2"
+          style={{
+            fontSize: isLongName ? "0.75rem" : "0.82rem",
+            fontWeight: 600,
+          }}
         >
-          {employee.extension}
+          {employee.name}
         </p>
-      ) : (
-        <p className="text-[0.7rem] text-white/25">Sin ext.</p>
-      )}
+
+        {/* Extension pill */}
+        {employee.extension ? (
+          <div
+            className="inline-flex items-center gap-[5px] w-fit"
+            style={{
+              background: `rgba(${hexToRgb(companyConfig.primary)}, 0.12)`,
+              border: `1px solid rgba(${hexToRgb(companyConfig.primary)}, 0.25)`,
+              borderRadius: "6px",
+              padding: "3px 10px",
+              marginTop: "8px",
+            }}
+          >
+            <Phone size={10} style={{ color: companyConfig.primary }} />
+            <span
+              style={{
+                fontFamily: "monospace",
+                fontSize: "1rem",
+                fontWeight: 700,
+                color: companyConfig.primary,
+                letterSpacing: "0.05em",
+              }}
+            >
+              {employee.extension}
+            </span>
+          </div>
+        ) : (
+          <span
+            style={{
+              fontSize: "0.7rem",
+              color: "rgba(255,255,255,0.20)",
+              fontStyle: "italic",
+              marginTop: "8px",
+            }}
+          >
+            Sin extension
+          </span>
+        )}
+      </div>
     </button>
   );
 });
+
+// Helper function to convert hex to RGB
+function hexToRgb(hex: string): string {
+  const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+  if (result) {
+    return `${parseInt(result[1], 16)}, ${parseInt(result[2], 16)}, ${parseInt(result[3], 16)}`;
+  }
+  return "255, 255, 255";
+}
 
 // Resize handle component
 const ResizeHandle = memo(function ResizeHandle({
@@ -317,6 +420,28 @@ export function ExtensionDirectory({
     if (subMode === "solo-extensiones" && searchInputRef.current) {
       searchInputRef.current.focus();
     }
+  }, [subMode]);
+
+  // Listen for quick-submode-change from navbar
+  useEffect(() => {
+    const handleQuickSubModeChange = (e: CustomEvent<SubMode>) => {
+      setSubMode(e.detail);
+    };
+    window.addEventListener("quick-submode-change", handleQuickSubModeChange as EventListener);
+    return () => window.removeEventListener("quick-submode-change", handleQuickSubModeChange as EventListener);
+  }, []);
+
+  // Load subMode from localStorage on mount
+  useEffect(() => {
+    const saved = localStorage.getItem("directorio-quick-subMode");
+    if (saved === "completo" || saved === "solo-extensiones") {
+      setSubMode(saved);
+    }
+  }, []);
+
+  // Persist subMode to localStorage
+  useEffect(() => {
+    localStorage.setItem("directorio-quick-subMode", subMode);
   }, [subMode]);
 
   // Use internal search for both modes now
@@ -554,33 +679,70 @@ export function ExtensionDirectory({
       {/* Search Bar - only for solo-extensiones mode */}
       {subMode === "solo-extensiones" && (
         <div className="px-4 py-3 border-b border-white/5 print-hidden">
-          <div className="relative">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-white/40" />
+          <div 
+            className="relative"
+            style={{
+              height: "52px",
+            }}
+          >
+            <Search 
+              className="absolute top-1/2 -translate-y-1/2 w-5 h-5" 
+              style={{ left: "18px", color: "rgba(255,255,255,0.22)" }}
+            />
             <input
               ref={searchInputRef}
               type="text"
               placeholder="Buscar nombre o extension..."
               value={internalSearch}
               onChange={(e) => setInternalSearch(e.target.value)}
-              className="w-full h-12 md:h-[52px] pl-11 pr-10 rounded-xl text-white placeholder-white/30 focus:outline-none focus:ring-2 focus:ring-white/20"
+              className="w-full h-full text-white focus:outline-none"
               style={{
-                background: "rgba(255,255,255,0.05)",
-                border: "1px solid rgba(255,255,255,0.08)",
-                fontSize: "1rem",
+                paddingLeft: "50px",
+                paddingRight: internalSearch ? "48px" : "18px",
+                borderRadius: "14px",
+                background: "rgba(255,255,255,0.04)",
+                border: "1.5px solid rgba(255,255,255,0.10)",
+                fontSize: "0.95rem",
+                transition: "border-color 150ms, box-shadow 150ms",
+              }}
+              onFocus={(e) => {
+                e.currentTarget.style.borderColor = "#00C9A7";
+                e.currentTarget.style.boxShadow = "0 0 0 3px rgba(0,201,167,0.12)";
+              }}
+              onBlur={(e) => {
+                e.currentTarget.style.borderColor = "rgba(255,255,255,0.10)";
+                e.currentTarget.style.boxShadow = "none";
               }}
             />
             {internalSearch && (
               <button
                 onClick={() => setInternalSearch("")}
-                className="absolute right-3 top-1/2 -translate-y-1/2 w-6 h-6 flex items-center justify-center rounded-full bg-white/10 hover:bg-white/20 transition-colors"
+                className="absolute top-1/2 -translate-y-1/2 flex items-center justify-center rounded-full bg-white/10 hover:bg-white/20 transition-colors"
+                style={{
+                  right: "12px",
+                  width: "24px",
+                  height: "24px",
+                }}
               >
                 <X className="w-4 h-4 text-white/60" />
               </button>
             )}
           </div>
-          <p className="text-xs text-white/40 mt-2">
+          {/* Result count pill */}
+          <div
+            className="inline-block"
+            style={{
+              marginTop: "8px",
+              padding: "3px 12px",
+              borderRadius: "20px",
+              background: "rgba(255,255,255,0.05)",
+              border: "1px solid rgba(255,255,255,0.08)",
+              fontSize: "0.72rem",
+              color: "rgba(255,255,255,0.5)",
+            }}
+          >
             {totalCount} resultado{totalCount !== 1 ? "s" : ""}
-          </p>
+          </div>
         </div>
       )}
 
@@ -737,18 +899,39 @@ export function ExtensionDirectory({
       {subMode === "solo-extensiones" && (
         <div className="p-4">
           {totalCount > 0 ? (
-            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-2">
-              {sortedForCards.map((employee) => {
-                const companyConfig = getCompanyConfig(employee.company);
-                return (
-                  <ExtensionCard
-                    key={employee.id}
-                    employee={employee}
-                    companyConfig={companyConfig}
-                    onClick={() => handleRowClick(employee.id)}
-                  />
-                );
-              })}
+            <div 
+              className="grid gap-[10px]"
+              style={{
+                gridTemplateColumns: "repeat(2, 1fr)",
+              }}
+            >
+              <style>{`
+                @media (min-width: 480px) {
+                  .solo-ext-grid { grid-template-columns: repeat(2, 1fr) !important; }
+                }
+                @media (min-width: 768px) {
+                  .solo-ext-grid { grid-template-columns: repeat(3, 1fr) !important; }
+                }
+                @media (min-width: 1024px) {
+                  .solo-ext-grid { grid-template-columns: repeat(4, 1fr) !important; }
+                }
+                @media (min-width: 1280px) {
+                  .solo-ext-grid { grid-template-columns: repeat(5, 1fr) !important; }
+                }
+              `}</style>
+              <div className="solo-ext-grid grid gap-[10px]" style={{ gridTemplateColumns: "repeat(2, 1fr)" }}>
+                {sortedForCards.map((employee) => {
+                  const companyConfig = getCompanyConfig(employee.company);
+                  return (
+                    <ExtensionCard
+                      key={employee.id}
+                      employee={employee}
+                      companyConfig={companyConfig}
+                      onClick={() => handleRowClick(employee.id)}
+                    />
+                  );
+                })}
+              </div>
             </div>
           ) : (
             <div className="text-center py-16">

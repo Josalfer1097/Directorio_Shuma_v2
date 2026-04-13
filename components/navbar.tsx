@@ -1,9 +1,9 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
-import { useState, useEffect, useRef, useMemo } from "react";
-import { LayoutGrid, List, Menu, X } from "lucide-react";
+import { usePathname, useRouter } from "next/navigation";
+import { useState, useEffect, useRef, useMemo, useCallback } from "react";
+import { LayoutGrid, List, Menu, X, Phone } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import type { ViewMode } from "@/types";
 import { cn } from "@/lib/utils";
@@ -11,13 +11,47 @@ import { getEmployees } from "@/lib/data";
 
 export function Navbar() {
   const pathname = usePathname();
+  const router = useRouter();
   const [scrolled, setScrolled] = useState(false);
   const [mounted, setMounted] = useState(false);
   const [viewMode, setViewMode] = useState<ViewMode>("grid");
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [phoneTooltipVisible, setPhoneTooltipVisible] = useState(false);
   const longPressTimer = useRef<NodeJS.Timeout | null>(null);
   
   const employeeCount = useMemo(() => getEmployees().length, []);
+
+  // Check if currently on directory with quick+solo mode
+  const isQuickSoloActive = pathname === "/directorio" && typeof window !== "undefined" && 
+    localStorage.getItem("directorio-viewMode") === "extensions" &&
+    localStorage.getItem("directorio-quick-subMode") === "solo-extensiones";
+
+  // Navigate to extensions quick view
+  const handlePhoneClick = useCallback(() => {
+    // Set the view mode and sub-mode in localStorage
+    localStorage.setItem("directorio-viewMode", "extensions");
+    localStorage.setItem("directorio-quick-subMode", "solo-extensiones");
+    
+    if (pathname === "/directorio") {
+      // Already on directory - dispatch events to update view
+      window.dispatchEvent(new CustomEvent("view-mode-change", { detail: "extensions" }));
+      window.dispatchEvent(new CustomEvent("quick-submode-change", { detail: "solo-extensiones" }));
+      window.scrollTo({ top: 0, behavior: "smooth" });
+      // Focus search bar after a delay
+      setTimeout(() => {
+        const searchInput = document.querySelector('input[placeholder*="Buscar nombre o extension"]') as HTMLInputElement;
+        if (searchInput) searchInput.focus();
+      }, 300);
+    } else {
+      // Navigate to directory
+      router.push("/directorio");
+      // Focus search bar after navigation completes
+      setTimeout(() => {
+        const searchInput = document.querySelector('input[placeholder*="Buscar nombre o extension"]') as HTMLInputElement;
+        if (searchInput) searchInput.focus();
+      }, 500);
+    }
+  }, [pathname, router]);
 
   useEffect(() => {
     setMounted(true);
@@ -105,6 +139,70 @@ export function Navbar() {
               <span className="absolute -bottom-1.5 left-0 right-0 h-0.5 bg-gradient-to-r from-[#C9A84C] to-[#E0C060] rounded-full" />
             )}
           </Link>
+
+          {/* Quick Extensions Button */}
+          <div className="relative">
+            <button
+              onClick={handlePhoneClick}
+              onMouseEnter={() => setPhoneTooltipVisible(true)}
+              onMouseLeave={() => setPhoneTooltipVisible(false)}
+              className="relative flex items-center justify-center transition-all duration-150 active:scale-95"
+              style={{
+                width: "36px",
+                height: "36px",
+                borderRadius: "8px",
+                background: isQuickSoloActive ? "rgba(0,201,167,0.15)" : "rgba(255,255,255,0.05)",
+                border: isQuickSoloActive ? "1px solid #00C9A7" : "1px solid rgba(255,255,255,0.08)",
+                boxShadow: isQuickSoloActive ? "0 0 8px rgba(0,201,167,0.25)" : "none",
+              }}
+              onMouseOver={(e) => {
+                if (!isQuickSoloActive) {
+                  e.currentTarget.style.background = "rgba(0,201,167,0.12)";
+                  e.currentTarget.style.borderColor = "rgba(0,201,167,0.35)";
+                  const icon = e.currentTarget.querySelector("svg");
+                  if (icon) (icon as SVGElement).style.color = "#00C9A7";
+                }
+              }}
+              onMouseOut={(e) => {
+                if (!isQuickSoloActive) {
+                  e.currentTarget.style.background = "rgba(255,255,255,0.05)";
+                  e.currentTarget.style.borderColor = "rgba(255,255,255,0.08)";
+                  const icon = e.currentTarget.querySelector("svg");
+                  if (icon) (icon as SVGElement).style.color = "rgba(255,255,255,0.6)";
+                }
+              }}
+            >
+              <Phone 
+                className="w-4 h-4" 
+                style={{ color: isQuickSoloActive ? "#00C9A7" : "rgba(255,255,255,0.6)" }} 
+              />
+            </button>
+            
+            {/* Tooltip */}
+            {phoneTooltipVisible && (
+              <div
+                className="absolute top-full left-1/2 -translate-x-1/2 mt-2 px-2 py-1 whitespace-nowrap pointer-events-none z-50"
+                style={{
+                  background: "#1A1A1A",
+                  border: "1px solid rgba(255,255,255,0.10)",
+                  borderRadius: "6px",
+                  fontSize: "0.7rem",
+                  color: "rgba(255,255,255,0.8)",
+                }}
+              >
+                Extensiones rapidas
+                {/* Arrow */}
+                <div
+                  className="absolute -top-1 left-1/2 -translate-x-1/2 w-2 h-2 rotate-45"
+                  style={{
+                    background: "#1A1A1A",
+                    borderTop: "1px solid rgba(255,255,255,0.10)",
+                    borderLeft: "1px solid rgba(255,255,255,0.10)",
+                  }}
+                />
+              </div>
+            )}
+          </div>
 
           {/* View Toggle - Always visible */}
           <button

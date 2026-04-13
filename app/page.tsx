@@ -123,6 +123,12 @@ export default function HomePage() {
                 }}>MA</span>
               </h1>
               <div className="max-w-[560px] mx-auto mb-12 text-center">
+                <style>{`
+                  @keyframes shimmerText {
+                    0% { background-position: 0% center; }
+                    100% { background-position: 200% center; }
+                  }
+                `}</style>
                 <p 
                   className="font-dm-sans"
                   style={{
@@ -132,7 +138,21 @@ export default function HomePage() {
                     letterSpacing: "0.01em",
                   }}
                 >
-                  Cada persona<span style={{ color: "#00C9A7" }}>.</span> Cada empresa<span style={{ color: "#845EC2" }}>.</span> Un solo Grupo Shuma<span style={{ color: "#00C2FF" }}>.</span>
+                  Cada persona<span style={{ color: "#00C9A7" }}>.</span> Cada empresa<span style={{ color: "#845EC2" }}>.</span> Un solo{" "}
+                  <span
+                    style={{
+                      fontWeight: 800,
+                      background: "linear-gradient(90deg, #00C9A7, #845EC2, #00C2FF, #00C9A7)",
+                      backgroundSize: "200% auto",
+                      WebkitBackgroundClip: "text",
+                      WebkitTextFillColor: "transparent",
+                      backgroundClip: "text",
+                      animation: "shimmerText 3s linear infinite",
+                    }}
+                  >
+                    Shuma
+                  </span>
+                  <span style={{ color: "#00C2FF" }}>.</span>
                 </p>
                 <p 
                   className="font-dm-sans"
