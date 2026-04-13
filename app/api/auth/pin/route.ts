@@ -1,11 +1,32 @@
 import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
+import { ADMIN_COOKIE_MAX_AGE } from "@/lib/constants";
 
 const ADMIN_PIN = process.env.ADMIN_PASSWORD || "123456";
-const SESSION_DURATION = 8 * 60 * 60 * 1000; // 8 hours in ms
+const SESSION_DURATION = ADMIN_COOKIE_MAX_AGE * 1000;
+
+// Simple in-memory rate limiting
+const rateLimitMap = new Map<string, { count: number; timestamp: number }>();
 
 export async function POST(request: Request) {
   try {
+    const ip = request.headers.get("x-forwarded-for") || request.headers.get("x-real-ip") || "unknown";
+    const now = Date.now();
+    const rateLimit = rateLimitMap.get(ip) || { count: 0, timestamp: now };
+    
+    // Reset rate limit every minute
+    if (now - rateLimit.timestamp > 60000) {
+      rateLimit.count = 0;
+      rateLimit.timestamp = now;
+    }
+    
+    if (rateLimit.count >= 5) {
+      return NextResponse.json(
+        { success: false, error: "Demasiados intentos. Intente en un minuto." },
+        { status: 429 }
+      );
+    }
+
     const { pin } = await request.json();
 
     if (!pin || typeof pin !== "string") {
@@ -15,12 +36,19 @@ export async function POST(request: Request) {
       );
     }
 
-    if (pin !== ADMIN_PIN) {
+    const sanitizedPin = pin.replace(/\D/g, '').slice(0, 6);
+
+    if (sanitizedPin !== ADMIN_PIN) {
+      rateLimit.count++;
+      rateLimitMap.set(ip, rateLimit);
       return NextResponse.json(
         { success: false, error: "PIN incorrecto" },
         { status: 401 }
       );
     }
+    
+    // Reset on success
+    rateLimitMap.delete(ip);
 
     // Create a simple session token (timestamp + random string)
     const sessionToken = `${Date.now()}-${Math.random().toString(36).substring(2, 15)}`;
@@ -32,7 +60,7 @@ export async function POST(request: Request) {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
       sameSite: "strict",
-      maxAge: SESSION_DURATION / 1000, // in seconds
+      maxAge: ADMIN_COOKIE_MAX_AGE,
       path: "/",
     });
 

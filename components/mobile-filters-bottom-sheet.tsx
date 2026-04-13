@@ -4,7 +4,6 @@ import { motion, AnimatePresence } from "framer-motion";
 import { X } from "lucide-react";
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
-import { Checkbox } from "@/components/ui/checkbox";
 import type { Company } from "@/types";
 import { getCompanyConfig } from "@/lib/companyConfig";
 
@@ -86,6 +85,7 @@ export function MobileFiltersBottomSheet({
   };
 
   const handleClearAll = () => {
+    onClearFilters();
     setLocalCompanies([]);
     setLocalDepartment("all");
     setLocalLocations([]);

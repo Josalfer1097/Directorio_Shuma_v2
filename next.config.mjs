@@ -1,8 +1,5 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  typescript: {
-    ignoreBuildErrors: true,
-  },
   images: {
     unoptimized: true,
   },
@@ -13,8 +10,12 @@ const nextConfig = {
         source: '/:path*',
         headers: [
           {
+            key: 'X-DNS-Prefetch-Control',
+            value: 'on',
+          },
+          {
             key: 'X-Frame-Options',
-            value: 'DENY',
+            value: 'SAMEORIGIN',
           },
           {
             key: 'X-Content-Type-Options',

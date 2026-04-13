@@ -15,7 +15,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { getEmployeeById, getEmployees, getCompanies, getDepartments } from "@/lib/data";
-import type { Employee } from "@/types";
+
 import { cn } from "@/lib/utils";
 import { getCompanyConfig } from "@/lib/companyConfig";
 
@@ -79,10 +79,10 @@ export function EmployeeFormModal({
           id: employee.id,
           name: employee.name,
           position: employee.position,
-          department: employee.department,
+          department: employee.department ?? "",
           company: employee.company,
-          email: employee.email,
-          phone: employee.phone,
+          email: employee.email ?? "",
+          phone: employee.phone ?? "",
           location: employee.location || "",
           reportsTo: employee.reportsTo || "",
         });

@@ -8,6 +8,7 @@ import { Navbar } from "@/components/navbar";
 import { FeaturedEmployees } from "@/components/featured-employees";
 import { getEmployees, getCompanies, getCompanyStats, getDepartments } from "@/lib/data";
 import { getCompanyConfig } from "@/lib/companyConfig";
+import { isLeadershipRole, getLeadershipTier } from "@/lib/utils";
 import { AdminTrigger } from "@/components/admin/admin-trigger";
 import { AdminToolbar } from "@/components/admin/admin-toolbar";
 import { PinModal } from "@/components/admin/pin-modal";
@@ -35,44 +36,6 @@ export default function HomePage() {
       locationCount: locations.size,
     };
   }, [employees, companies, departments]);
-
-  // Strict whitelist for leadership positions
-  const isLeadershipRole = (position: string): boolean => {
-    const p = position?.toLowerCase().trim() ?? '';
-    
-    // Explicit exclusions first
-    const excluded = [
-      'almacén', 'almacen', 'sub gerente',
-      'auxiliar', 'agente', 'analista',
-      'vendedor', 'vendedora', 'caja',
-      'encargado', 'soporte', 'desarrollador',
-      'facturista', 'recepción', 'recepcion'
-    ];
-    if (excluded.some(ex => p.includes(ex))) return false;
-    
-    // Whitelist of leadership positions
-    const included = [
-      'director', 'directora',
-      'gerente general', 'gerenta general',
-      'gerente de sistemas',
-      'gerente de contabilidad',
-      'gerente crédito', 'gerente credito',
-      'gerente de ventas',
-      'gerente de logística', 'gerente de logistica',
-      'gerente de crédito', 'gerente de credito',
-      'gerente de compras',
-      'gerente general administrativo'
-    ];
-    return included.some(inc => p.includes(inc));
-  };
-
-  // Leadership tier priority function
-  const getLeadershipTier = (position: string): number => {
-    const p = position?.toLowerCase() ?? '';
-    if (p.includes('director')) return 1;
-    if (p.includes('gerente general') || p.includes('gerente de compras y asistente')) return 2;
-    return 3;
-  };
 
   const featuredEmployees = employees
     .filter(emp => {

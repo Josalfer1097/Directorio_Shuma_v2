@@ -5,7 +5,6 @@ import { usePathname } from "next/navigation";
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { Home, Users, GitBranch, Search } from "lucide-react";
-import { cn } from "@/lib/utils";
 
 const tabs = [
   { href: "/", label: "Inicio", icon: Home },
@@ -38,7 +37,7 @@ export function MobileBottomTabBar() {
           className="absolute inset-y-1 left-1 right-1 bg-primary/10 rounded-lg -z-10"
         />
 
-        {tabs.map((tab, index) => {
+        {tabs.map((tab) => {
           const isActive = pathname === tab.href || (tab.href !== "/" && pathname.startsWith(tab.href));
           const Icon = tab.icon;
 

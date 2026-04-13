@@ -7,7 +7,6 @@ import { haptics } from "@/lib/haptics";
 import { useState } from "react";
 import Link from "next/link";
 import { toast } from "sonner";
-import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import type { Employee, Company } from "@/types";
@@ -147,7 +146,7 @@ export function EmployeeCard({
               className="absolute top-0 left-0 right-0 transition-all duration-[180ms]"
               style={{
                 height: '2px',
-                backgroundColor: companyConfig.accent || companyConfig.primary,
+                backgroundColor: companyConfig.highlight || companyConfig.primary,
                 opacity: isHovered ? 1 : 0.4,
               }}
             />
@@ -157,8 +156,8 @@ export function EmployeeCard({
               className="absolute left-0 top-0 bottom-0 transition-all duration-[180ms]"
               style={{
                 width: isHovered ? '5px' : '3px',
-                background: isHovered && companyConfig.accent 
-                  ? `linear-gradient(to bottom, ${companyConfig.accent}, ${companyConfig.primary})`
+                background: isHovered && companyConfig.highlight 
+                  ? `linear-gradient(to bottom, ${companyConfig.highlight}, ${companyConfig.primary})`
                   : companyConfig.primary,
                 opacity: isHovered ? 1 : 0.7,
               }}
@@ -170,10 +169,10 @@ export function EmployeeCard({
                   borderWidth: isHovered ? '2px' : '1.5px',
                   borderStyle: 'solid',
                   borderColor: isHovered 
-                    ? (companyConfig.accent || companyConfig.primary) 
+                    ? (companyConfig.highlight || companyConfig.primary) 
                     : `${companyConfig.primary}66`,
                   boxShadow: isHovered 
-                    ? `0 0 12px ${companyConfig.accentGlow || companyConfig.glow}` 
+                    ? `0 0 12px ${companyConfig.glow}` 
                     : 'none',
                   transform: isHovered ? 'scale(1.05)' : 'none',
                 }}
@@ -181,7 +180,7 @@ export function EmployeeCard({
                 <AvatarFallback
                   style={{
                     background: `linear-gradient(135deg, ${companyConfig.secondary}, ${companyConfig.primary})`,
-                    color: companyConfig.textColor || 'white',
+                    color: 'white',
                   }}
                 >
                   {getInitials(employee.name)}
@@ -198,9 +197,9 @@ export function EmployeeCard({
                   <span
                     className="text-xs font-medium px-2 py-0.5 rounded-full shrink-0"
                     style={{
-                      backgroundColor: companyConfig.accent ? companyConfig.secondary : `${companyConfig.primary}15`,
-                      border: companyConfig.accent ? `1px solid ${companyConfig.primary}` : 'none',
-                      color: companyConfig.accent || companyConfig.primary,
+                      backgroundColor: companyConfig.highlight ? companyConfig.secondary : `${companyConfig.primary}15`,
+                      border: companyConfig.highlight ? `1px solid ${companyConfig.primary}` : 'none',
+                      color: companyConfig.highlight || companyConfig.primary,
                     }}
                   >
                     {company.shortName || company.name}
@@ -355,7 +354,7 @@ export function EmployeeCard({
             className="absolute top-0 left-0 right-0 transition-all duration-[180ms]"
             style={{
               height: '2px',
-              backgroundColor: companyConfig.accent || companyConfig.primary,
+              backgroundColor: companyConfig.highlight || companyConfig.primary,
               opacity: isHovered ? 1 : 0.4,
             }}
           />
@@ -365,8 +364,8 @@ export function EmployeeCard({
             className="absolute left-0 top-0 bottom-0 transition-all duration-[180ms]"
             style={{
               width: isHovered ? '5px' : '3px',
-              background: isHovered && companyConfig.accent 
-                ? `linear-gradient(to bottom, ${companyConfig.accent}, ${companyConfig.primary})`
+              background: isHovered && companyConfig.highlight 
+                ? `linear-gradient(to bottom, ${companyConfig.highlight}, ${companyConfig.primary})`
                 : companyConfig.primary,
               opacity: isHovered ? 1 : 0.7,
             }}
@@ -382,10 +381,10 @@ export function EmployeeCard({
                 borderWidth: isHovered ? '2px' : '1.5px',
                 borderStyle: 'solid',
                 borderColor: isHovered 
-                  ? (companyConfig.accent || companyConfig.primary) 
+                  ? (companyConfig.highlight || companyConfig.primary) 
                   : `${companyConfig.primary}66`,
                 boxShadow: isHovered 
-                  ? `0 0 12px ${companyConfig.accentGlow || companyConfig.glow}` 
+                  ? `0 0 12px ${companyConfig.glow}` 
                   : 'none',
                 transform: isHovered ? 'scale(1.05)' : 'none',
               }}
@@ -394,7 +393,7 @@ export function EmployeeCard({
                 className="font-semibold avatar-animated-inner"
                 style={{
                   fontSize: 'calc(1.1rem * var(--font-scale, 1))',
-                  background: `conic-gradient(from var(--avatar-angle, 0deg), ${companyConfig.secondary} 0%, ${companyConfig.primary} 40%, ${companyConfig.highlight || companyConfig.accent || companyConfig.primary} 60%, ${companyConfig.secondary} 100%)`,
+                  background: `conic-gradient(from var(--avatar-angle, 0deg), ${companyConfig.secondary} 0%, ${companyConfig.primary} 40%, ${companyConfig.highlight || companyConfig.primary} 60%, ${companyConfig.secondary} 100%)`,
                   color: 'white',
                   textShadow: '0 1px 3px rgba(0,0,0,0.4)',
                   fontWeight: 700,
@@ -439,7 +438,7 @@ export function EmployeeCard({
                     marginTop: 'calc(4px * var(--font-scale, 1))',
                     backgroundColor: `${companyConfig.primary}15`,
                     border: `1px solid ${companyConfig.primary}40`,
-                    color: companyConfig.accent || companyConfig.primary,
+                    color: companyConfig.highlight || companyConfig.primary,
                   }}
                 >
                   {company.shortName || company.name}

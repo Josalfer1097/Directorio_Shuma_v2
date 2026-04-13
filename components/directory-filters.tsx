@@ -1,6 +1,5 @@
 "use client";
 
-import { motion, AnimatePresence } from "framer-motion";
 import { X, Filter, Download, Star, ChevronRight, Layers } from "lucide-react";
 import { useFavorites } from "@/lib/useFavorites";
 import { useState } from "react";
@@ -26,12 +25,7 @@ import { getCompanyConfig } from "@/lib/companyConfig";
 import { getEmployees } from "@/lib/data";
 import { useMemo } from "react";
 
-// Spring animation for filter panel
-const springTransition = {
-  type: "spring",
-  stiffness: 400,
-  damping: 30,
-};
+
 
 interface DirectoryFiltersProps {
   companies: Company[];
@@ -425,10 +419,13 @@ export function DirectoryFilters({
         onClose={() => setMobileSheetOpen(false)}
         companies={companies.filter(c => !c.disabled)}
         departments={departments}
+        locations={locations}
         selectedCompanies={selectedCompanies}
         selectedDepartment={selectedDepartment}
+        selectedLocations={selectedLocations}
         onCompanyChange={onCompanyChange}
         onDepartmentChange={onDepartmentChange}
+        onLocationChange={onLocationChange}
         onClearFilters={onClearFilters}
         onApply={() => {}}
       />

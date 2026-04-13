@@ -62,11 +62,11 @@ const truncateEmail = (email: string | null | undefined, maxLength = 18) => {
 // Featured Employee Card Component
 interface FeaturedEmployeeCardProps {
   employee: Employee;
-  companyConfig: { primary: string; secondary: string; glow: string };
+  companyConfig: { primary: string; secondary: string; glow: string; highlight: string };
   companyName: string;
   getInitials: (name: string) => string;
   handleCardClick: (employeeId: string) => void;
-  copyToClipboard: (e: MouseEvent, text: string, field: string) => void;
+  copyToClipboard: (e: MouseEvent, text: string | null | undefined, field: string) => void;
   copiedField: string | null;
 }
 
@@ -108,43 +108,43 @@ function FeaturedEmployeeCard({
           transitionTimingFunction: 'cubic-bezier(0.25, 0.46, 0.45, 0.94)'
         }}
       >
-        {/* Left accent bar */}
-        <div 
-          className="absolute left-0 top-0 bottom-0 transition-all duration-[180ms]"
-          style={{
-            width: isHovered ? '5px' : '3px',
-            background: isHovered && companyConfig.accent 
-              ? `linear-gradient(to bottom, ${companyConfig.accent}, ${companyConfig.primary})`
-              : companyConfig.primary,
-            opacity: isHovered ? 1 : 0.7,
-          }}
-        />
-
-        {/* Top section */}
-        <div className="flex items-start gap-3 flex-1 pl-2">
-          <Avatar 
-            className="shrink-0 transition-all duration-[180ms]"
+          {/* Left accent bar */}
+          <div 
+            className="absolute left-0 top-0 bottom-0 transition-all duration-[180ms]"
             style={{
-              width: 'calc(56px * var(--font-scale))',
-              height: 'calc(56px * var(--font-scale))',
-              borderWidth: isHovered ? '2px' : '1.5px',
-              borderStyle: 'solid',
-              borderColor: isHovered 
-                ? (companyConfig.accent || companyConfig.primary) 
-                : `${companyConfig.primary}66`,
-              boxShadow: isHovered 
-                ? `0 0 12px ${companyConfig.accentGlow || companyConfig.glow}` 
-                : 'none',
-              transform: isHovered ? 'scale(1.05)' : 'none',
+              width: isHovered ? '5px' : '3px',
+              background: isHovered && companyConfig.highlight 
+                ? `linear-gradient(to bottom, ${companyConfig.highlight}, ${companyConfig.primary})`
+                : companyConfig.primary,
+              opacity: isHovered ? 1 : 0.7,
             }}
-          >
-            <AvatarFallback
-              className="text-sm font-semibold"
+          />
+
+          {/* Top section */}
+          <div className="flex items-start gap-3 flex-1 pl-2">
+            <Avatar 
+              className="shrink-0 transition-all duration-[180ms]"
               style={{
-                background: `linear-gradient(135deg, ${companyConfig.secondary}, ${companyConfig.primary})`,
-                color: companyConfig.textColor || 'white',
+                width: 'calc(56px * var(--font-scale))',
+                height: 'calc(56px * var(--font-scale))',
+                borderWidth: isHovered ? '2px' : '1.5px',
+                borderStyle: 'solid',
+                borderColor: isHovered 
+                  ? (companyConfig.highlight || companyConfig.primary) 
+                  : `${companyConfig.primary}66`,
+                boxShadow: isHovered 
+                  ? `0 0 12px ${companyConfig.glow}` 
+                  : 'none',
+                transform: isHovered ? 'scale(1.05)' : 'none',
               }}
             >
+              <AvatarFallback
+                className="text-sm font-semibold"
+                style={{
+                  background: `linear-gradient(135deg, ${companyConfig.secondary}, ${companyConfig.primary})`,
+                  color: 'white',
+                }}
+              >
               {getInitials(employee.name)}
             </AvatarFallback>
           </Avatar>
@@ -158,14 +158,14 @@ function FeaturedEmployeeCard({
             <p className="text-muted-foreground line-clamp-1 text-scale-sm">
               {employee.position}
             </p>
-            <span
-              className="inline-block font-medium px-1.5 py-0.5 rounded-full mt-1 text-scale-xs"
-              style={{
-                backgroundColor: companyConfig.accent ? companyConfig.secondary : `${companyConfig.primary}15`,
-                border: companyConfig.accent ? `1px solid ${companyConfig.primary}` : 'none',
-                color: companyConfig.accent || companyConfig.primary,
-              }}
-            >
+              <span
+                className="inline-block font-medium px-1.5 py-0.5 rounded-full mt-1 text-scale-xs"
+                style={{
+                  backgroundColor: companyConfig.highlight ? companyConfig.secondary : `${companyConfig.primary}15`,
+                  border: companyConfig.highlight ? `1px solid ${companyConfig.primary}` : 'none',
+                  color: companyConfig.highlight || companyConfig.primary,
+                }}
+              >
               {companyName}
             </span>
           </div>
@@ -271,10 +271,6 @@ export function FeaturedEmployees({
     currentIndex * itemsPerPage,
     (currentIndex + 1) * itemsPerPage
   );
-
-  const getCompanyColor = (companyId: string) => {
-    return companies.find((c) => c.id === companyId)?.colors.primary || "#7C3AED";
-  };
 
   const getCompanyName = (companyId: string) => {
     const company = companies.find((c) => c.id === companyId);

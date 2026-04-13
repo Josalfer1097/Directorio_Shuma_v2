@@ -2,7 +2,7 @@
 
 import { useState, useMemo, useEffect, Suspense, useRef, useCallback, useDeferredValue } from "react";
 import { useSearchParams } from "next/navigation";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion } from "framer-motion";
 import Fuse from "fuse.js";
 import { Search, LayoutGrid, List, Users, Filter, Phone } from "lucide-react";
 import { Navbar } from "@/components/navbar";
@@ -15,15 +15,20 @@ import {
   getEmployees,
   getCompanies,
   getDepartments,
-  getAllTags,
   getCompanyById,
 } from "@/lib/data";
 import { MobileFiltersBottomSheet } from "@/components/mobile-filters-bottom-sheet";
 import { ExtensionDirectory } from "@/components/extension-directory";
-import { DepartmentView } from "@/components/department-view";
+import dynamic from "next/dynamic";
 import type { ViewMode, Employee } from "@/types";
 import { useFavorites } from "@/lib/useFavorites";
 import { useCompanyTheme, ActiveTheme } from "@/lib/CompanyThemeContext";
+import { safeGetItem, safeSetItem } from "@/lib/localStorage";
+
+const DepartmentView = dynamic(
+  () => import("@/components/department-view").then(mod => mod.DepartmentView),
+  { ssr: false }
+);
 
 const ITEMS_PER_PAGE = 12;
 
@@ -39,9 +44,9 @@ function DirectoryContent() {
   const deferredSearchQuery = useDeferredValue(searchQuery);
   const [viewMode, setViewMode] = useState<ViewMode>(() => {
     if (typeof window !== "undefined") {
-      const saved = localStorage.getItem("directorio-viewMode");
+      const saved = safeGetItem("directorio-viewMode");
       if (saved === "grid" || saved === "list" || saved === "extensions") {
-        return saved;
+        return saved as ViewMode;
       }
     }
     return "grid";
@@ -49,7 +54,7 @@ function DirectoryContent() {
 
   // Persist viewMode to localStorage
   useEffect(() => {
-    localStorage.setItem("directorio-viewMode", viewMode);
+    safeSetItem("directorio-viewMode", viewMode);
   }, [viewMode]);
 
   // Listen for view mode changes from navbar
@@ -96,17 +101,19 @@ function DirectoryContent() {
   const employees = getEmployees();
   const companies = getCompanies();
   const departments = getDepartments();
-  const tags = getAllTags();
 
   // First load animation - only on initial mount
   useEffect(() => {
+    let timer: NodeJS.Timeout;
     if (employees.length > 0 && !hasAnimated.current) {
       hasAnimated.current = true;
       setShowCardAnimation(true);
       // After cards animate, disable for subsequent renders
-      const timer = setTimeout(() => setShowCardAnimation(false), 1200);
-      return () => clearTimeout(timer);
+      timer = setTimeout(() => setShowCardAnimation(false), 1200);
     }
+    return () => {
+      if (timer) clearTimeout(timer);
+    };
   }, [employees.length]);
 
   // Cmd+K / Ctrl+K keyboard shortcut to focus search
@@ -191,14 +198,14 @@ function DirectoryContent() {
     setCurrentPage(1);
   }, [searchQuery, selectedCompanies, selectedDepartment, selectedLocations, selectedTags]);
 
-  const clearFilters = () => {
+  const clearFilters = useCallback(() => {
     setSearchQuery("");
     setSelectedCompanies([]);
     setSelectedDepartment("all");
     setSelectedLocations([]);
     setSelectedTags([]);
     setShowFavoritesOnly(false);
-  };
+  }, []);
 
   return (
       <div className="min-h-screen bg-background relative page-transition">

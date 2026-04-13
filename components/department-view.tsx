@@ -2,7 +2,6 @@
 
 import { useState, useEffect, useMemo, useRef, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { useRouter } from "next/navigation";
 import { ArrowLeft, Users } from "lucide-react";
 import { getEmployees, getCompanies } from "@/lib/data";
 import { getCompanyConfig } from "@/lib/companyConfig";
@@ -16,7 +15,6 @@ interface DepartmentViewProps {
 }
 
 export function DepartmentView({ department, onClose }: DepartmentViewProps) {
-  const router = useRouter();
   const panelRef = useRef<HTMLDivElement>(null);
   const backdropRef = useRef<HTMLDivElement>(null);
   
@@ -364,7 +362,7 @@ export function DepartmentView({ department, onClose }: DepartmentViewProps) {
                                 gap: "calc(12px * var(--font-scale, 1))",
                               }}
                             >
-                              {companyEmployees.map((emp, idx) => (
+                              {companyEmployees.map((emp) => (
                                 <EmployeeCard
                                   key={emp.id}
                                   employee={emp}
@@ -386,7 +384,7 @@ export function DepartmentView({ department, onClose }: DepartmentViewProps) {
                           gap: "calc(12px * var(--font-scale, 1))",
                         }}
                       >
-                        {teamMembers.map((emp, idx) => (
+                        {teamMembers.map((emp) => (
                           <EmployeeCard
                             key={emp.id}
                             employee={emp}

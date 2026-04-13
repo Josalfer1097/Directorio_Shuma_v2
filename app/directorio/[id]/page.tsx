@@ -5,7 +5,6 @@ import { motion, AnimatePresence } from "framer-motion";
 import { notFound, useRouter } from "next/navigation";
 import { toast } from "sonner";
 import {
-  Mail,
   Phone,
   Copy,
   Check,

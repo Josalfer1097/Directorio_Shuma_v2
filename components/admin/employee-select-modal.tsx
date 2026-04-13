@@ -26,9 +26,9 @@ export function EmployeeSelectModal({
   const employees = getEmployees();
 
   const filteredEmployees = employees.filter((emp) =>
-    emp.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    emp.position.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    emp.department.toLowerCase().includes(searchQuery.toLowerCase())
+    (emp.name ?? "").toLowerCase().includes(searchQuery.toLowerCase()) ||
+    (emp.position ?? "").toLowerCase().includes(searchQuery.toLowerCase()) ||
+    (emp.department ?? "").toLowerCase().includes(searchQuery.toLowerCase())
   );
 
   const getInitials = (name: string) => {
@@ -121,8 +121,8 @@ export function EmployeeSelectModal({
                         <Avatar className="w-10 h-10 border border-border">
                           <AvatarFallback
                             style={{
-                              backgroundColor: `${company?.color}20`,
-                              color: company?.color,
+                              backgroundColor: `${company?.colors?.primary}20`,
+                              color: company?.colors?.primary,
                             }}
                           >
                             {getInitials(employee.name)}

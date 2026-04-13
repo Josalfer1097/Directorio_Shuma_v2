@@ -1,0 +1,12 @@
+export const ADMIN_COOKIE_MAX_AGE = 8 * 60 * 60; // 8 hours
+export const SEARCH_DEBOUNCE_MS = 150;
+export const SWIPE_CLOSE_THRESHOLD = 120;
+export const SWIPE_VELOCITY_THRESHOLD = 0.5;
+export const FONT_SCALE_STORAGE_KEY = 'shuma-font-scale';
+export const FAVORITES_STORAGE_KEY = 'shuma-favorites';
+export const VIEW_MODE_STORAGE_KEY = 'shuma-view-mode';
+export const MAX_SEARCH_LENGTH = 100;
+export const CARD_ANIMATION_STAGGER_MS = 30;
+export const CARD_ANIMATION_MAX_DELAY_MS = 600;
+export const PARTICLE_COUNT_DESKTOP = 60;
+export const PARTICLE_COUNT_MOBILE = 25;

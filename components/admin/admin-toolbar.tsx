@@ -1,21 +1,29 @@
 "use client";
 
 import { useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
-import { Plus, Edit, Trash2, LogOut, Users } from "lucide-react";
+import { motion } from "framer-motion";
+import { Plus, LogOut } from "lucide-react";
 import { useAdmin } from "./admin-context";
-import { Button } from "@/components/ui/button";
 import { EmployeeFormModal } from "./employee-form-modal";
 import { EmployeeSelectModal } from "./employee-select-modal";
 import { DeleteConfirmModal } from "./delete-confirm-modal";
-import { cn } from "@/lib/utils";
 
-type AdminAction = "add" | "edit" | "delete" | null;
+type AdminAction = "add" | "edit" | "delete" | "edit-select" | "delete-select" | null;
 
 export function AdminToolbar() {
   const { isAuthenticated, logout, isLoading } = useAdmin();
   const [currentAction, setCurrentAction] = useState<AdminAction>(null);
   const [selectedEmployeeId, setSelectedEmployeeId] = useState<string | null>(null);
+
+  const handleEditSelect = (id: string) => {
+    setSelectedEmployeeId(id);
+    setCurrentAction("edit");
+  };
+
+  const handleDeleteSelect = (id: string) => {
+    setSelectedEmployeeId(id);
+    setCurrentAction("delete");
+  };
 
   if (isLoading || !isAuthenticated) return null;
 

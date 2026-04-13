@@ -32,8 +32,9 @@ const neuropol = localFont({
 })
 
 export const metadata: Metadata = {
-  title: 'DIRECTORIO | Shuma',
-  description: 'Directorio corporativo de las empresas Shuma',
+  title: 'Directorio Shuma',
+  description: 'Directorio de colaboradores de Grupo Shuma',
+  robots: 'noindex, nofollow',
 }
 
 export type ViewMode = "grid" | "list";
@@ -54,8 +55,6 @@ export default function RootLayout({
   return (
     <html lang="es" className={`${neuropol.variable} ${orbitron.variable} dark`} style={{ colorScheme: 'dark' }} suppressHydrationWarning>
       <head>
-        <meta name="color-scheme" content="dark" />
-        <meta name="robots" content="noindex, nofollow" />
       </head>
       <body className={`${dmSans.variable} font-dm-sans antialiased`}>
         <ThemeProvider

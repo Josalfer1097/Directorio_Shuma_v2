@@ -108,8 +108,8 @@ export function DeleteConfirmModal({
               <Avatar className="w-12 h-12 border border-border">
                 <AvatarFallback
                   style={{
-                    backgroundColor: `${company?.color}20`,
-                    color: company?.color,
+                    backgroundColor: `${company?.colors?.primary}20`,
+                    color: company?.colors?.primary,
                   }}
                 >
                   {getInitials(employee.name)}

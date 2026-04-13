@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+
 
 const SIGNATURE_TEXT = "DESIGNED & POWERED BY SHUMA SISTEMAS IT";
 const VERSION = "v2.3.2";

@@ -11,11 +11,10 @@ import {
   type Node,
   type Edge,
   BackgroundVariant,
-  Panel,
 } from "@xyflow/react";
 import "@xyflow/react/dist/style.css";
 import { OrgChartNode } from "./org-chart-node";
-import type { Employee, Company, OrgChartLayout } from "@/types";
+import type { Company, OrgChartLayout } from "@/types";
 import { cn } from "@/lib/utils";
 import { getEmployees, getCompanies } from "@/lib/data";
 
@@ -187,8 +186,6 @@ function OrgChartInner({ selectedCompany, layout }: OrgChartInnerProps) {
       zoomOnScroll={!isMobile}
       zoomOnPinch={true}
       selectionOnDrag={false}
-      minZoom={0.08}
-      maxZoom={2}
     >
       <Background
         variant={BackgroundVariant.Dots}
@@ -252,7 +249,7 @@ export function OrgChart({ initialCompany }: OrgChartProps) {
               key={filter.id}
               onClick={() => setSelectedCompany(filter.id)}
               className={cn(
-                "px-3 py-1.5 rounded-full uppercase tracking-wider font-neuropol transition-all duration-[180ms] whitespace-nowrap shrink-0 touch-manipulation min-h-[32px]",
+                "px-3 py-1.5 rounded-full uppercase tracking-wider font-neuropol transition-all duration-[180ms] whitespace-nowrap shrink-0 touch-manipulation min-h-[32px] text-scale-xs",
                 selectedCompany === filter.id 
                   ? "text-white shadow-lg" 
                   : "bg-white/5 text-white/50 border border-white/10"
@@ -261,7 +258,6 @@ export function OrgChart({ initialCompany }: OrgChartProps) {
                 backgroundColor: selectedCompany === filter.id ? filter.color : undefined,
                 boxShadow: selectedCompany === filter.id ? `0 4px 12px ${filter.color}40` : undefined,
               }}
-              className="text-scale-xs"
             >
               {filter.shortLabel}
             </button>

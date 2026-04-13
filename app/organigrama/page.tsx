@@ -1,6 +1,6 @@
 "use client";
 
-import { Suspense, useEffect, useRef } from "react";
+import { useEffect, Suspense } from "react";
 import dynamic from "next/dynamic";
 import { Navbar } from "@/components/navbar";
 import { ErrorBoundary } from "@/components/error-boundary";
@@ -44,20 +44,22 @@ function OrgChartLoading() {
 export default function OrganigramaPage() {
   // Check if we've shown the zoom hint before
   useEffect(() => {
-    const hasShownHint = localStorage.getItem("orgchart-zoom-hint-shown");
-    if (!hasShownHint && typeof window !== "undefined" && window.innerWidth < 768) {
-      // Import toast dynamically to avoid SSR issues
-      import("sonner").then(({ toast }) => {
-        setTimeout(() => {
-          toast("Pellizca para hacer zoom", {
-            description: "Usa dos dedos para navegar el organigrama",
-            duration: 3000,
-            position: "bottom-center",
-          });
-          localStorage.setItem("orgchart-zoom-hint-shown", "true");
-        }, 500);
-      });
-    }
+    import("@/lib/localStorage").then(({ safeGetItem, safeSetItem }) => {
+      const hasShownHint = safeGetItem("orgchart-zoom-hint-shown");
+      if (!hasShownHint && typeof window !== "undefined" && window.innerWidth < 768) {
+        // Import toast dynamically to avoid SSR issues
+        import("sonner").then(({ toast }) => {
+          setTimeout(() => {
+            toast("Pellizca para hacer zoom", {
+              description: "Usa dos dedos para navegar el organigrama",
+              duration: 3000,
+              position: "bottom-center",
+            });
+            safeSetItem("orgchart-zoom-hint-shown", "true");
+          }, 500);
+        });
+      }
+    });
   }, []);
 
   return (

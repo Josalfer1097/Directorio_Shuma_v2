@@ -2,15 +2,13 @@
 
 import { memo, useState } from "react";
 import { Handle, Position } from "@xyflow/react";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
-import type { Employee, Company } from "@/types";
+import type { Employee } from "@/types";
 import { cn } from "@/lib/utils";
 import { getCompanyConfig } from "@/lib/companyConfig";
 
 interface OrgNodeData {
   employee: Employee;
-  company: Company;
   isCollapsed?: boolean;
   hasChildren?: boolean;
   onToggle?: () => void;
@@ -21,20 +19,8 @@ interface OrgChartNodeProps {
   data: OrgNodeData;
 }
 
-// Get monogram class based on company
-const getMonogramClass = (companyId: string) => {
-  const classMap: Record<string, string> = {
-    "grupo-shuma": "monogram-corporativo",
-    "comercializadora-shuma": "monogram-comercializadora",
-    "acabados-shuma": "monogram-acabados",
-    "ferrecapital": "monogram-ferrecapital",
-    "arkiramica": "monogram-arkiramica",
-  };
-  return classMap[companyId] || "monogram-corporativo";
-};
-
 function OrgChartNodeComponent({ data }: OrgChartNodeProps) {
-  const { employee, company, onSelect } = data;
+  const { employee, onSelect } = data;
   const [isHovered, setIsHovered] = useState(false);
   
   const colors = getCompanyConfig(employee.company);
