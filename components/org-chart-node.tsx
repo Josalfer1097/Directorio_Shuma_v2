@@ -114,14 +114,14 @@ function OrgChartNodeComponent({ data }: OrgChartNodeProps) {
                       fontFamily: "var(--font-neuropol), var(--font-orbitron), 'Orbitron', 'Courier New', monospace",
                       wordWrap: 'break-word',
                       whiteSpace: 'normal',
-                      fontSize: '0.68rem',
+                      fontSize: 'var(--font-xs)',
                     }}
                   >
                     {employee.name}
                   </h4>
                   <p 
                     className="font-dm-sans italic text-text-muted mt-0.5 leading-tight"
-                    style={{ fontSize: '0.58rem' }}
+                    style={{ fontSize: 'var(--font-xs)' }}
                   >
                     {employee.position}
                   </p>

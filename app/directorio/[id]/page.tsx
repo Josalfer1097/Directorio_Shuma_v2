@@ -13,12 +13,16 @@ import {
   MessageSquare,
   AlertTriangle,
   MapPin,
+  Star,
+  ClipboardList,
 } from "lucide-react";
 import {
   getEmployeeById,
   getCompanyById,
 } from "@/lib/data";
 import { getCompanyConfig } from "@/lib/companyConfig";
+import { useFavorites } from "@/lib/useFavorites";
+import { haptics } from "@/lib/haptics";
 
 interface Props {
   params: Promise<{ id: string }>;
@@ -64,28 +68,72 @@ class EmployeeDetailErrorBoundary extends Component<
 function EmployeeDetailContent({ id }: { id: string }) {
   const router = useRouter();
   const [copiedField, setCopiedField] = useState<string | null>(null);
+  const [copyAllState, setCopyAllState] = useState<'idle' | 'copied'>('idle');
+  const { isFavorite, toggleFavorite } = useFavorites();
 
   const employee = getEmployeeById(id);
   if (!employee) {
     notFound();
   }
 
+  const isEmployeeFavorite = isFavorite(employee.id);
   const company = getCompanyById(employee.company);
   const config = getCompanyConfig(employee.company);
 
   const handleClose = () => {
+    haptics.soft();
     router.push("/directorio");
   };
 
   const copyToClipboard = async (text: string, field: string) => {
     try {
       await navigator.clipboard.writeText(text);
+      haptics.light();
       setCopiedField(field);
       toast.success("Copiado al portapapeles");
       setTimeout(() => setCopiedField(null), 800);
     } catch {
       toast.error("Error al copiar");
     }
+  };
+
+  const copyAllInfo = async () => {
+    const lines: string[] = [];
+    lines.push(`*${employee.name}*`);
+    if (employee.position && employee.department) {
+      lines.push(`${employee.position} — ${employee.department}`);
+    } else if (employee.position) {
+      lines.push(employee.position);
+    }
+    if (company?.name) {
+      lines.push(company.name);
+    }
+    if (employee.location) {
+      lines.push(`📍 ${employee.location}`);
+    }
+    if (employee.phone || employee.extension) {
+      const phonePart = employee.phone || '';
+      const extPart = employee.extension ? `  Ext. ${employee.extension}` : '';
+      lines.push(`📞 ${phonePart}${extPart}`);
+    }
+    if (employee.email) {
+      lines.push(`✉️ ${employee.email}`);
+    }
+
+    try {
+      await navigator.clipboard.writeText(lines.join('\n'));
+      haptics.double();
+      setCopyAllState('copied');
+      toast.success("Todo copiado al portapapeles");
+      setTimeout(() => setCopyAllState('idle'), 1000);
+    } catch {
+      toast.error("Error al copiar");
+    }
+  };
+
+  const handleToggleFavorite = () => {
+    haptics.success();
+    toggleFavorite(employee.id);
   };
 
   const openTeamsChat = () => {
@@ -228,7 +276,7 @@ function EmployeeDetailContent({ id }: { id: string }) {
                 className="text-white font-bold"
                 style={{ 
                   fontFamily: "var(--font-neuropol), var(--font-orbitron), 'Orbitron', 'Courier New', monospace",
-                  fontSize: '1.6rem',
+                  fontSize: 'var(--font-2xl)',
                 }}
               >
                 {getInitials(employee.name)}
@@ -240,7 +288,7 @@ function EmployeeDetailContent({ id }: { id: string }) {
               className="text-white font-bold mt-4"
               style={{ 
                 fontFamily: "'DM Sans', sans-serif",
-                fontSize: '1.3rem',
+                fontSize: 'var(--font-xl)',
                 fontWeight: 700,
               }}
             >
@@ -252,7 +300,7 @@ function EmployeeDetailContent({ id }: { id: string }) {
               className="italic mt-1"
               style={{ 
                 color: config.primary,
-                fontSize: '0.85rem',
+                fontSize: 'var(--font-base)',
                 fontFamily: "'DM Sans', sans-serif",
               }}
             >
@@ -266,7 +314,7 @@ function EmployeeDetailContent({ id }: { id: string }) {
                 background: `color-mix(in srgb, ${config.primary} 18%, transparent)`,
                 border: `1px solid color-mix(in srgb, ${config.primary} 45%, transparent)`,
                 color: config.highlight,
-                fontSize: '0.65rem',
+                fontSize: 'var(--font-xs)',
                 fontFamily: "var(--font-neuropol), var(--font-orbitron), 'Orbitron', 'Courier New', monospace",
                 textTransform: 'uppercase',
                 letterSpacing: '0.1em',
@@ -287,7 +335,7 @@ function EmployeeDetailContent({ id }: { id: string }) {
               <p 
                 className="mb-1"
                 style={{ 
-                  fontSize: '0.6rem', 
+                  fontSize: 'var(--font-xs)', 
                   color: 'rgba(255,255,255,0.27)', 
                   textTransform: 'uppercase',
                   letterSpacing: '0.1em',
@@ -295,7 +343,7 @@ function EmployeeDetailContent({ id }: { id: string }) {
               >
                 Departamento
               </p>
-              <p style={{ fontSize: '0.9rem', color: '#FFFFFF', fontWeight: 500 }}>
+              <p style={{ fontSize: 'var(--font-base)', color: '#FFFFFF', fontWeight: 500 }}>
                 {employee.department || "—"}
               </p>
             </div>
@@ -305,7 +353,7 @@ function EmployeeDetailContent({ id }: { id: string }) {
               <p 
                 className="mb-1"
                 style={{ 
-                  fontSize: '0.6rem', 
+                  fontSize: 'var(--font-xs)', 
                   color: 'rgba(255,255,255,0.27)', 
                   textTransform: 'uppercase',
                   letterSpacing: '0.1em',
@@ -313,7 +361,7 @@ function EmployeeDetailContent({ id }: { id: string }) {
               >
                 Empresa
               </p>
-              <p style={{ fontSize: '0.9rem', color: '#FFFFFF', fontWeight: 500 }}>
+              <p style={{ fontSize: 'var(--font-base)', color: '#FFFFFF', fontWeight: 500 }}>
                 {company?.name || "—"}
               </p>
             </div>
@@ -323,7 +371,7 @@ function EmployeeDetailContent({ id }: { id: string }) {
               <p 
                 className="mb-1"
                 style={{ 
-                  fontSize: '0.6rem', 
+                  fontSize: 'var(--font-xs)', 
                   color: 'rgba(255,255,255,0.27)', 
                   textTransform: 'uppercase',
                   letterSpacing: '0.1em',
@@ -331,7 +379,7 @@ function EmployeeDetailContent({ id }: { id: string }) {
               >
                 Telefono
               </p>
-              <p style={{ fontSize: '0.9rem', color: '#FFFFFF', fontWeight: 500 }}>
+              <p style={{ fontSize: 'var(--font-base)', color: '#FFFFFF', fontWeight: 500 }}>
                 {employee.phone || "—"}
               </p>
             </div>
@@ -341,7 +389,7 @@ function EmployeeDetailContent({ id }: { id: string }) {
               <p 
                 className="mb-1"
                 style={{ 
-                  fontSize: '0.6rem', 
+                  fontSize: 'var(--font-xs)', 
                   color: 'rgba(255,255,255,0.27)', 
                   textTransform: 'uppercase',
                   letterSpacing: '0.1em',
@@ -350,13 +398,13 @@ function EmployeeDetailContent({ id }: { id: string }) {
                 Extension
               </p>
               {employee.extension && employee.extension !== "—" ? (
-                <p style={{ fontSize: '0.9rem', color: '#FFFFFF', fontWeight: 500 }}>
+                <p style={{ fontSize: 'var(--font-base)', color: '#FFFFFF', fontWeight: 500 }}>
                   {employee.extension}
                 </p>
               ) : (
                 <span 
                   style={{ 
-                    fontSize: '0.75rem', 
+                    fontSize: 'var(--font-sm)', 
                     color: 'rgba(255,255,255,0.3)',
                     padding: '2px 8px',
                     background: 'rgba(255,255,255,0.05)',
@@ -373,7 +421,7 @@ function EmployeeDetailContent({ id }: { id: string }) {
               <p 
                 className="mb-1"
                 style={{ 
-                  fontSize: '0.6rem', 
+                  fontSize: 'var(--font-xs)', 
                   color: 'rgba(255,255,255,0.27)', 
                   textTransform: 'uppercase',
                   letterSpacing: '0.1em',
@@ -389,7 +437,7 @@ function EmployeeDetailContent({ id }: { id: string }) {
                     border: '1px solid rgba(255,255,255,0.10)',
                     borderRadius: '20px',
                     padding: '4px 12px',
-                    fontSize: '0.8rem',
+                    fontSize: 'var(--font-sm)',
                     color: 'white',
                   }}
                 >
@@ -397,7 +445,7 @@ function EmployeeDetailContent({ id }: { id: string }) {
                   {employee.location}
                 </span>
               ) : (
-                <span style={{ fontSize: '0.8rem', color: 'rgba(255,255,255,0.4)' }}>
+                <span style={{ fontSize: 'var(--font-sm)', color: 'rgba(255,255,255,0.4)' }}>
                   Sin sucursal
                 </span>
               )}
@@ -408,7 +456,7 @@ function EmployeeDetailContent({ id }: { id: string }) {
               <p 
                 className="mb-1"
                 style={{ 
-                  fontSize: '0.6rem', 
+                  fontSize: 'var(--font-xs)', 
                   color: 'rgba(255,255,255,0.27)', 
                   textTransform: 'uppercase',
                   letterSpacing: '0.1em',
@@ -416,7 +464,7 @@ function EmployeeDetailContent({ id }: { id: string }) {
               >
                 Email
               </p>
-              <p style={{ fontSize: '0.9rem', color: '#FFFFFF', fontWeight: 500, wordBreak: 'break-all' }}>
+              <p style={{ fontSize: 'var(--font-base)', color: '#FFFFFF', fontWeight: 500, wordBreak: 'break-all' }}>
                 {employee.email || "—"}
               </p>
             </div>
@@ -441,7 +489,7 @@ function EmployeeDetailContent({ id }: { id: string }) {
               background: copiedField === 'email' ? config.primary : 'rgba(255,255,255,0.04)',
               border: `1px solid ${copiedField === 'email' ? config.primary : 'rgba(255,255,255,0.08)'}`,
               color: copiedField === 'email' ? 'white' : 'rgba(255,255,255,0.44)',
-              fontSize: '0.8rem',
+              fontSize: 'var(--font-sm)',
               boxShadow: copiedField === 'email' ? `0 0 12px ${config.glow}` : 'none',
             }}
             onMouseEnter={(e) => {
@@ -483,7 +531,7 @@ function EmployeeDetailContent({ id }: { id: string }) {
               background: 'rgba(255,255,255,0.04)',
               border: '1px solid rgba(255,255,255,0.08)',
               color: 'rgba(255,255,255,0.44)',
-              fontSize: '0.8rem',
+              fontSize: 'var(--font-sm)',
             }}
             onMouseEnter={(e) => {
               e.currentTarget.style.background = `color-mix(in srgb, ${config.primary} 15%, transparent)`;
@@ -511,7 +559,7 @@ function EmployeeDetailContent({ id }: { id: string }) {
               background: copiedField === 'phone' ? config.primary : 'rgba(255,255,255,0.04)',
               border: `1px solid ${copiedField === 'phone' ? config.primary : 'rgba(255,255,255,0.08)'}`,
               color: copiedField === 'phone' ? 'white' : 'rgba(255,255,255,0.44)',
-              fontSize: '0.8rem',
+              fontSize: 'var(--font-sm)',
               boxShadow: copiedField === 'phone' ? `0 0 12px ${config.glow}` : 'none',
             }}
             onMouseEnter={(e) => {
@@ -540,6 +588,47 @@ function EmployeeDetailContent({ id }: { id: string }) {
               <>
                 <Phone className="w-3.5 h-3.5" />
                 <span>Copiar tel</span>
+              </>
+            )}
+          </button>
+
+          {/* Favorite */}
+          <button
+            onClick={handleToggleFavorite}
+            className="flex-1 rounded-[10px] flex items-center justify-center gap-1.5 transition-all duration-[180ms]"
+            style={{
+              height: '38px',
+              background: isEmployeeFavorite ? 'rgba(245,196,0,0.15)' : 'rgba(255,255,255,0.04)',
+              border: isEmployeeFavorite ? '1px solid rgba(245,196,0,0.4)' : '1px solid rgba(255,255,255,0.08)',
+              color: isEmployeeFavorite ? '#F5C400' : 'rgba(255,255,255,0.44)',
+              fontSize: 'var(--font-sm)',
+            }}
+          >
+            <Star className={`w-3.5 h-3.5 ${isEmployeeFavorite ? 'fill-[#F5C400]' : ''}`} />
+            <span>{isEmployeeFavorite ? 'Guardado' : 'Favorito'}</span>
+          </button>
+
+          {/* Copy All */}
+          <button
+            onClick={copyAllInfo}
+            className="flex-1 rounded-[10px] flex items-center justify-center gap-1.5 transition-all duration-[180ms]"
+            style={{
+              height: '38px',
+              background: copyAllState === 'copied' ? '#00C9A7' : 'rgba(255,255,255,0.04)',
+              border: copyAllState === 'copied' ? '1px solid #00C9A7' : '1px solid rgba(255,255,255,0.08)',
+              color: copyAllState === 'copied' ? 'white' : 'rgba(255,255,255,0.44)',
+              fontSize: 'var(--font-sm)',
+            }}
+          >
+            {copyAllState === 'copied' ? (
+              <>
+                <Check className="w-3.5 h-3.5" />
+                <span>Copiado</span>
+              </>
+            ) : (
+              <>
+                <ClipboardList className="w-3.5 h-3.5" />
+                <span>Copiar todo</span>
               </>
             )}
           </button>
@@ -640,7 +729,7 @@ function EmployeeDetailContent({ id }: { id: string }) {
                 className="text-white font-bold"
                 style={{ 
                   fontFamily: "var(--font-neuropol), var(--font-orbitron), 'Orbitron', 'Courier New', monospace",
-                  fontSize: '1.3rem',
+                  fontSize: 'var(--font-xl)',
                 }}
               >
                 {getInitials(employee.name)}
@@ -652,7 +741,7 @@ function EmployeeDetailContent({ id }: { id: string }) {
               className="text-white font-bold mt-3"
               style={{ 
                 fontFamily: "'DM Sans', sans-serif",
-                fontSize: '1.15rem',
+                fontSize: 'var(--font-lg)',
                 fontWeight: 700,
               }}
             >
@@ -664,7 +753,7 @@ function EmployeeDetailContent({ id }: { id: string }) {
               className="italic mt-1"
               style={{ 
                 color: config.primary,
-                fontSize: '0.8rem',
+                fontSize: 'var(--font-sm)',
                 fontFamily: "'DM Sans', sans-serif",
               }}
             >
@@ -678,7 +767,7 @@ function EmployeeDetailContent({ id }: { id: string }) {
                 background: `color-mix(in srgb, ${config.primary} 18%, transparent)`,
                 border: `1px solid color-mix(in srgb, ${config.primary} 45%, transparent)`,
                 color: config.highlight,
-                fontSize: '0.6rem',
+                fontSize: 'var(--font-xs)',
                 fontFamily: "var(--font-neuropol), var(--font-orbitron), 'Orbitron', 'Courier New', monospace",
                 textTransform: 'uppercase',
                 letterSpacing: '0.1em',
@@ -699,7 +788,7 @@ function EmployeeDetailContent({ id }: { id: string }) {
               <p 
                 className="mb-0.5"
                 style={{ 
-                  fontSize: '0.55rem', 
+                  fontSize: 'var(--font-xs)', 
                   color: 'rgba(255,255,255,0.27)', 
                   textTransform: 'uppercase',
                   letterSpacing: '0.1em',
@@ -707,7 +796,7 @@ function EmployeeDetailContent({ id }: { id: string }) {
               >
                 Departamento
               </p>
-              <p style={{ fontSize: '0.8rem', color: '#FFFFFF', fontWeight: 500 }}>
+              <p style={{ fontSize: 'var(--font-sm)', color: '#FFFFFF', fontWeight: 500 }}>
                 {employee.department || "—"}
               </p>
             </div>
@@ -717,7 +806,7 @@ function EmployeeDetailContent({ id }: { id: string }) {
               <p 
                 className="mb-0.5"
                 style={{ 
-                  fontSize: '0.55rem', 
+                  fontSize: 'var(--font-xs)', 
                   color: 'rgba(255,255,255,0.27)', 
                   textTransform: 'uppercase',
                   letterSpacing: '0.1em',
@@ -725,7 +814,7 @@ function EmployeeDetailContent({ id }: { id: string }) {
               >
                 Empresa
               </p>
-              <p style={{ fontSize: '0.8rem', color: '#FFFFFF', fontWeight: 500 }}>
+              <p style={{ fontSize: 'var(--font-sm)', color: '#FFFFFF', fontWeight: 500 }}>
                 {company?.shortName || "—"}
               </p>
             </div>
@@ -735,7 +824,7 @@ function EmployeeDetailContent({ id }: { id: string }) {
               <p 
                 className="mb-0.5"
                 style={{ 
-                  fontSize: '0.55rem', 
+                  fontSize: 'var(--font-xs)', 
                   color: 'rgba(255,255,255,0.27)', 
                   textTransform: 'uppercase',
                   letterSpacing: '0.1em',
@@ -743,7 +832,7 @@ function EmployeeDetailContent({ id }: { id: string }) {
               >
                 Telefono
               </p>
-              <p style={{ fontSize: '0.8rem', color: '#FFFFFF', fontWeight: 500 }}>
+              <p style={{ fontSize: 'var(--font-sm)', color: '#FFFFFF', fontWeight: 500 }}>
                 {employee.phone || "—"}
               </p>
             </div>
@@ -753,7 +842,7 @@ function EmployeeDetailContent({ id }: { id: string }) {
               <p 
                 className="mb-0.5"
                 style={{ 
-                  fontSize: '0.55rem', 
+                  fontSize: 'var(--font-xs)', 
                   color: 'rgba(255,255,255,0.27)', 
                   textTransform: 'uppercase',
                   letterSpacing: '0.1em',
@@ -762,13 +851,13 @@ function EmployeeDetailContent({ id }: { id: string }) {
                 Extension
               </p>
               {employee.extension && employee.extension !== "—" ? (
-                <p style={{ fontSize: '0.8rem', color: '#FFFFFF', fontWeight: 500 }}>
+                <p style={{ fontSize: 'var(--font-sm)', color: '#FFFFFF', fontWeight: 500 }}>
                   {employee.extension}
                 </p>
               ) : (
                 <span 
                   style={{ 
-                    fontSize: '0.7rem', 
+                    fontSize: 'var(--font-xs)', 
                     color: 'rgba(255,255,255,0.3)',
                   }}
                 >
@@ -782,7 +871,7 @@ function EmployeeDetailContent({ id }: { id: string }) {
               <p 
                 className="mb-0.5"
                 style={{ 
-                  fontSize: '0.55rem', 
+                  fontSize: 'var(--font-xs)', 
                   color: 'rgba(255,255,255,0.27)', 
                   textTransform: 'uppercase',
                   letterSpacing: '0.1em',
@@ -790,7 +879,7 @@ function EmployeeDetailContent({ id }: { id: string }) {
               >
                 Email
               </p>
-              <p style={{ fontSize: '0.8rem', color: '#FFFFFF', fontWeight: 500, wordBreak: 'break-all' }}>
+              <p style={{ fontSize: 'var(--font-sm)', color: '#FFFFFF', fontWeight: 500, wordBreak: 'break-all' }}>
                 {employee.email || "—"}
               </p>
             </div>
@@ -815,7 +904,7 @@ function EmployeeDetailContent({ id }: { id: string }) {
               background: copiedField === 'email' ? config.primary : 'rgba(255,255,255,0.04)',
               border: `1px solid ${copiedField === 'email' ? config.primary : 'rgba(255,255,255,0.08)'}`,
               color: copiedField === 'email' ? 'white' : 'rgba(255,255,255,0.44)',
-              fontSize: '0.8rem',
+              fontSize: 'var(--font-sm)',
             }}
           >
             {copiedField === 'email' ? (
@@ -840,7 +929,7 @@ function EmployeeDetailContent({ id }: { id: string }) {
               background: 'rgba(255,255,255,0.04)',
               border: '1px solid rgba(255,255,255,0.08)',
               color: 'rgba(255,255,255,0.44)',
-              fontSize: '0.8rem',
+              fontSize: 'var(--font-sm)',
             }}
           >
             <MessageSquare className="w-4 h-4" />
@@ -856,7 +945,7 @@ function EmployeeDetailContent({ id }: { id: string }) {
               background: copiedField === 'phone' ? config.primary : 'rgba(255,255,255,0.04)',
               border: `1px solid ${copiedField === 'phone' ? config.primary : 'rgba(255,255,255,0.08)'}`,
               color: copiedField === 'phone' ? 'white' : 'rgba(255,255,255,0.44)',
-              fontSize: '0.8rem',
+              fontSize: 'var(--font-sm)',
             }}
           >
             {copiedField === 'phone' ? (
@@ -871,6 +960,48 @@ function EmployeeDetailContent({ id }: { id: string }) {
               </>
             )}
           </button>
+
+          {/* Favorite + Copy All row */}
+          <div className="flex gap-2">
+            <button
+              onClick={handleToggleFavorite}
+              className="flex-1 rounded-[10px] flex items-center justify-center gap-1.5 transition-all duration-[180ms]"
+              style={{
+                height: '44px',
+                background: isEmployeeFavorite ? 'rgba(245,196,0,0.15)' : 'rgba(255,255,255,0.04)',
+                border: isEmployeeFavorite ? '1px solid rgba(245,196,0,0.4)' : '1px solid rgba(255,255,255,0.08)',
+                color: isEmployeeFavorite ? '#F5C400' : 'rgba(255,255,255,0.44)',
+                fontSize: 'var(--font-sm)',
+              }}
+            >
+              <Star className={`w-4 h-4 ${isEmployeeFavorite ? 'fill-[#F5C400]' : ''}`} />
+              <span>{isEmployeeFavorite ? 'Guardado' : 'Favorito'}</span>
+            </button>
+
+            <button
+              onClick={copyAllInfo}
+              className="flex-1 rounded-[10px] flex items-center justify-center gap-1.5 transition-all duration-[180ms]"
+              style={{
+                height: '44px',
+                background: copyAllState === 'copied' ? '#00C9A7' : 'rgba(255,255,255,0.04)',
+                border: copyAllState === 'copied' ? '1px solid #00C9A7' : '1px solid rgba(255,255,255,0.08)',
+                color: copyAllState === 'copied' ? 'white' : 'rgba(255,255,255,0.44)',
+                fontSize: 'var(--font-sm)',
+              }}
+            >
+              {copyAllState === 'copied' ? (
+                <>
+                  <Check className="w-4 h-4" />
+                  <span>Copiado</span>
+                </>
+              ) : (
+                <>
+                  <ClipboardList className="w-4 h-4" />
+                  <span>Copiar todo</span>
+                </>
+              )}
+            </button>
+          </div>
         </div>
       </motion.div>
     </div>

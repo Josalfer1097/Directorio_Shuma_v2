@@ -3,9 +3,13 @@ import { DM_Sans, Orbitron } from 'next/font/google'
 import localFont from 'next/font/local'
 import { Analytics } from '@vercel/analytics/next'
 import { ThemeProvider } from '@/components/theme-provider'
+import { FontScaleProvider } from '@/lib/FontScaleContext'
+import { CompanyThemeProvider } from '@/lib/CompanyThemeContext'
 import { RgbSignature } from '@/components/rgb-signature'
 import { Toaster } from 'sonner'
 import { ScrollToTop } from '@/components/scroll-to-top'
+import { ParticleBackground } from '@/components/particle-background'
+import { AmbientGlows } from '@/components/ambient-glows'
 import './globals.css'
 
 const dmSans = DM_Sans({ 
@@ -59,13 +63,19 @@ export default function RootLayout({
           defaultTheme="dark"
           enableSystem={false}
         >
-          <div className="dot-grid-overlay" />
-          <div className="pb-7">
-            {children}
-          </div>
-          <RgbSignature />
-          <ScrollToTop />
-          <Toaster position="bottom-right" richColors />
+          <FontScaleProvider>
+            <CompanyThemeProvider>
+              <AmbientGlows />
+              <ParticleBackground />
+              <div className="dot-grid-overlay" />
+              <div className="pb-7 relative z-[1]">
+                {children}
+              </div>
+              <RgbSignature />
+              <ScrollToTop />
+              <Toaster position="bottom-right" richColors />
+            </CompanyThemeProvider>
+          </FontScaleProvider>
         </ThemeProvider>
         <Analytics />
       </body>

@@ -8,6 +8,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import type { ViewMode } from "@/types";
 import { cn } from "@/lib/utils";
 import { getEmployees } from "@/lib/data";
+import { FontScaleControl } from "./font-scale-control";
 
 export function Navbar() {
   const pathname = usePathname();
@@ -100,6 +101,15 @@ export function Navbar() {
         backdropFilter: scrolled ? 'blur(20px) saturate(180%)' : undefined,
       }}
     >
+      {/* Company Theme Tint Overlay */}
+      <div
+        className="absolute inset-0 pointer-events-none"
+        style={{
+          background: 'var(--theme-navbar-tint, rgba(0,0,0,0))',
+          transition: 'background 600ms ease',
+        }}
+        aria-hidden="true"
+      />
       <nav className="container mx-auto px-4 flex items-center justify-between">
           <Link
             href="/"
@@ -143,6 +153,9 @@ export function Navbar() {
               <span className="absolute -bottom-1.5 left-0 right-0 h-0.5 bg-gradient-to-r from-[#C9A84C] to-[#E0C060] rounded-full" />
             )}
           </Link>
+
+          {/* Font Scale Control */}
+          <FontScaleControl />
 
           {/* Quick Extensions Button */}
           <div className="relative">
@@ -190,7 +203,7 @@ export function Navbar() {
                   background: "#1A1A1A",
                   border: "1px solid rgba(255,255,255,0.10)",
                   borderRadius: "6px",
-                  fontSize: "0.7rem",
+                  fontSize: "var(--font-xs)",
                   color: "rgba(255,255,255,0.8)",
                 }}
               >

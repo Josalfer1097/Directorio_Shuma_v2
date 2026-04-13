@@ -1,7 +1,8 @@
 "use client";
 
 import { motion, AnimatePresence } from "framer-motion";
-import { X, Filter, Download } from "lucide-react";
+import { X, Filter, Download, Star, ChevronRight, Layers } from "lucide-react";
+import { useFavorites } from "@/lib/useFavorites";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -39,9 +40,12 @@ interface DirectoryFiltersProps {
   selectedCompanies: string[];
   selectedDepartment: string;
   selectedLocations: string[];
+  showFavoritesOnly: boolean;
   onCompanyChange: (companies: string[]) => void;
   onDepartmentChange: (department: string) => void;
   onLocationChange: (locations: string[]) => void;
+  onFavoritesToggle: (show: boolean) => void;
+  onDeptViewOpen: (department: string) => void;
   onClearFilters: () => void;
   filteredEmployees: Employee[];
 }
@@ -53,14 +57,18 @@ export function DirectoryFilters({
   selectedCompanies,
   selectedDepartment,
   selectedLocations,
+  showFavoritesOnly,
   onCompanyChange,
   onDepartmentChange,
   onLocationChange,
+  onFavoritesToggle,
+  onDeptViewOpen,
   onClearFilters,
   filteredEmployees,
 }: DirectoryFiltersProps) {
   const [mobileSheetOpen, setMobileSheetOpen] = useState(false);
   const allEmployees = getEmployees();
+  const { favorites, clearAllFavorites } = useFavorites();
 
   // Calculate counts for each filter option
   const filterCounts = useMemo(() => {
@@ -146,6 +154,46 @@ export function DirectoryFilters({
 
   const FilterContent = () => (
     <div className="space-y-6">
+      {/* Favorites Section - Only show if there are favorites */}
+      {favorites.length > 0 && (
+        <div>
+          <button
+            onClick={() => onFavoritesToggle(!showFavoritesOnly)}
+            className="w-full flex items-center justify-between gap-2 px-3 py-2.5 rounded-lg transition-all duration-[180ms]"
+            style={{
+              background: showFavoritesOnly ? 'rgba(245,196,0,0.12)' : 'rgba(255,255,255,0.03)',
+              border: showFavoritesOnly ? '1px solid rgba(245,196,0,0.30)' : '1px solid rgba(255,255,255,0.08)',
+              color: showFavoritesOnly ? '#F5C400' : 'rgba(255,255,255,0.7)',
+            }}
+          >
+            <span className="flex items-center gap-2 text-sm font-medium">
+              <Star className={`w-4 h-4 ${showFavoritesOnly ? 'fill-[#F5C400]' : ''}`} />
+              Mis Contactos
+              <span 
+                className="px-1.5 py-0.5 text-xs rounded"
+                style={{
+                  background: 'rgba(255,255,255,0.08)',
+                  color: 'rgba(255,255,255,0.5)',
+                }}
+              >
+                {favorites.length}
+              </span>
+            </span>
+          </button>
+          {showFavoritesOnly && (
+            <button
+              onClick={() => {
+                clearAllFavorites();
+                onFavoritesToggle(false);
+              }}
+              className="mt-2 text-xs text-white/40 hover:text-white/70 transition-colors"
+            >
+              Limpiar todos
+            </button>
+          )}
+        </div>
+      )}
+
       {/* Companies */}
       <div>
         <h4 className="font-medium text-foreground mb-3" style={{ fontFamily: "var(--font-neuropol), var(--font-orbitron), 'Orbitron', 'Courier New', monospace" }}>Empresas</h4>
@@ -216,6 +264,80 @@ export function DirectoryFilters({
             ))}
           </SelectContent>
         </Select>
+        
+        {/* Department View Link - only when a specific department is selected */}
+        {selectedDepartment !== "all" && (
+          <button
+            onClick={() => onDeptViewOpen(selectedDepartment)}
+            className="mt-2 w-full flex items-center justify-center gap-1.5 transition-colors cursor-pointer group"
+            style={{
+              fontSize: "var(--font-xs)",
+              color: "#00C9A7",
+              background: "rgba(0,201,167,0.06)",
+              border: "1px solid rgba(0,201,167,0.20)",
+              borderRadius: "8px",
+              padding: "6px 12px",
+            }}
+            onMouseEnter={(e) => e.currentTarget.style.background = "rgba(0,201,167,0.12)"}
+            onMouseLeave={(e) => e.currentTarget.style.background = "rgba(0,201,167,0.06)"}
+          >
+            <Layers className="w-3 h-3" />
+            <span>Ver vista de {selectedDepartment}</span>
+            <ChevronRight className="w-3 h-3 transition-transform group-hover:translate-x-0.5" />
+          </button>
+        )}
+
+        {/* Department Quick List with visible Ver buttons */}
+        <div className="mt-4 space-y-1.5">
+          {departments.slice(0, 8).map((dept) => (
+            <div 
+              key={dept}
+              className="flex items-center gap-2"
+              style={{ minHeight: "40px" }}
+            >
+              <label 
+                className="flex items-center gap-2 cursor-pointer flex-1 py-1"
+              >
+                <Checkbox
+                  checked={selectedDepartment === dept}
+                  onCheckedChange={() => onDepartmentChange(selectedDepartment === dept ? "all" : dept)}
+                />
+                <span 
+                  className="text-white/60 hover:text-white/80 truncate transition-colors"
+                  style={{ fontSize: "var(--font-xs)", maxWidth: "120px" }}
+                >
+                  {dept}
+                </span>
+              </label>
+              <button
+                onClick={() => onDeptViewOpen(dept)}
+                className="flex items-center gap-1 transition-all shrink-0"
+                style={{
+                  fontSize: "var(--font-xs)",
+                  color: "rgba(255,255,255,0.35)",
+                  background: "rgba(255,255,255,0.04)",
+                  border: "1px solid rgba(255,255,255,0.08)",
+                  borderRadius: "6px",
+                  padding: "3px 8px",
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.color = "#00C9A7";
+                  e.currentTarget.style.borderColor = "rgba(0,201,167,0.35)";
+                  e.currentTarget.style.background = "rgba(0,201,167,0.08)";
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.color = "rgba(255,255,255,0.35)";
+                  e.currentTarget.style.borderColor = "rgba(255,255,255,0.08)";
+                  e.currentTarget.style.background = "rgba(255,255,255,0.04)";
+                }}
+                title={`Ver departamento ${dept}`}
+              >
+                <span>Ver</span>
+                <ChevronRight className="w-3 h-3" />
+              </button>
+            </div>
+          ))}
+        </div>
       </div>
 
       {/* Locations */}

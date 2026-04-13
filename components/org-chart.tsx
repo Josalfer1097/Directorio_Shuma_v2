@@ -260,7 +260,7 @@ export function OrgChart({ initialCompany }: OrgChartProps) {
               style={{
                 backgroundColor: selectedCompany === filter.id ? filter.color : undefined,
                 boxShadow: selectedCompany === filter.id ? `0 4px 12px ${filter.color}40` : undefined,
-                fontSize: "0.72rem",
+                fontSize: "var(--font-xs)",
               }}
             >
               {filter.shortLabel}
@@ -277,7 +277,7 @@ export function OrgChart({ initialCompany }: OrgChartProps) {
                 "px-2 py-1 rounded font-neuropol uppercase transition-colors touch-manipulation",
                 layout === "vertical" ? "bg-white/10 text-white" : "text-white/40"
               )}
-              style={{ fontSize: "0.7rem" }}
+              style={{ fontSize: "var(--font-xs)" }}
             >
               Vertical
             </button>
@@ -287,7 +287,7 @@ export function OrgChart({ initialCompany }: OrgChartProps) {
                 "px-2 py-1 rounded font-neuropol uppercase transition-colors touch-manipulation",
                 layout === "horizontal" ? "bg-white/10 text-white" : "text-white/40"
               )}
-              style={{ fontSize: "0.7rem" }}
+              style={{ fontSize: "var(--font-xs)" }}
             >
               Horizontal
             </button>

@@ -47,7 +47,7 @@ const ExtensionRow = memo(function ExtensionRow({
           <span
             className="inline-block font-mono font-bold"
             style={{
-              fontSize: "0.9rem",
+              fontSize: "var(--font-base)",
               color: companyConfig.primary,
               background: `${companyConfig.primary}1f`,
               borderRadius: "6px",
@@ -57,14 +57,14 @@ const ExtensionRow = memo(function ExtensionRow({
             {employee.extension}
           </span>
         ) : (
-          <span className="text-white/20 text-xs">--</span>
+          <span className="text-white/20" style={{ fontSize: "var(--font-xs)" }}>--</span>
         )}
       </td>
       {/* Name */}
       <td
         className="px-3 font-medium text-white group-hover:text-white/90"
         style={{ 
-          fontSize: "0.85rem", 
+          fontSize: "var(--font-base)", 
           fontWeight: 500,
           whiteSpace: "nowrap",
           overflow: "hidden",
@@ -78,7 +78,7 @@ const ExtensionRow = memo(function ExtensionRow({
       <td
         className="px-3 hidden md:table-cell"
         style={{ 
-          fontSize: "0.78rem", 
+          fontSize: "var(--font-sm)", 
           color: "rgba(255,255,255,0.65)",
           whiteSpace: "nowrap",
           overflow: "hidden",
@@ -92,7 +92,7 @@ const ExtensionRow = memo(function ExtensionRow({
       <td
         className="px-3 hidden lg:table-cell"
         style={{ 
-          fontSize: "0.75rem", 
+          fontSize: "var(--font-sm)", 
           color: "rgba(255,255,255,0.45)",
           whiteSpace: "nowrap",
           overflow: "hidden",
@@ -106,7 +106,7 @@ const ExtensionRow = memo(function ExtensionRow({
       <td
         className="px-3 hidden xl:table-cell"
         style={{ 
-          fontSize: "0.72rem", 
+          fontSize: "var(--font-xs)", 
           color: "rgba(255,255,255,0.35)",
           whiteSpace: "nowrap",
           overflow: "hidden",
@@ -144,7 +144,7 @@ const CompanyHeader = memo(function CompanyHeader({
             className="font-neuropol uppercase tracking-wider"
             style={{
               fontFamily: "var(--font-neuropol), var(--font-orbitron), 'Orbitron', monospace",
-              fontSize: "0.7rem",
+              fontSize: "var(--font-xs)",
               letterSpacing: "0.15em",
               color: companyConfig.primary,
             }}
@@ -152,12 +152,12 @@ const CompanyHeader = memo(function CompanyHeader({
             {companyName}
           </span>
           <span
-            className="px-2 py-0.5 rounded-full text-xs"
+            className="px-2 py-0.5 rounded-full"
             style={{
               background: "rgba(255,255,255,0.08)",
               border: "1px solid rgba(255,255,255,0.12)",
               color: "rgba(255,255,255,0.6)",
-              fontSize: "0.65rem",
+              fontSize: "var(--font-xs)",
             }}
           >
             {employeeCount}
@@ -184,7 +184,7 @@ const LocationSubHeader = memo(function LocationSubHeader({
       <td colSpan={5} style={{ paddingLeft: "80px" }}>
         <span
           className="flex items-center gap-1"
-          style={{ fontSize: "0.65rem", color: "rgba(255,255,255,0.3)" }}
+          style={{ fontSize: "var(--font-xs)", color: "rgba(255,255,255,0.3)" }}
         >
           <MapPin className="w-3 h-3" />
           {location}
@@ -281,7 +281,7 @@ const ExtensionCard = memo(function ExtensionCard({
         <p
           className="text-white leading-tight line-clamp-2"
           style={{
-            fontSize: "0.78rem",
+            fontSize: "var(--font-sm)",
             fontWeight: 600,
             wordBreak: "break-word",
           }}
@@ -305,7 +305,7 @@ const ExtensionCard = memo(function ExtensionCard({
             <span
               style={{
                 fontFamily: "monospace",
-                fontSize: "0.9rem",
+                fontSize: "var(--font-base)",
                 fontWeight: 700,
                 color: companyConfig.primary,
                 letterSpacing: "0.05em",
@@ -317,7 +317,7 @@ const ExtensionCard = memo(function ExtensionCard({
         ) : (
           <span
             style={{
-              fontSize: "0.65rem",
+              fontSize: "var(--font-xs)",
               color: "rgba(255,255,255,0.20)",
               fontStyle: "italic",
               marginTop: "6px",
@@ -601,7 +601,7 @@ export function ExtensionDirectory({
           className="uppercase tracking-widest shrink-0"
           style={{
             fontFamily: "var(--font-neuropol), var(--font-orbitron), 'Orbitron', monospace",
-            fontSize: "0.7rem",
+            fontSize: "var(--font-xs)",
             letterSpacing: "0.2em",
             color: "rgba(255,255,255,0.5)",
           }}
@@ -647,7 +647,7 @@ export function ExtensionDirectory({
               title="Resetear anchos de columnas"
             >
               <RotateCcw className="w-3 h-3" />
-              <span className="hidden sm:inline" style={{ fontSize: "0.7rem" }}>Reset columnas</span>
+              <span className="hidden sm:inline" style={{ fontSize: "var(--font-xs)" }}>Reset columnas</span>
             </button>
           )}
 
@@ -740,7 +740,7 @@ export function ExtensionDirectory({
               borderRadius: "20px",
               background: "rgba(255,255,255,0.05)",
               border: "1px solid rgba(255,255,255,0.08)",
-              fontSize: "0.72rem",
+              fontSize: "var(--font-xs)",
               color: "rgba(255,255,255,0.5)",
             }}
           >
@@ -830,7 +830,7 @@ export function ExtensionDirectory({
                       className={`px-3 relative select-none ${hiddenClasses} ${idx === 0 ? "text-center" : ""}`}
                       style={{
                         fontFamily: "var(--font-neuropol), var(--font-orbitron), 'Orbitron', monospace",
-                        fontSize: "0.6rem",
+                        fontSize: "var(--font-xs)",
                         letterSpacing: "0.1em",
                         color: "rgba(255,255,255,0.35)",
                         textTransform: "uppercase",
