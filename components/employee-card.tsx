@@ -1,7 +1,9 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { Mail, Phone, Copy, Check, MessageSquare, MapPin } from "lucide-react";
+import { Mail, Phone, Copy, Check, MessageSquare, MapPin, Star } from "lucide-react";
+import { useFavorites } from "@/lib/useFavorites";
+import { haptics } from "@/lib/haptics";
 import { useState } from "react";
 import Link from "next/link";
 import { toast } from "sonner";
@@ -56,6 +58,18 @@ export function EmployeeCard({
 }: EmployeeCardProps) {
   const [copiedField, setCopiedField] = useState<string | null>(null);
   const [isHovered, setIsHovered] = useState(false);
+  const [favoriteAnimating, setFavoriteAnimating] = useState(false);
+  const { isFavorite, toggleFavorite } = useFavorites();
+  const isEmployeeFavorite = isFavorite(employee.id);
+
+  const handleToggleFavorite = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setFavoriteAnimating(true);
+    haptics.success();
+    toggleFavorite(employee.id);
+    setTimeout(() => setFavoriteAnimating(false), 300);
+  };
   
   // Get company-specific config using the shared module
   const companyConfig = getCompanyConfig(employee.company);
@@ -74,6 +88,7 @@ export function EmployeeCard({
     e.stopPropagation();
     if (!text) return;
     navigator.clipboard.writeText(text);
+    haptics.light();
     setCopiedField(field);
     toast.success("Copiado al portapapeles", { duration: 2000 });
     setTimeout(() => setCopiedField(null), 2000);
@@ -283,12 +298,16 @@ export function EmployeeCard({
       <Link href={`/directorio/${employee.id}`}>
         <div
           className={cn(
-            "card-shimmer corner-bracket group relative overflow-hidden rounded-xl p-4 h-[200px] flex flex-col touch-manipulation select-none",
+            "card-shimmer corner-bracket group relative overflow-hidden rounded-xl flex flex-col touch-manipulation select-none employee-card",
             "transition-all duration-[180ms]"
           )}
           style={{ 
             ["--shimmer-color" as string]: companyConfig.primary,
             ["--bracket-color" as string]: companyConfig.primary,
+            ["--card-color" as string]: companyConfig.primary,
+            height: 'auto',
+            minHeight: 'calc(180px * var(--font-scale, 1))',
+            padding: 'calc(14px * var(--font-scale, 1)) calc(16px * var(--font-scale, 1))',
             borderWidth: isHovered ? '1.5px' : '1px',
             borderStyle: 'solid',
             borderColor: isHovered ? companyConfig.primary : 'var(--border)',
@@ -300,6 +319,30 @@ export function EmployeeCard({
             transitionTimingFunction: "cubic-bezier(0.25, 0.46, 0.45, 0.94)"
           }}
         >
+          {/* Favorite button */}
+          <button
+            onClick={handleToggleFavorite}
+            className="absolute top-2 right-2 z-10 flex items-center justify-center transition-all duration-[180ms]"
+            style={{
+              width: '28px',
+              height: '28px',
+              borderRadius: '50%',
+              background: isEmployeeFavorite ? 'rgba(245,196,0,0.15)' : 'rgba(0,0,0,0.3)',
+              border: isEmployeeFavorite ? '1px solid rgba(245,196,0,0.4)' : '1px solid rgba(255,255,255,0.1)',
+              transform: favoriteAnimating ? 'scale(1.3)' : 'scale(1)',
+            }}
+          >
+            <Star
+              className={`transition-all duration-[180ms] ${isEmployeeFavorite ? 'fill-[#F5C400]' : ''}`}
+              style={{
+                width: '14px',
+                height: '14px',
+                color: isEmployeeFavorite ? '#F5C400' : 'rgba(255,255,255,0.20)',
+                filter: isEmployeeFavorite ? 'drop-shadow(0 0 4px rgba(245,196,0,0.6))' : 'none',
+              }}
+            />
+          </button>
+
           {/* Top accent line */}
           <div 
             className="absolute top-0 left-0 right-0 transition-all duration-[180ms]"
@@ -323,10 +366,12 @@ export function EmployeeCard({
           />
           
           {/* Top section: Avatar + Info */}
-          <div className="flex items-start gap-3 flex-1 pl-2">
+          <div className="flex items-start flex-1 pl-2" style={{ gap: 'calc(12px * var(--font-scale, 1))' }}>
             <Avatar 
-              className="w-14 h-14 shrink-0 transition-all duration-[180ms]"
+              className="shrink-0 transition-all duration-[180ms] avatar-animated"
               style={{
+                width: 'calc(52px * var(--font-scale, 1))',
+                height: 'calc(52px * var(--font-scale, 1))',
                 borderWidth: isHovered ? '2px' : '1.5px',
                 borderStyle: 'solid',
                 borderColor: isHovered 
@@ -339,10 +384,13 @@ export function EmployeeCard({
               }}
             >
               <AvatarFallback
-                className="text-sm font-semibold"
+                className="font-semibold avatar-animated-inner"
                 style={{
-                  background: `linear-gradient(135deg, ${companyConfig.secondary}, ${companyConfig.primary})`,
-                  color: companyConfig.textColor || 'white',
+                  fontSize: 'calc(1.1rem * var(--font-scale, 1))',
+                  background: `conic-gradient(from var(--avatar-angle, 0deg), ${companyConfig.secondary} 0%, ${companyConfig.primary} 40%, ${companyConfig.highlight || companyConfig.accent || companyConfig.primary} 60%, ${companyConfig.secondary} 100%)`,
+                  color: 'white',
+                  textShadow: '0 1px 3px rgba(0,0,0,0.4)',
+                  fontWeight: 700,
                 }}
               >
                 {getInitials(employee.name)}
@@ -352,26 +400,36 @@ export function EmployeeCard({
             <div className="flex-1 min-w-0">
               <h3 
                 className="font-semibold text-foreground group-hover:text-primary transition-colors duration-[180ms] line-clamp-1"
-                style={{ fontSize: 'var(--font-base)' }}
+                style={{ fontSize: 'var(--font-md)' }}
               >
                 {employee.name}
               </h3>
-              <p className="text-muted-foreground line-clamp-1" style={{ fontSize: 'var(--font-sm)' }}>
+              <p className="text-muted-foreground line-clamp-1" style={{ fontSize: 'var(--font-base)' }}>
                 {employee.position}
               </p>
-              <p className="text-muted-foreground/70 line-clamp-1" style={{ fontSize: 'var(--font-xs)' }}>
+              <p className="text-muted-foreground/70 line-clamp-1" style={{ fontSize: 'var(--font-sm)' }}>
                 {employee.department}
               </p>
               {employee.location && (
-                <p className="flex items-center gap-1 text-[10px] text-muted-foreground/50 line-clamp-1 mt-0.5">
-                  <MapPin className="w-2.5 h-2.5" />
+                <p 
+                  className="flex items-center text-muted-foreground/50 line-clamp-1"
+                  style={{ 
+                    fontSize: 'var(--font-xs)', 
+                    gap: 'calc(4px * var(--font-scale, 1))',
+                    marginTop: 'calc(2px * var(--font-scale, 1))',
+                  }}
+                >
+                  <MapPin style={{ width: 'calc(10px * var(--font-scale, 1))', height: 'calc(10px * var(--font-scale, 1))' }} />
                   {employee.location}
                 </p>
               )}
               {!hideCompanyBadge && (
                 <span
-                  className="inline-block text-[10px] font-medium px-2 py-0.5 rounded-full mt-1"
+                  className="inline-block font-medium rounded-full"
                   style={{
+                    fontSize: 'var(--font-xs)',
+                    padding: 'calc(3px * var(--font-scale, 1)) calc(10px * var(--font-scale, 1))',
+                    marginTop: 'calc(4px * var(--font-scale, 1))',
                     backgroundColor: `${companyConfig.primary}15`,
                     border: `1px solid ${companyConfig.primary}40`,
                     color: companyConfig.accent || companyConfig.primary,

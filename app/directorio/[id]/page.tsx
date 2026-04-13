@@ -1,6 +1,6 @@
 "use client";
 
-import { use, useState, Component, ReactNode } from "react";
+import { use, useState, useRef, useEffect, Component, ReactNode } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { notFound, useRouter } from "next/navigation";
 import { toast } from "sonner";
@@ -13,12 +13,20 @@ import {
   MessageSquare,
   AlertTriangle,
   MapPin,
+  Star,
+  ClipboardList,
+  QrCode,
+  Download,
+  ChevronDown,
 } from "lucide-react";
 import {
   getEmployeeById,
   getCompanyById,
 } from "@/lib/data";
 import { getCompanyConfig } from "@/lib/companyConfig";
+import { useFavorites } from "@/lib/useFavorites";
+import { haptics } from "@/lib/haptics";
+import QRCode from "qrcode";
 
 interface Props {
   params: Promise<{ id: string }>;
@@ -64,28 +72,101 @@ class EmployeeDetailErrorBoundary extends Component<
 function EmployeeDetailContent({ id }: { id: string }) {
   const router = useRouter();
   const [copiedField, setCopiedField] = useState<string | null>(null);
+  const [showQr, setShowQr] = useState(false);
+  const [qrDataUrl, setQrDataUrl] = useState<string | null>(null);
+  const [copyAllState, setCopyAllState] = useState<'idle' | 'copied'>('idle');
+  const { isFavorite, toggleFavorite } = useFavorites();
 
   const employee = getEmployeeById(id);
   if (!employee) {
     notFound();
   }
 
+  const isEmployeeFavorite = isFavorite(employee.id);
   const company = getCompanyById(employee.company);
   const config = getCompanyConfig(employee.company);
 
+  // Generate QR code when showQr is toggled on
+  useEffect(() => {
+    if (showQr && !qrDataUrl) {
+      const url = `${window.location.origin}/directorio/${id}`;
+      QRCode.toDataURL(url, {
+        width: 280,
+        margin: 2,
+        color: {
+          dark: '#000000',
+          light: '#FFFFFF',
+        },
+        errorCorrectionLevel: 'M',
+      })
+        .then((dataUrl: string) => setQrDataUrl(dataUrl))
+        .catch(() => toast.error("Error generando QR"));
+    }
+  }, [showQr, qrDataUrl, id]);
+
   const handleClose = () => {
+    haptics.soft();
     router.push("/directorio");
   };
 
   const copyToClipboard = async (text: string, field: string) => {
     try {
       await navigator.clipboard.writeText(text);
+      haptics.light();
       setCopiedField(field);
       toast.success("Copiado al portapapeles");
       setTimeout(() => setCopiedField(null), 800);
     } catch {
       toast.error("Error al copiar");
     }
+  };
+
+  const copyAllInfo = async () => {
+    const lines: string[] = [];
+    lines.push(`*${employee.name}*`);
+    if (employee.position && employee.department) {
+      lines.push(`${employee.position} — ${employee.department}`);
+    } else if (employee.position) {
+      lines.push(employee.position);
+    }
+    if (company?.name) {
+      lines.push(company.name);
+    }
+    if (employee.location) {
+      lines.push(`📍 ${employee.location}`);
+    }
+    if (employee.phone || employee.extension) {
+      const phonePart = employee.phone || '';
+      const extPart = employee.extension ? `  Ext. ${employee.extension}` : '';
+      lines.push(`📞 ${phonePart}${extPart}`);
+    }
+    if (employee.email) {
+      lines.push(`✉️ ${employee.email}`);
+    }
+
+    try {
+      await navigator.clipboard.writeText(lines.join('\n'));
+      haptics.double();
+      setCopyAllState('copied');
+      toast.success("Todo copiado al portapapeles");
+      setTimeout(() => setCopyAllState('idle'), 1000);
+    } catch {
+      toast.error("Error al copiar");
+    }
+  };
+
+  const downloadQr = () => {
+    if (!qrDataUrl) return;
+    const link = document.createElement('a');
+    link.href = qrDataUrl;
+    const slug = employee.name.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '');
+    link.download = `qr-${slug}.png`;
+    link.click();
+  };
+
+  const handleToggleFavorite = () => {
+    haptics.success();
+    toggleFavorite(employee.id);
   };
 
   const openTeamsChat = () => {
@@ -543,6 +624,115 @@ function EmployeeDetailContent({ id }: { id: string }) {
               </>
             )}
           </button>
+
+          {/* Favorite */}
+          <button
+            onClick={handleToggleFavorite}
+            className="flex-1 rounded-[10px] flex items-center justify-center gap-1.5 transition-all duration-[180ms]"
+            style={{
+              height: '38px',
+              background: isEmployeeFavorite ? 'rgba(245,196,0,0.15)' : 'rgba(255,255,255,0.04)',
+              border: isEmployeeFavorite ? '1px solid rgba(245,196,0,0.4)' : '1px solid rgba(255,255,255,0.08)',
+              color: isEmployeeFavorite ? '#F5C400' : 'rgba(255,255,255,0.44)',
+              fontSize: 'var(--font-sm)',
+            }}
+          >
+            <Star className={`w-3.5 h-3.5 ${isEmployeeFavorite ? 'fill-[#F5C400]' : ''}`} />
+            <span>{isEmployeeFavorite ? 'Guardado' : 'Favorito'}</span>
+          </button>
+
+          {/* Copy All */}
+          <button
+            onClick={copyAllInfo}
+            className="flex-1 rounded-[10px] flex items-center justify-center gap-1.5 transition-all duration-[180ms]"
+            style={{
+              height: '38px',
+              background: copyAllState === 'copied' ? '#00C9A7' : 'rgba(255,255,255,0.04)',
+              border: copyAllState === 'copied' ? '1px solid #00C9A7' : '1px solid rgba(255,255,255,0.08)',
+              color: copyAllState === 'copied' ? 'white' : 'rgba(255,255,255,0.44)',
+              fontSize: 'var(--font-sm)',
+            }}
+          >
+            {copyAllState === 'copied' ? (
+              <>
+                <Check className="w-3.5 h-3.5" />
+                <span>Copiado</span>
+              </>
+            ) : (
+              <>
+                <ClipboardList className="w-3.5 h-3.5" />
+                <span>Copiar todo</span>
+              </>
+            )}
+          </button>
+        </div>
+
+        {/* QR Code Section */}
+        <div className="px-7 pb-5">
+          <button
+            onClick={() => setShowQr(!showQr)}
+            className="w-full rounded-[10px] flex items-center justify-center gap-1.5 transition-all duration-[180ms]"
+            style={{
+              height: '36px',
+              background: 'rgba(255,255,255,0.02)',
+              border: '1px solid rgba(255,255,255,0.06)',
+              color: 'rgba(255,255,255,0.35)',
+              fontSize: 'var(--font-sm)',
+            }}
+          >
+            <QrCode className="w-3.5 h-3.5" />
+            <span>{showQr ? 'Cerrar QR' : 'Ver QR'}</span>
+            <ChevronDown className={`w-3.5 h-3.5 transition-transform ${showQr ? 'rotate-180' : ''}`} />
+          </button>
+
+          {/* QR Expanded */}
+          <AnimatePresence>
+            {showQr && (
+              <motion.div
+                initial={{ height: 0, opacity: 0 }}
+                animate={{ height: 'auto', opacity: 1 }}
+                exit={{ height: 0, opacity: 0 }}
+                transition={{ duration: 0.2 }}
+                className="overflow-hidden"
+              >
+                <div className="pt-4 flex flex-col items-center">
+                  {qrDataUrl ? (
+                    <>
+                      <div 
+                        className="p-2 rounded-lg"
+                        style={{ background: 'white' }}
+                      >
+                        <img src={qrDataUrl} alt="QR Code" style={{ width: '140px', height: '140px' }} />
+                      </div>
+                      <p 
+                        className="mt-2 text-center"
+                        style={{ fontSize: 'var(--font-xs)', color: 'rgba(255,255,255,0.4)' }}
+                      >
+                        Escanea para abrir esta tarjeta
+                      </p>
+                      <button
+                        onClick={downloadQr}
+                        className="mt-3 flex items-center gap-1.5 px-4 py-2 rounded-lg transition-colors"
+                        style={{
+                          background: 'rgba(255,255,255,0.04)',
+                          border: '1px solid rgba(255,255,255,0.08)',
+                          color: 'rgba(255,255,255,0.6)',
+                          fontSize: 'var(--font-sm)',
+                        }}
+                      >
+                        <Download className="w-3.5 h-3.5" />
+                        Descargar QR
+                      </button>
+                    </>
+                  ) : (
+                    <div className="py-4 text-center" style={{ color: 'rgba(255,255,255,0.4)' }}>
+                      Generando QR...
+                    </div>
+                  )}
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
         </div>
       </motion.div>
 
@@ -871,6 +1061,114 @@ function EmployeeDetailContent({ id }: { id: string }) {
               </>
             )}
           </button>
+
+          {/* Favorite + Copy All row */}
+          <div className="flex gap-2">
+            <button
+              onClick={handleToggleFavorite}
+              className="flex-1 rounded-[10px] flex items-center justify-center gap-1.5 transition-all duration-[180ms]"
+              style={{
+                height: '44px',
+                background: isEmployeeFavorite ? 'rgba(245,196,0,0.15)' : 'rgba(255,255,255,0.04)',
+                border: isEmployeeFavorite ? '1px solid rgba(245,196,0,0.4)' : '1px solid rgba(255,255,255,0.08)',
+                color: isEmployeeFavorite ? '#F5C400' : 'rgba(255,255,255,0.44)',
+                fontSize: '0.8rem',
+              }}
+            >
+              <Star className={`w-4 h-4 ${isEmployeeFavorite ? 'fill-[#F5C400]' : ''}`} />
+              <span>{isEmployeeFavorite ? 'Guardado' : 'Favorito'}</span>
+            </button>
+
+            <button
+              onClick={copyAllInfo}
+              className="flex-1 rounded-[10px] flex items-center justify-center gap-1.5 transition-all duration-[180ms]"
+              style={{
+                height: '44px',
+                background: copyAllState === 'copied' ? '#00C9A7' : 'rgba(255,255,255,0.04)',
+                border: copyAllState === 'copied' ? '1px solid #00C9A7' : '1px solid rgba(255,255,255,0.08)',
+                color: copyAllState === 'copied' ? 'white' : 'rgba(255,255,255,0.44)',
+                fontSize: '0.8rem',
+              }}
+            >
+              {copyAllState === 'copied' ? (
+                <>
+                  <Check className="w-4 h-4" />
+                  <span>Copiado</span>
+                </>
+              ) : (
+                <>
+                  <ClipboardList className="w-4 h-4" />
+                  <span>Copiar todo</span>
+                </>
+              )}
+            </button>
+          </div>
+
+          {/* QR Button */}
+          <button
+            onClick={() => setShowQr(!showQr)}
+            className="w-full rounded-[10px] flex items-center justify-center gap-1.5 transition-all duration-[180ms]"
+            style={{
+              height: '40px',
+              background: 'rgba(255,255,255,0.02)',
+              border: '1px solid rgba(255,255,255,0.06)',
+              color: 'rgba(255,255,255,0.35)',
+              fontSize: '0.8rem',
+            }}
+          >
+            <QrCode className="w-4 h-4" />
+            <span>{showQr ? 'Cerrar QR' : 'Ver QR'}</span>
+            <ChevronDown className={`w-4 h-4 transition-transform ${showQr ? 'rotate-180' : ''}`} />
+          </button>
+
+          {/* QR Expanded */}
+          <AnimatePresence>
+            {showQr && (
+              <motion.div
+                initial={{ height: 0, opacity: 0 }}
+                animate={{ height: 'auto', opacity: 1 }}
+                exit={{ height: 0, opacity: 0 }}
+                transition={{ duration: 0.2 }}
+                className="overflow-hidden"
+              >
+                <div className="pt-2 flex flex-col items-center">
+                  {qrDataUrl ? (
+                    <>
+                      <div 
+                        className="p-2 rounded-lg"
+                        style={{ background: 'white' }}
+                      >
+                        <img src={qrDataUrl} alt="QR Code" style={{ width: '140px', height: '140px' }} />
+                      </div>
+                      <p 
+                        className="mt-2 text-center"
+                        style={{ fontSize: '0.7rem', color: 'rgba(255,255,255,0.4)' }}
+                      >
+                        Escanea para abrir esta tarjeta
+                      </p>
+                      <button
+                        onClick={downloadQr}
+                        className="mt-2 flex items-center gap-1.5 px-4 py-2 rounded-lg"
+                        style={{
+                          background: 'rgba(255,255,255,0.04)',
+                          border: '1px solid rgba(255,255,255,0.08)',
+                          color: 'rgba(255,255,255,0.6)',
+                          fontSize: '0.75rem',
+                        }}
+                      >
+                        <Download className="w-3.5 h-3.5" />
+                        Descargar QR
+                      </button>
+                    </>
+                  ) : (
+                    <div className="py-4 text-center" style={{ color: 'rgba(255,255,255,0.4)', fontSize: '0.75rem' }}>
+                      Generando QR...
+                    </div>
+                  )}
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
         </div>
       </motion.div>
     </div>

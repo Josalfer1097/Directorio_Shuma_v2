@@ -21,6 +21,7 @@ import {
 import { MobileFiltersBottomSheet } from "@/components/mobile-filters-bottom-sheet";
 import { ExtensionDirectory } from "@/components/extension-directory";
 import type { ViewMode, Employee } from "@/types";
+import { useFavorites } from "@/lib/useFavorites";
 
 const ITEMS_PER_PAGE = 12;
 
@@ -65,7 +66,9 @@ function DirectoryContent() {
   const [selectedLocations, setSelectedLocations] = useState<string[]>([]);
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
   const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
+  const [showFavoritesOnly, setShowFavoritesOnly] = useState(false);
   const searchInputRef = useRef<HTMLInputElement>(null);
+  const { favorites } = useFavorites();
 
   // Cmd+K / Ctrl+K keyboard shortcut to focus search
   useEffect(() => {
@@ -130,12 +133,17 @@ function DirectoryContent() {
       results = results.filter((emp) => emp.location && selectedLocations.includes(emp.location));
     }
 
+    // Filter by favorites if enabled
+    if (showFavoritesOnly) {
+      results = results.filter((emp) => favorites.includes(emp.id));
+    }
+
     if (!deferredSearchQuery.trim()) {
       results = [...results].sort((a, b) => a.name.localeCompare(b.name, "es"));
     }
 
     return results;
-  }, [employees, deferredSearchQuery, selectedCompanies, selectedDepartment, selectedLocations, fuse]);
+  }, [employees, deferredSearchQuery, selectedCompanies, selectedDepartment, selectedLocations, fuse, showFavoritesOnly, favorites]);
 
   // Pagination
   const totalPages = Math.ceil(filteredEmployees.length / ITEMS_PER_PAGE);
@@ -155,6 +163,7 @@ function DirectoryContent() {
     setSelectedDepartment("all");
     setSelectedLocations([]);
     setSelectedTags([]);
+    setShowFavoritesOnly(false);
   };
 
   return (
@@ -190,9 +199,11 @@ function DirectoryContent() {
                     selectedCompanies={selectedCompanies}
                     selectedDepartment={selectedDepartment}
                     selectedLocations={selectedLocations}
+                    showFavoritesOnly={showFavoritesOnly}
                     onCompanyChange={setSelectedCompanies}
                     onDepartmentChange={setSelectedDepartment}
                     onLocationChange={setSelectedLocations}
+                    onFavoritesToggle={setShowFavoritesOnly}
                     onClearFilters={clearFilters}
                     filteredEmployees={filteredEmployees}
                 />
@@ -272,9 +283,14 @@ function DirectoryContent() {
                     <div
                         className={
                           viewMode === "grid"
-                              ? "grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 gap-4"
+                              ? "flex flex-col gap-4"
                               : "flex flex-col gap-3"
                         }
+                        style={viewMode === "grid" ? {
+                          display: 'grid',
+                          gridTemplateColumns: 'repeat(auto-fill, minmax(calc(280px * var(--font-scale, 1)), 1fr))',
+                          gap: 'calc(16px * var(--font-scale, 1))',
+                        } : undefined}
                     >
                       {paginatedEmployees.map((employee, index) => {
                         const company = getCompanyById(employee.company);

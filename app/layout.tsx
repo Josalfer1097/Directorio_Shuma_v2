@@ -7,6 +7,7 @@ import { FontScaleProvider } from '@/lib/FontScaleContext'
 import { RgbSignature } from '@/components/rgb-signature'
 import { Toaster } from 'sonner'
 import { ScrollToTop } from '@/components/scroll-to-top'
+import { ParticleBackground } from '@/components/particle-background'
 import './globals.css'
 
 const dmSans = DM_Sans({ 
@@ -61,8 +62,9 @@ export default function RootLayout({
           enableSystem={false}
         >
           <FontScaleProvider>
+            <ParticleBackground />
             <div className="dot-grid-overlay" />
-            <div className="pb-7">
+            <div className="pb-7 relative z-[1]">
               {children}
             </div>
             <RgbSignature />

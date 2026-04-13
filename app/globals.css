@@ -509,7 +509,7 @@
   }
 }
 
-/* ═══════════════════════════════════════════════════════════════════
+/* ══════════════════════════════════════════════════════════════��════
    MONOGRAM AVATAR
    ═══════════════════════════════════════════════════════════════════ */
 
@@ -1149,5 +1149,32 @@ button, a, [role="button"], .clickable {
     right: 0;
     font-size: 8pt;
     color: #666;
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   ANIMATED AVATAR MONOGRAM
+   ═══════════════════════════════════════════════════════════════════ */
+
+@property --avatar-angle {
+  syntax: '<angle>';
+  initial-value: 0deg;
+  inherits: false;
+}
+
+@keyframes rotateAvatarGradient {
+  0%   { --avatar-angle: 0deg; }
+  100% { --avatar-angle: 360deg; }
+}
+
+.avatar-animated .avatar-animated-inner {
+  animation: rotateAvatarGradient 4s linear infinite;
+}
+
+/* Fallback for browsers that don't support @property */
+@supports not (animation: test) or (not selector(:has(+ *))) {
+  .avatar-animated .avatar-animated-inner {
+    animation: none;
+    /* Static gradient fallback */
   }
 }

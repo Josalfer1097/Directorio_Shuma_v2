@@ -1,7 +1,8 @@
 "use client";
 
 import { motion, AnimatePresence } from "framer-motion";
-import { X, Filter, Download } from "lucide-react";
+import { X, Filter, Download, Star } from "lucide-react";
+import { useFavorites } from "@/lib/useFavorites";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -39,9 +40,11 @@ interface DirectoryFiltersProps {
   selectedCompanies: string[];
   selectedDepartment: string;
   selectedLocations: string[];
+  showFavoritesOnly: boolean;
   onCompanyChange: (companies: string[]) => void;
   onDepartmentChange: (department: string) => void;
   onLocationChange: (locations: string[]) => void;
+  onFavoritesToggle: (show: boolean) => void;
   onClearFilters: () => void;
   filteredEmployees: Employee[];
 }
@@ -53,14 +56,17 @@ export function DirectoryFilters({
   selectedCompanies,
   selectedDepartment,
   selectedLocations,
+  showFavoritesOnly,
   onCompanyChange,
   onDepartmentChange,
   onLocationChange,
+  onFavoritesToggle,
   onClearFilters,
   filteredEmployees,
 }: DirectoryFiltersProps) {
   const [mobileSheetOpen, setMobileSheetOpen] = useState(false);
   const allEmployees = getEmployees();
+  const { favorites, clearAllFavorites } = useFavorites();
 
   // Calculate counts for each filter option
   const filterCounts = useMemo(() => {
@@ -146,6 +152,46 @@ export function DirectoryFilters({
 
   const FilterContent = () => (
     <div className="space-y-6">
+      {/* Favorites Section - Only show if there are favorites */}
+      {favorites.length > 0 && (
+        <div>
+          <button
+            onClick={() => onFavoritesToggle(!showFavoritesOnly)}
+            className="w-full flex items-center justify-between gap-2 px-3 py-2.5 rounded-lg transition-all duration-[180ms]"
+            style={{
+              background: showFavoritesOnly ? 'rgba(245,196,0,0.12)' : 'rgba(255,255,255,0.03)',
+              border: showFavoritesOnly ? '1px solid rgba(245,196,0,0.30)' : '1px solid rgba(255,255,255,0.08)',
+              color: showFavoritesOnly ? '#F5C400' : 'rgba(255,255,255,0.7)',
+            }}
+          >
+            <span className="flex items-center gap-2 text-sm font-medium">
+              <Star className={`w-4 h-4 ${showFavoritesOnly ? 'fill-[#F5C400]' : ''}`} />
+              Mis Contactos
+              <span 
+                className="px-1.5 py-0.5 text-xs rounded"
+                style={{
+                  background: 'rgba(255,255,255,0.08)',
+                  color: 'rgba(255,255,255,0.5)',
+                }}
+              >
+                {favorites.length}
+              </span>
+            </span>
+          </button>
+          {showFavoritesOnly && (
+            <button
+              onClick={() => {
+                clearAllFavorites();
+                onFavoritesToggle(false);
+              }}
+              className="mt-2 text-xs text-white/40 hover:text-white/70 transition-colors"
+            >
+              Limpiar todos
+            </button>
+          )}
+        </div>
+      )}
+
       {/* Companies */}
       <div>
         <h4 className="font-medium text-foreground mb-3" style={{ fontFamily: "var(--font-neuropol), var(--font-orbitron), 'Orbitron', 'Courier New', monospace" }}>Empresas</h4>
