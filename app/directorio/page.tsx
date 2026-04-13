@@ -93,6 +93,11 @@ function DirectoryContent() {
     }
   }, [selectedCompanies, setActiveTheme]);
 
+  const employees = getEmployees();
+  const companies = getCompanies();
+  const departments = getDepartments();
+  const tags = getAllTags();
+
   // First load animation - only on initial mount
   useEffect(() => {
     if (employees.length > 0 && !hasAnimated.current) {
@@ -118,11 +123,6 @@ function DirectoryContent() {
     document.addEventListener("keydown", handleKeyDown);
     return () => document.removeEventListener("keydown", handleKeyDown);
   }, []);
-
-  const employees = getEmployees();
-  const companies = getCompanies();
-  const departments = getDepartments();
-  const tags = getAllTags();
 
   // Get available locations from employees
   const availableLocations = useMemo(() => {
@@ -457,6 +457,11 @@ function DirectoryContent() {
           onClearFilters={clearFilters}
           onApply={() => setMobileFiltersOpen(false)}
         />
+        {/* Department View Panel */}
+        <DepartmentView 
+          department={deptView} 
+          onClose={() => setDeptView(null)} 
+        />
       </div>
   );
 }
@@ -477,11 +482,6 @@ function DirectoryLoading() {
           </div>
         </main>
 
-      {/* Department View Panel */}
-      <DepartmentView 
-        department={deptView} 
-        onClose={() => setDeptView(null)} 
-      />
       </div>
   );
 }

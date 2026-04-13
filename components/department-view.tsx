@@ -246,14 +246,13 @@ export function DepartmentView({ department, onClose }: DepartmentViewProps) {
 
               {/* Employee count */}
               <div
-                className="flex items-center gap-1.5"
+                className="flex items-center gap-1.5 text-scale-xs"
                 style={{
                   background: "rgba(255,255,255,0.07)",
                   borderRadius: "20px",
                   padding: "4px 12px",
                   color: "rgba(255,255,255,0.7)",
                 }}
-                className="text-scale-xs"
               >
                 <Users className="w-3.5 h-3.5" />
                 <span>{departmentEmployees.length} colaborador{departmentEmployees.length !== 1 ? "es" : ""}</span>

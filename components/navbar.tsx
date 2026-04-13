@@ -19,6 +19,13 @@ export function Navbar() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [phoneTooltipVisible, setPhoneTooltipVisible] = useState(false);
   const longPressTimer = useRef<NodeJS.Timeout | null>(null);
+
+  const pageNames: Record<string, string> = {
+    '/':            '',
+    '/directorio':  'DIRECTORIO',
+    '/organigrama': 'ORGANIGRAMA',
+  };
+  const pageName = pageNames[pathname] ?? '';
   
   const employeeCount = useMemo(() => getEmployees().length, []);
 
@@ -67,7 +74,7 @@ export function Navbar() {
   }, []);
 
   const toggleViewMode = () => {
-    const nextView = viewMode === "grid" ? "compact" : "grid";
+    const nextView = viewMode === "grid" ? "list" : "grid";
     setViewMode(nextView);
     localStorage.setItem("shuma-view-mode", nextView);
     window.dispatchEvent(new CustomEvent("view-mode-change", { detail: nextView }));
@@ -113,15 +120,63 @@ export function Navbar() {
       <nav className="container mx-auto px-4 flex items-center justify-between">
           <Link
             href="/"
-            style={{ fontFamily: "var(--font-neuropol), var(--font-orbitron), 'Orbitron', 'Courier New', monospace" }}
-            className="text-base md:text-lg tracking-wider max-w-[50%] truncate"
+            style={{
+              display: 'flex', alignItems: 'center',
+              gap: '8px', textDecoration: 'none',
+              letterSpacing: '0.08em',
+            }}
             onTouchStart={handleTouchStart}
             onTouchEnd={handleTouchEnd}
             onMouseDown={handleTouchStart}
             onMouseUp={handleTouchEnd}
           >
-            <span className="text-[#F2F0EC]" style={{ fontFamily: "var(--font-neuropol), var(--font-orbitron), 'Orbitron', 'Courier New', monospace" }}>DIRECTO</span>
-            <span className="animate-gradient-text" style={{ fontFamily: "var(--font-neuropol), var(--font-orbitron), 'Orbitron', 'Courier New', monospace" }}>RIO</span>
+            {/* SHUMA — iridescent shimmer */}
+            <span
+              style={{
+                fontFamily: 'Neuropol, var(--font-orbitron), monospace',
+                fontWeight: 900,
+                fontSize: '1rem',
+                background: 'linear-gradient(90deg, #00C9A7, #845EC2, #00C2FF, #00C9A7)',
+                backgroundSize: '200% auto',
+                WebkitBackgroundClip: 'text',
+                WebkitTextFillColor: 'transparent',
+                backgroundClip: 'text',
+                animation: 'shimmerText 4s linear infinite',
+                letterSpacing: '0.1em',
+              }}
+            >
+              SHUMA
+            </span>
+
+            {/* Separator — only shown if pageName exists */}
+            {pageName && (
+              <span className="nav-separator" style={{
+                color: 'rgba(255,255,255,0.18)',
+                fontSize: '0.85rem',
+                fontWeight: 300,
+                lineHeight: 1,
+                userSelect: 'none',
+              }}>
+                ·
+              </span>
+            )}
+
+            {/* Page name */}
+            {pageName && (
+              <span
+                className="nav-page-name"
+                style={{
+                  fontFamily: 'Neuropol, var(--font-orbitron), monospace',
+                  fontSize: '0.75rem',
+                  fontWeight: 400,
+                  color: 'rgba(255,255,255,0.60)',
+                  letterSpacing: '0.14em',
+                  marginTop: '1px',
+                }}
+              >
+                {pageName}
+              </span>
+            )}
           </Link>
 
         <div className="flex items-center gap-6">

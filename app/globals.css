@@ -1226,3 +1226,18 @@ button, a, [role="button"], .clickable {
 }
 
 /* Fallback for browsers that don't support @property - removed complex @supports */
+
+@keyframes slideInRight {
+  from { transform: translateX(100%) }
+  to   { transform: translateX(0) }
+}
+
+@media (max-width: 768px) {
+  .nav-separator,
+  .nav-page-name { display: none !important; }
+}
+
+@keyframes shimmerText {
+  0%   { background-position: 0% center }
+  100% { background-position: 200% center }
+}
