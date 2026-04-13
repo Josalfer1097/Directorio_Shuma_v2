@@ -90,17 +90,21 @@ export function Navbar() {
     <>
     <header
       className={cn(
-        "fixed top-0 left-0 right-0 z-50 transition-all duration-300 h-[64px] flex items-center",
+        "fixed top-0 left-0 right-0 z-50 transition-all duration-300 h-[56px] md:h-[64px] flex items-center safe-top",
         scrolled
-          ? "bg-[--bg-base]/88 backdrop-blur-xl border-b border-white/8 saturate-[180%]"
+          ? "bg-[--bg-base]/88 -webkit-backdrop-filter-blur-xl backdrop-blur-xl border-b border-white/8 saturate-[180%]"
           : "bg-transparent border-b border-transparent"
       )}
+      style={{
+        WebkitBackdropFilter: scrolled ? 'blur(20px) saturate(180%)' : undefined,
+        backdropFilter: scrolled ? 'blur(20px) saturate(180%)' : undefined,
+      }}
     >
       <nav className="container mx-auto px-4 flex items-center justify-between">
           <Link
             href="/"
             style={{ fontFamily: "var(--font-neuropol), var(--font-orbitron), 'Orbitron', 'Courier New', monospace" }}
-            className="text-lg tracking-wider"
+            className="text-base md:text-lg tracking-wider max-w-[50%] truncate"
             onTouchStart={handleTouchStart}
             onTouchEnd={handleTouchEnd}
             onMouseDown={handleTouchStart}
@@ -259,14 +263,20 @@ export function Navbar() {
             animate={{ y: 0, opacity: 1 }}
             exit={{ y: -20, opacity: 0 }}
             transition={{ duration: 0.25, ease: [0.25, 0.46, 0.45, 0.94] }}
-            className="fixed top-[64px] left-0 right-0 z-50 md:hidden bg-[--bg-surface]/95 backdrop-blur-xl border-b border-white/8"
+            className="fixed top-[56px] md:top-[64px] left-0 right-0 z-50 md:hidden"
+            style={{
+              background: "rgba(15, 15, 26, 0.95)",
+              WebkitBackdropFilter: "blur(20px)",
+              backdropFilter: "blur(20px)",
+              borderBottom: "1px solid rgba(255,255,255,0.08)",
+            }}
           >
-            <nav className="container mx-auto px-4 py-6 flex flex-col gap-4">
+            <nav className="container mx-auto px-4 py-4 flex flex-col gap-2">
               <Link 
                 href="/directorio"
                 onClick={() => setMobileMenuOpen(false)}
                 className={cn(
-                  "font-neuropol text-base uppercase tracking-wider py-3 px-4 rounded-lg transition-all",
+                  "font-neuropol text-base uppercase tracking-wider py-3 px-4 rounded-lg transition-all min-h-[52px] flex items-center touch-manipulation",
                   pathname === "/directorio" 
                     ? "text-text-primary bg-white/5" 
                     : "text-text-muted hover:text-text-primary hover:bg-white/5"
@@ -278,7 +288,7 @@ export function Navbar() {
                 href="/organigrama"
                 onClick={() => setMobileMenuOpen(false)}
                 className={cn(
-                  "font-neuropol text-base uppercase tracking-wider py-3 px-4 rounded-lg transition-all",
+                  "font-neuropol text-base uppercase tracking-wider py-3 px-4 rounded-lg transition-all min-h-[52px] flex items-center touch-manipulation",
                   pathname === "/organigrama" 
                     ? "text-text-primary bg-white/5" 
                     : "text-text-muted hover:text-text-primary hover:bg-white/5"

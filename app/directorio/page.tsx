@@ -215,6 +215,7 @@ function DirectoryContent() {
                           onChange={(e) => setSearchQuery(e.target.value)}
                           className="pl-10 w-full"
                           aria-describedby="search-description"
+                          style={{ fontSize: '16px' }} // 16px minimum prevents iOS Safari auto-zoom on focus
                       />
                       <span id="search-description" className="sr-only">
                         Escribe para buscar empleados por nombre, puesto, departamento o extensión

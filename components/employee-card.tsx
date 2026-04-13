@@ -283,7 +283,7 @@ export function EmployeeCard({
       <Link href={`/directorio/${employee.id}`}>
         <div
           className={cn(
-            "card-shimmer corner-bracket group relative overflow-hidden rounded-xl p-4 h-[200px] flex flex-col",
+            "card-shimmer corner-bracket group relative overflow-hidden rounded-xl p-4 h-[200px] flex flex-col touch-manipulation select-none",
             "transition-all duration-[180ms]"
           )}
           style={{ 
@@ -403,7 +403,7 @@ export function EmployeeCard({
               </button>
               <button
                 onClick={(e) => copyToClipboard(e, employee.email, `email-${employee.id}`)}
-                className="p-1.5 sm:p-1 rounded hover:bg-muted transition-colors shrink-0 min-w-[36px] min-h-[36px] sm:min-w-0 sm:min-h-0 flex items-center justify-center"
+                className="p-1.5 sm:p-1 rounded hover:bg-muted transition-colors shrink-0 min-w-[40px] min-h-[40px] sm:min-w-0 sm:min-h-0 flex items-center justify-center touch-manipulation"
               >
                 {copiedField === `email-${employee.id}` ? (
                   <Check className="w-4 h-4 sm:w-3 sm:h-3 text-green-500" />
@@ -416,7 +416,7 @@ export function EmployeeCard({
                   <TooltipTrigger asChild>
                     <button
                       onClick={openTeamsChat}
-                      className="p-1.5 sm:p-1 rounded hover:bg-[#6264A7]/10 transition-colors shrink-0 group/teams min-w-[36px] min-h-[36px] sm:min-w-0 sm:min-h-0 flex items-center justify-center"
+                      className="p-1.5 sm:p-1 rounded hover:bg-[#6264A7]/10 transition-colors shrink-0 group/teams min-w-[40px] min-h-[40px] sm:min-w-0 sm:min-h-0 flex items-center justify-center touch-manipulation"
                     >
                       <MessageSquare className="w-4 h-4 sm:w-3 sm:h-3 text-muted-foreground group-hover/teams:text-[#6264A7]" />
                     </button>
@@ -450,7 +450,7 @@ export function EmployeeCard({
               </span>
               <button
                 onClick={(e) => copyToClipboard(e, employee.phone, `phone-${employee.id}`)}
-                className="p-1.5 sm:p-1 rounded hover:bg-muted transition-colors shrink-0 ml-auto min-w-[36px] min-h-[36px] sm:min-w-0 sm:min-h-0 flex items-center justify-center"
+                className="p-1.5 sm:p-1 rounded hover:bg-muted transition-colors shrink-0 ml-auto min-w-[40px] min-h-[40px] sm:min-w-0 sm:min-h-0 flex items-center justify-center touch-manipulation"
               >
                 {copiedField === `phone-${employee.id}` ? (
                   <Check className="w-4 h-4 sm:w-3 sm:h-3 text-green-500" />

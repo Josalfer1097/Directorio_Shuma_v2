@@ -194,6 +194,15 @@ const LocationSubHeader = memo(function LocationSubHeader({
   );
 });
 
+// Format name for display - shorten long names
+function formatName(fullName: string): string {
+  const parts = fullName.trim().split(' ');
+  if (fullName.length > 22 && parts.length >= 2) {
+    return `${parts[0]} ${parts[1]}`;
+  }
+  return fullName;
+}
+
 // Extension Card for Solo Extensiones mode - redesigned
 const ExtensionCard = memo(function ExtensionCard({
   employee,
@@ -204,34 +213,33 @@ const ExtensionCard = memo(function ExtensionCard({
   companyConfig: ReturnType<typeof getCompanyConfig>;
   onClick: () => void;
 }) {
-  const isLongName = employee.name.length > 28;
+  const displayName = formatName(employee.name);
   
   return (
     <button
       onClick={onClick}
-      className="text-left w-full relative overflow-hidden cursor-pointer group"
+      title={employee.name}
+      className="text-left w-full relative overflow-hidden cursor-pointer group touch-manipulation select-none"
       style={{
-        height: "88px",
-        borderRadius: "12px",
+        minHeight: "96px",
+        height: "auto",
+        borderRadius: "10px",
         background: "rgba(255,255,255,0.03)",
-        border: "1px solid rgba(255,255,255,0.07)",
-        borderLeftWidth: "4px",
+        border: "1px solid rgba(255,255,255,0.08)",
+        borderLeftWidth: "3px",
         borderLeftColor: companyConfig.primary,
-        transition: "all 160ms cubic-bezier(0.25,0.46,0.45,0.94)",
+        padding: "10px 12px",
+        transition: "transform 80ms ease, box-shadow 150ms ease",
       }}
       onMouseEnter={(e) => {
-        const el = e.currentTarget;
-        el.style.transform = "translateY(-2px) scale(1.02)";
-        el.style.borderColor = `rgba(${hexToRgb(companyConfig.primary)}, 0.30)`;
-        el.style.borderLeftColor = companyConfig.primary;
-        el.style.boxShadow = `0 0 0 1px rgba(${hexToRgb(companyConfig.primary)}, 0.20), 0 8px 24px rgba(${hexToRgb(companyConfig.primary)}, 0.12), 0 2px 8px rgba(0,0,0,0.40)`;
-        el.style.background = "rgba(255,255,255,0.055)";
+        if (window.matchMedia('(hover: hover)').matches) {
+          const el = e.currentTarget;
+          el.style.boxShadow = `0 0 0 1px rgba(${hexToRgb(companyConfig.primary)}, 0.20), 0 4px 16px rgba(${hexToRgb(companyConfig.primary)}, 0.10)`;
+          el.style.background = "rgba(255,255,255,0.05)";
+        }
       }}
       onMouseLeave={(e) => {
         const el = e.currentTarget;
-        el.style.transform = "translateY(0) scale(1)";
-        el.style.borderColor = "rgba(255,255,255,0.07)";
-        el.style.borderLeftColor = companyConfig.primary;
         el.style.boxShadow = "none";
         el.style.background = "rgba(255,255,255,0.03)";
       }}
@@ -240,10 +248,10 @@ const ExtensionCard = memo(function ExtensionCard({
       <div
         className="absolute pointer-events-none select-none"
         style={{
-          right: "-8px",
-          top: "-8px",
+          right: "-6px",
+          top: "-6px",
           fontFamily: "var(--font-neuropol), var(--font-orbitron), 'Orbitron', monospace",
-          fontSize: "52px",
+          fontSize: "44px",
           fontWeight: 900,
           color: companyConfig.primary,
           opacity: 0.06,
@@ -257,10 +265,10 @@ const ExtensionCard = memo(function ExtensionCard({
       <div
         className="absolute"
         style={{
-          top: "10px",
-          right: "12px",
-          width: "6px",
-          height: "6px",
+          top: "8px",
+          right: "10px",
+          width: "5px",
+          height: "5px",
           borderRadius: "50%",
           background: companyConfig.primary,
           opacity: 0.5,
@@ -268,41 +276,36 @@ const ExtensionCard = memo(function ExtensionCard({
       />
 
       {/* Card content */}
-      <div
-        className="relative flex flex-col justify-between h-full"
-        style={{
-          padding: "14px 16px",
-          zIndex: 1,
-        }}
-      >
+      <div className="relative flex flex-col h-full" style={{ zIndex: 1 }}>
         {/* Employee name */}
         <p
-          className="text-white font-semibold leading-tight line-clamp-2"
+          className="text-white leading-tight line-clamp-2"
           style={{
-            fontSize: isLongName ? "0.75rem" : "0.82rem",
+            fontSize: "0.78rem",
             fontWeight: 600,
+            wordBreak: "break-word",
           }}
         >
-          {employee.name}
+          {displayName}
         </p>
 
         {/* Extension pill */}
         {employee.extension ? (
           <div
-            className="inline-flex items-center gap-[5px] w-fit"
+            className="inline-flex items-center gap-[4px] w-fit"
             style={{
               background: `rgba(${hexToRgb(companyConfig.primary)}, 0.12)`,
               border: `1px solid rgba(${hexToRgb(companyConfig.primary)}, 0.25)`,
-              borderRadius: "6px",
-              padding: "3px 10px",
-              marginTop: "8px",
+              borderRadius: "5px",
+              padding: "2px 8px",
+              marginTop: "6px",
             }}
           >
-            <Phone size={10} style={{ color: companyConfig.primary }} />
+            <Phone size={9} style={{ color: companyConfig.primary }} />
             <span
               style={{
                 fontFamily: "monospace",
-                fontSize: "1rem",
+                fontSize: "0.9rem",
                 fontWeight: 700,
                 color: companyConfig.primary,
                 letterSpacing: "0.05em",
@@ -314,13 +317,13 @@ const ExtensionCard = memo(function ExtensionCard({
         ) : (
           <span
             style={{
-              fontSize: "0.7rem",
+              fontSize: "0.65rem",
               color: "rgba(255,255,255,0.20)",
               fontStyle: "italic",
-              marginTop: "8px",
+              marginTop: "6px",
             }}
           >
-            Sin extension
+            Sin ext.
           </span>
         )}
       </div>
@@ -702,7 +705,7 @@ export function ExtensionDirectory({
                 borderRadius: "14px",
                 background: "rgba(255,255,255,0.04)",
                 border: "1.5px solid rgba(255,255,255,0.10)",
-                fontSize: "0.95rem",
+                fontSize: "16px", // 16px minimum prevents iOS Safari auto-zoom on focus
                 transition: "border-color 150ms, box-shadow 150ms",
               }}
               onFocus={(e) => {
@@ -756,10 +759,11 @@ export function ExtensionDirectory({
               placeholder="Buscar por nombre, extension o puesto..."
               value={internalSearch}
               onChange={(e) => setInternalSearch(e.target.value)}
-              className="w-full h-10 pl-10 pr-10 rounded-lg text-white placeholder-white/30 focus:outline-none focus:ring-2 focus:ring-white/20 text-sm"
+              className="w-full h-10 pl-10 pr-10 rounded-lg text-white placeholder-white/30 focus:outline-none focus:ring-2 focus:ring-white/20"
               style={{
                 background: "rgba(255,255,255,0.04)",
                 border: "1px solid rgba(255,255,255,0.08)",
+                fontSize: "16px", // 16px minimum prevents iOS Safari auto-zoom on focus
               }}
             />
             {internalSearch && (
@@ -897,41 +901,27 @@ export function ExtensionDirectory({
 
       {/* SOLO EXTENSIONES MODE - Card Grid */}
       {subMode === "solo-extensiones" && (
-        <div className="p-4">
+        <div className="flex-1 min-w-0 overflow-hidden p-4">
           {totalCount > 0 ? (
             <div 
-              className="grid gap-[10px]"
+              className="w-full"
               style={{
-                gridTemplateColumns: "repeat(2, 1fr)",
+                display: "grid",
+                gridTemplateColumns: "repeat(auto-fill, minmax(160px, 1fr))",
+                gap: "10px",
               }}
             >
-              <style>{`
-                @media (min-width: 480px) {
-                  .solo-ext-grid { grid-template-columns: repeat(2, 1fr) !important; }
-                }
-                @media (min-width: 768px) {
-                  .solo-ext-grid { grid-template-columns: repeat(3, 1fr) !important; }
-                }
-                @media (min-width: 1024px) {
-                  .solo-ext-grid { grid-template-columns: repeat(4, 1fr) !important; }
-                }
-                @media (min-width: 1280px) {
-                  .solo-ext-grid { grid-template-columns: repeat(5, 1fr) !important; }
-                }
-              `}</style>
-              <div className="solo-ext-grid grid gap-[10px]" style={{ gridTemplateColumns: "repeat(2, 1fr)" }}>
-                {sortedForCards.map((employee) => {
-                  const companyConfig = getCompanyConfig(employee.company);
-                  return (
-                    <ExtensionCard
-                      key={employee.id}
-                      employee={employee}
-                      companyConfig={companyConfig}
-                      onClick={() => handleRowClick(employee.id)}
-                    />
-                  );
-                })}
-              </div>
+              {sortedForCards.map((employee) => {
+                const companyConfig = getCompanyConfig(employee.company);
+                return (
+                  <ExtensionCard
+                    key={employee.id}
+                    employee={employee}
+                    companyConfig={companyConfig}
+                    onClick={() => handleRowClick(employee.id)}
+                  />
+                );
+              })}
             </div>
           ) : (
             <div className="text-center py-16">

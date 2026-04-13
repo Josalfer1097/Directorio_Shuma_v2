@@ -64,13 +64,13 @@ function OrgChartNodeComponent({ data }: OrgChartNodeProps) {
               onMouseEnter={() => setIsHovered(true)}
               onMouseLeave={() => setIsHovered(false)}
               className={cn(
-                "relative overflow-hidden bg-[--bg-elevated] rounded-xl transition-all duration-[180ms] group cursor-pointer",
+                "relative overflow-hidden bg-[--bg-elevated] rounded-xl transition-all duration-[180ms] group cursor-pointer touch-manipulation",
                 "shadow-xl shadow-black/20",
-                "p-2 md:p-4"
+                "p-2 md:p-3"
               )}
               style={{ 
                 minWidth: '150px',
-                maxWidth: '200px',
+                maxWidth: '190px',
                 borderWidth: '1px',
                 borderStyle: 'solid',
                 borderLeftWidth: '3px',
@@ -81,6 +81,7 @@ function OrgChartNodeComponent({ data }: OrgChartNodeProps) {
                 background: isHovered 
                   ? `linear-gradient(180deg, ${colors.glow} 0%, var(--bg-elevated) 40%)`
                   : 'var(--bg-elevated)',
+                padding: '8px 10px',
               }}
             >
               {/* Left Accent Bar */}
@@ -108,16 +109,20 @@ function OrgChartNodeComponent({ data }: OrgChartNodeProps) {
 
                 <div className="min-w-0 flex-1">
                   <h4 
-                    className="text-[0.7rem] md:text-[12px] text-text-primary leading-tight line-clamp-2"
+                    className="text-text-primary leading-tight line-clamp-2"
                     style={{ 
                       fontFamily: "var(--font-neuropol), var(--font-orbitron), 'Orbitron', 'Courier New', monospace",
                       wordWrap: 'break-word',
                       whiteSpace: 'normal',
+                      fontSize: '0.68rem',
                     }}
                   >
                     {employee.name}
                   </h4>
-                  <p className="font-dm-sans italic text-[0.6rem] md:text-[10px] text-text-muted mt-0.5 leading-tight">
+                  <p 
+                    className="font-dm-sans italic text-text-muted mt-0.5 leading-tight"
+                    style={{ fontSize: '0.58rem' }}
+                  >
                     {employee.position}
                   </p>
                 </div>

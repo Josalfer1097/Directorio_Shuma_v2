@@ -111,18 +111,21 @@
    ═══════════════════════════════════════════════════════════════════ */
 
 @layer base {
-  * {
+  *, *::before, *::after {
     @apply border-border outline-ring/50;
     -webkit-tap-highlight-color: transparent;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     text-rendering: optimizeLegibility;
+    box-sizing: border-box;
   }
   
   html {
     scroll-behavior: smooth;
     overflow-x: hidden;
     color-scheme: dark;
+    -webkit-text-size-adjust: 100%;
+    text-size-adjust: 100%;
   }
   
   body {
@@ -832,7 +835,7 @@
   margin: 8px auto;
 }
 
-/* ════════════════════════════���══════════════════════════════════════
+/* ═════��══════════════════════���══════════════════════════════════════
    REACT FLOW OVERRIDES
    ═══════════════════════════════════════════════════════════════════ */
 
@@ -902,12 +905,104 @@
   padding-bottom: var(--safe-bottom);
 }
 
+.safe-bottom {
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+}
+
+.safe-top {
+  padding-top: env(safe-area-inset-top, 0px);
+}
+
 /* Reduced motion */
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {
     animation-duration: 0.01ms !important;
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   TOUCH & INTERACTION POLISH
+   ═══════════════════════════════════════════════════════════════════ */
+
+/* All tap targets minimum 44x44px */
+.touch-target {
+  min-width: 44px;
+  min-height: 44px;
+}
+
+/* Touch manipulation - disable 300ms tap delay */
+button, a, [role="button"], .clickable {
+  touch-action: manipulation;
+}
+
+/* Prevent text selection on interactive cards */
+.card-no-select {
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+/* Disable hover effects on touch devices */
+@media (hover: none) {
+  .employee-card:hover {
+    transform: none !important;
+    box-shadow: none !important;
+  }
+  
+  .employee-card:hover::before {
+    width: 3px !important;
+  }
+}
+
+/* Touch feedback for cards */
+.employee-card:active {
+  transform: scale(0.97) !important;
+  transition: transform 80ms ease !important;
+}
+
+/* Scrollable containers touch scrolling */
+.touch-scroll {
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior: contain;
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   MOBILE PERFORMANCE OPTIMIZATIONS
+   ═══════════════════════════════════════════════════════════════════ */
+
+@media (max-width: 768px) {
+  /* Reduce blur values on mobile for GPU performance */
+  .glass {
+    -webkit-backdrop-filter: blur(8px) !important;
+    backdrop-filter: blur(8px) !important;
+  }
+  
+  .glass-light {
+    -webkit-backdrop-filter: blur(6px) !important;
+    backdrop-filter: blur(6px) !important;
+  }
+  
+  /* Disable non-essential animations on mobile */
+  .employee-card {
+    transition: none !important;
+  }
+  
+  /* Slow down RGB letter animation */
+  .rgb-letter {
+    animation-duration: 4s !important;
+  }
+  
+  /* Remove ambient blob animations on mobile */
+  .ambient-glow {
+    display: none;
+  }
+}
+
+/* Hide minimap on mobile for org chart */
+@media (max-width: 768px) {
+  .react-flow__minimap {
+    display: none !important;
   }
 }
 

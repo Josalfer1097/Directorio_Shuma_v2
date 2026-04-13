@@ -117,15 +117,33 @@ export function MobileFiltersBottomSheet({
                 onClose();
               }
             }}
-            className="fixed bottom-0 left-0 right-0 z-50 md:hidden bg-[--bg-surface] rounded-t-2xl border-t border-[--border-subtle] shadow-2xl"
-            style={{ height: "65vh", maxHeight: "65vh" }}
+            className="fixed bottom-0 left-0 right-0 z-50 md:hidden shadow-2xl safe-bottom"
+            style={{ 
+              height: "70vh", 
+              maxHeight: "70vh",
+              borderRadius: "20px 20px 0 0",
+              background: "#0F1114",
+              WebkitBackdropFilter: "blur(20px)",
+              backdropFilter: "blur(20px)",
+              border: "1px solid rgba(255,255,255,0.08)",
+              borderBottom: "none",
+            }}
           >
+            {/* Drag handle */}
+            <div className="flex justify-center pt-3 pb-2">
+              <div 
+                className="rounded-full"
+                style={{ 
+                  width: "32px", 
+                  height: "4px", 
+                  background: "rgba(255,255,255,0.18)" 
+                }} 
+              />
+            </div>
+            
             {/* Header */}
-            <div className="flex items-center justify-between p-4 border-b border-[--border-subtle] sticky top-0 bg-[--bg-surface] rounded-t-2xl">
-              {/* Drag handle */}
-              <div className="flex-1 flex justify-center">
-                <div className="w-10 h-1 rounded-full bg-muted-foreground/30" />
-              </div>
+            <div className="flex items-center justify-between px-5 pb-3 border-b border-[--border-subtle]">
+              <div className="flex-1" />
 
               <h2 className="text-lg font-semibold text-foreground flex-1 text-center">
                 Filtros
@@ -152,7 +170,7 @@ export function MobileFiltersBottomSheet({
             )}
 
             {/* Scrollable content */}
-            <div className="overflow-y-auto flex-1 p-4 space-y-6">
+            <div className="overflow-y-auto flex-1 px-5 py-4 space-y-6 touch-scroll" style={{ WebkitOverflowScrolling: 'touch', overscrollBehavior: 'contain' }}>
               {/* Empresas - Horizontal pills */}
               <div>
                 <h3 className="font-semibold text-foreground mb-3">Empresa</h3>
@@ -161,7 +179,7 @@ export function MobileFiltersBottomSheet({
                     <button
                       key={company.id}
                       onClick={() => toggleCompany(company.id)}
-                      className={`px-4 py-2 rounded-full text-sm font-medium transition-all duration-150 ${
+                      className={`px-4 py-2.5 rounded-full text-sm font-medium transition-all duration-150 touch-manipulation min-h-[44px] ${
                         localCompanies.includes(company.id)
                           ? "text-white"
                           : "bg-muted text-muted-foreground"
@@ -187,7 +205,7 @@ export function MobileFiltersBottomSheet({
                   <button
                     type="button"
                     onClick={() => setLocalDepartment("all")}
-                    className={`w-full flex items-center gap-3 p-3 rounded-lg cursor-pointer transition-colors ${
+                    className={`w-full flex items-center gap-3 p-3 rounded-lg cursor-pointer transition-colors min-h-[44px] touch-manipulation ${
                       localDepartment === "all" 
                         ? "bg-primary/10 border border-primary/30" 
                         : "hover:bg-muted"
@@ -215,7 +233,7 @@ export function MobileFiltersBottomSheet({
                       key={dept}
                       type="button"
                       onClick={() => setLocalDepartment(dept)}
-                      className={`w-full flex items-center gap-3 p-3 rounded-lg cursor-pointer transition-colors ${
+                      className={`w-full flex items-center gap-3 p-3 rounded-lg cursor-pointer transition-colors min-h-[44px] touch-manipulation ${
                         localDepartment === dept 
                           ? "bg-primary/10 border border-primary/30" 
                           : "hover:bg-muted"
@@ -243,7 +261,7 @@ export function MobileFiltersBottomSheet({
               </div>
 
               {/* Sucursal - Horizontal pills like empresas */}
-              {locations.length > 0 && (
+              {locations && locations.length > 0 && (
                 <div>
                   <h3 className="font-semibold text-foreground mb-3">Sucursal</h3>
                   <div className="flex flex-wrap gap-2">
@@ -251,7 +269,7 @@ export function MobileFiltersBottomSheet({
                       <button
                         key={location}
                         onClick={() => toggleLocation(location)}
-                        className={`px-4 py-2 rounded-full text-sm font-medium transition-all duration-150 ${
+                        className={`px-4 py-2.5 rounded-full text-sm font-medium transition-all duration-150 touch-manipulation min-h-[44px] ${
                           localLocations.includes(location)
                             ? "bg-primary text-primary-foreground"
                             : "bg-muted text-muted-foreground"

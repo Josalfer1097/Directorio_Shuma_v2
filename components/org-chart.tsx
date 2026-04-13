@@ -187,6 +187,8 @@ function OrgChartInner({ selectedCompany, layout }: OrgChartInnerProps) {
       zoomOnScroll={!isMobile}
       zoomOnPinch={true}
       selectionOnDrag={false}
+      minZoom={0.08}
+      maxZoom={2}
     >
       <Background
         variant={BackgroundVariant.Dots}
@@ -227,11 +229,22 @@ export function OrgChart({ initialCompany }: OrgChartProps) {
   return (
     <div className="h-full w-full flex flex-col overflow-hidden bg-[--bg-base] md:rounded-xl md:border md:border-border-subtle">
       {/* Mobile Controls */}
-      <div className="md:hidden flex flex-col shrink-0 bg-[--bg-surface]/80 backdrop-blur-md border-b border-border-subtle">
+      <div 
+        className="md:hidden flex flex-col shrink-0 border-b border-border-subtle"
+        style={{
+          background: "rgba(15, 15, 26, 0.90)",
+          WebkitBackdropFilter: "blur(12px)",
+          backdropFilter: "blur(12px)",
+        }}
+      >
         {/* Row 3: Company filter pills - horizontal scroll */}
         <div 
-          className="flex gap-2 px-4 py-2 overflow-x-auto"
-          style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
+          className="flex gap-2 px-4 py-2 overflow-x-auto touch-scroll"
+          style={{ 
+            scrollbarWidth: "none", 
+            msOverflowStyle: "none",
+            WebkitOverflowScrolling: "touch",
+          }}
         >
           <style jsx>{`div::-webkit-scrollbar { display: none; }`}</style>
           {companyFilters.map((filter) => (
@@ -239,7 +252,7 @@ export function OrgChart({ initialCompany }: OrgChartProps) {
               key={filter.id}
               onClick={() => setSelectedCompany(filter.id)}
               className={cn(
-                "px-3 py-1.5 rounded-full text-[10px] uppercase tracking-wider font-neuropol transition-all duration-[180ms] whitespace-nowrap shrink-0",
+                "px-3 py-1.5 rounded-full uppercase tracking-wider font-neuropol transition-all duration-[180ms] whitespace-nowrap shrink-0 touch-manipulation min-h-[32px]",
                 selectedCompany === filter.id 
                   ? "text-white shadow-lg" 
                   : "bg-white/5 text-white/50 border border-white/10"
@@ -247,6 +260,7 @@ export function OrgChart({ initialCompany }: OrgChartProps) {
               style={{
                 backgroundColor: selectedCompany === filter.id ? filter.color : undefined,
                 boxShadow: selectedCompany === filter.id ? `0 4px 12px ${filter.color}40` : undefined,
+                fontSize: "0.72rem",
               }}
             >
               {filter.shortLabel}
@@ -260,18 +274,20 @@ export function OrgChart({ initialCompany }: OrgChartProps) {
             <button
               onClick={() => setLayout("vertical")}
               className={cn(
-                "px-2 py-0.5 rounded font-neuropol text-[0.65rem] uppercase transition-colors",
+                "px-2 py-1 rounded font-neuropol uppercase transition-colors touch-manipulation",
                 layout === "vertical" ? "bg-white/10 text-white" : "text-white/40"
               )}
+              style={{ fontSize: "0.7rem" }}
             >
               Vertical
             </button>
             <button
               onClick={() => setLayout("horizontal")}
               className={cn(
-                "px-2 py-0.5 rounded font-neuropol text-[0.65rem] uppercase transition-colors",
+                "px-2 py-1 rounded font-neuropol uppercase transition-colors touch-manipulation",
                 layout === "horizontal" ? "bg-white/10 text-white" : "text-white/40"
               )}
+              style={{ fontSize: "0.7rem" }}
             >
               Horizontal
             </button>

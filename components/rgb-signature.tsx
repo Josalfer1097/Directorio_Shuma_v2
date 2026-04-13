@@ -8,22 +8,24 @@ const VERSION = "v1.2.1";
 export function RgbSignature() {
   return (
     <div 
-      className="fixed bottom-0 left-0 right-0 flex flex-col items-center justify-center pointer-events-none"
+      className="fixed bottom-0 left-0 right-0 flex flex-col items-center justify-center pointer-events-none safe-bottom rgb-signature"
       style={{
         height: '44px',
-        background: 'rgba(0,0,0,0.85)',
+        background: 'rgba(0,0,0,0.92)',
+        WebkitBackdropFilter: 'blur(8px)',
         backdropFilter: 'blur(8px)',
         borderTop: '1px solid rgba(255,255,255,0.04)',
         zIndex: 40,
+        paddingBottom: 'env(safe-area-inset-bottom, 0px)',
       }}
     >
       {/* Line 1: RGB animated signature */}
       <p 
-        className="m-0 p-0"
+        className="m-0 p-0 text-center"
         style={{
-          fontFamily: "'Neuropol', monospace",
-          fontSize: '0.55rem',
-          letterSpacing: '0.22em',
+          fontFamily: "'Neuropol', var(--font-orbitron), monospace",
+          fontSize: 'clamp(0.42rem, 1.5vw, 0.55rem)',
+          letterSpacing: '0.12em',
           textTransform: 'uppercase',
         }}
       >
