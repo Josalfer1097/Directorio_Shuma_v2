@@ -198,12 +198,11 @@ export function Navbar() {
             {/* Tooltip */}
             {phoneTooltipVisible && (
               <div
-                className="absolute top-full left-1/2 -translate-x-1/2 mt-2 px-2 py-1 whitespace-nowrap pointer-events-none z-50"
+                className="absolute top-full left-1/2 -translate-x-1/2 mt-2 px-2 py-1 whitespace-nowrap pointer-events-none z-50 text-scale-xs"
                 style={{
                   background: "#1A1A1A",
                   border: "1px solid rgba(255,255,255,0.10)",
                   borderRadius: "6px",
-                  fontSize: "var(--font-xs)",
                   color: "rgba(255,255,255,0.8)",
                 }}
               >

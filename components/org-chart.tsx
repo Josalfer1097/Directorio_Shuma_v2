@@ -260,8 +260,8 @@ export function OrgChart({ initialCompany }: OrgChartProps) {
               style={{
                 backgroundColor: selectedCompany === filter.id ? filter.color : undefined,
                 boxShadow: selectedCompany === filter.id ? `0 4px 12px ${filter.color}40` : undefined,
-                fontSize: "var(--font-xs)",
               }}
+              className="text-scale-xs"
             >
               {filter.shortLabel}
             </button>
@@ -274,20 +274,18 @@ export function OrgChart({ initialCompany }: OrgChartProps) {
             <button
               onClick={() => setLayout("vertical")}
               className={cn(
-                "px-2 py-1 rounded font-neuropol uppercase transition-colors touch-manipulation",
+                "px-2 py-1 rounded font-neuropol uppercase transition-colors touch-manipulation text-scale-xs",
                 layout === "vertical" ? "bg-white/10 text-white" : "text-white/40"
               )}
-              style={{ fontSize: "var(--font-xs)" }}
             >
               Vertical
             </button>
             <button
               onClick={() => setLayout("horizontal")}
               className={cn(
-                "px-2 py-1 rounded font-neuropol uppercase transition-colors touch-manipulation",
+                "px-2 py-1 rounded font-neuropol uppercase transition-colors touch-manipulation text-scale-xs",
                 layout === "horizontal" ? "bg-white/10 text-white" : "text-white/40"
               )}
-              style={{ fontSize: "var(--font-xs)" }}
             >
               Horizontal
             </button>

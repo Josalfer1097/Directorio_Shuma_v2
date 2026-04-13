@@ -221,10 +221,9 @@ export function DepartmentView({ department, onClose }: DepartmentViewProps) {
               {/* Back button */}
               <button
                 onClick={onClose}
-                className="flex items-center gap-2 transition-colors"
+                className="flex items-center gap-2 transition-colors text-scale-sm"
                 style={{ 
                   color: "rgba(255,255,255,0.6)",
-                  fontSize: "var(--font-sm)",
                 }}
                 onMouseEnter={(e) => e.currentTarget.style.color = "white"}
                 onMouseLeave={(e) => e.currentTarget.style.color = "rgba(255,255,255,0.6)"}
@@ -235,10 +234,9 @@ export function DepartmentView({ department, onClose }: DepartmentViewProps) {
 
               {/* Department name */}
               <h1
-                className="absolute left-1/2 -translate-x-1/2 font-neuropol uppercase truncate max-w-[50%]"
+                className="absolute left-1/2 -translate-x-1/2 font-neuropol uppercase truncate max-w-[50%] text-scale-xl"
                 style={{
                   fontFamily: "var(--font-neuropol), var(--font-orbitron), 'Orbitron', monospace",
-                  fontSize: "var(--font-xl)",
                   letterSpacing: "0.05em",
                   color: "white",
                 }}
@@ -253,9 +251,9 @@ export function DepartmentView({ department, onClose }: DepartmentViewProps) {
                   background: "rgba(255,255,255,0.07)",
                   borderRadius: "20px",
                   padding: "4px 12px",
-                  fontSize: "var(--font-xs)",
                   color: "rgba(255,255,255,0.7)",
                 }}
+                className="text-scale-xs"
               >
                 <Users className="w-3.5 h-3.5" />
                 <span>{departmentEmployees.length} colaborador{departmentEmployees.length !== 1 ? "es" : ""}</span>
@@ -270,7 +268,7 @@ export function DepartmentView({ department, onClose }: DepartmentViewProps) {
                     className="w-12 h-12"
                     style={{ color: "rgba(255,255,255,0.15)" }}
                   />
-                  <p style={{ fontSize: "var(--font-base)", color: "rgba(255,255,255,0.30)" }}>
+                  <p className="text-scale-base" style={{ color: "rgba(255,255,255,0.30)" }}>
                     No hay colaboradores en este departamento
                   </p>
                 </div>
@@ -286,9 +284,8 @@ export function DepartmentView({ department, onClose }: DepartmentViewProps) {
                       }}
                     >
                       <p
-                        className="mb-3"
+                        className="mb-3 text-scale-xs"
                         style={{
-                          fontSize: "var(--font-xs)",
                           letterSpacing: "0.18em",
                           color: getCompanyConfig(manager.company).primary,
                           textTransform: "uppercase",
@@ -319,9 +316,9 @@ export function DepartmentView({ department, onClose }: DepartmentViewProps) {
                       }}
                     >
                       <span
+                        className="text-scale-xs"
                         style={{
                           position: "absolute",
-                          fontSize: "var(--font-xs)",
                           letterSpacing: "0.15em",
                           color: "rgba(255,255,255,0.25)",
                           background: "#0C0E11",
@@ -350,10 +347,9 @@ export function DepartmentView({ department, onClose }: DepartmentViewProps) {
                               }}
                             >
                               <span
-                                className="font-neuropol uppercase"
+                                className="font-neuropol uppercase text-scale-xs"
                                 style={{
                                   fontFamily: "var(--font-neuropol), var(--font-orbitron), 'Orbitron', monospace",
-                                  fontSize: "var(--font-xs)",
                                   letterSpacing: "0.1em",
                                   color: config.primary,
                                 }}

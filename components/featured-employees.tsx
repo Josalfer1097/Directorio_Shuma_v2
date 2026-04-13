@@ -151,18 +151,16 @@ function FeaturedEmployeeCard({
 
           <div className="flex-1 min-w-0">
             <h3 
-              className="font-semibold text-foreground group-hover:text-primary transition-colors duration-[180ms] line-clamp-1"
-              style={{ fontSize: "var(--font-md)" }}
+              className="font-semibold text-foreground group-hover:text-primary transition-colors duration-[180ms] line-clamp-1 text-scale-md"
             >
               {employee.name}
             </h3>
-            <p className="text-muted-foreground line-clamp-1" style={{ fontSize: "var(--font-sm)" }}>
+            <p className="text-muted-foreground line-clamp-1 text-scale-sm">
               {employee.position}
             </p>
             <span
-              className="inline-block font-medium px-1.5 py-0.5 rounded-full mt-1"
+              className="inline-block font-medium px-1.5 py-0.5 rounded-full mt-1 text-scale-xs"
               style={{
-                fontSize: "var(--font-xs)",
                 backgroundColor: companyConfig.accent ? companyConfig.secondary : `${companyConfig.primary}15`,
                 border: companyConfig.accent ? `1px solid ${companyConfig.primary}` : 'none',
                 color: companyConfig.accent || companyConfig.primary,
@@ -177,7 +175,7 @@ function FeaturedEmployeeCard({
         <div className="gradient-divider my-2" />
 
         {/* Contact info */}
-        <div className="space-y-1.5 pl-2" style={{ fontSize: "var(--font-sm)" }}
+        <div className="space-y-1.5 pl-2 text-scale-sm">
           {/* Email row */}
           <div className="flex items-center gap-1">
             <button
@@ -311,10 +309,10 @@ export function FeaturedEmployees({
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="font-bold text-foreground" style={{ fontSize: "var(--font-2xl)" }}>
+          <h2 className="font-bold text-foreground text-scale-2xl">
             Liderazgo Shuma
           </h2>
-          <p className="text-muted-foreground" style={{ fontSize: "var(--font-base)" }}>
+          <p className="text-muted-foreground text-scale-base">
             Las personas que guían el camino de nuestras empresas
           </p>
         </div>
