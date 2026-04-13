@@ -8,6 +8,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import type { ViewMode } from "@/types";
 import { cn } from "@/lib/utils";
 import { getEmployees } from "@/lib/data";
+import { FontScaleControl } from "./font-scale-control";
 
 export function Navbar() {
   const pathname = usePathname();
@@ -143,6 +144,9 @@ export function Navbar() {
               <span className="absolute -bottom-1.5 left-0 right-0 h-0.5 bg-gradient-to-r from-[#C9A84C] to-[#E0C060] rounded-full" />
             )}
           </Link>
+
+          {/* Font Scale Control */}
+          <FontScaleControl />
 
           {/* Quick Extensions Button */}
           <div className="relative">

@@ -350,13 +350,16 @@ export function EmployeeCard({
             </Avatar>
 
             <div className="flex-1 min-w-0">
-              <h3 className="font-semibold text-foreground group-hover:text-primary transition-colors duration-[180ms] line-clamp-1 text-sm">
+              <h3 
+                className="font-semibold text-foreground group-hover:text-primary transition-colors duration-[180ms] line-clamp-1"
+                style={{ fontSize: 'var(--font-base)' }}
+              >
                 {employee.name}
               </h3>
-              <p className="text-xs text-muted-foreground line-clamp-1">
+              <p className="text-muted-foreground line-clamp-1" style={{ fontSize: 'var(--font-sm)' }}>
                 {employee.position}
               </p>
-              <p className="text-[11px] text-muted-foreground/70 line-clamp-1">
+              <p className="text-muted-foreground/70 line-clamp-1" style={{ fontSize: 'var(--font-xs)' }}>
                 {employee.department}
               </p>
               {employee.location && (
@@ -384,7 +387,7 @@ export function EmployeeCard({
           <div className="gradient-divider my-2" />
 
           {/* Bottom section: Contact info */}
-          <div className="space-y-1.5 text-[12px]">
+          <div className="space-y-1.5" style={{ fontSize: 'var(--font-sm)' }}>
             {/* Email row */}
             <div className="flex items-center gap-1">
               <button

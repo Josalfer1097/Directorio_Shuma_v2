@@ -8,6 +8,17 @@
    ═══════════════════════════════════════════════════════════════════ */
 
 :root {
+  /* Font Scale - Accessibility */
+  --font-scale: 1;
+  --font-xs:   calc(0.65rem * var(--font-scale));
+  --font-sm:   calc(0.75rem * var(--font-scale));
+  --font-base: calc(0.875rem * var(--font-scale));
+  --font-md:   calc(1rem * var(--font-scale));
+  --font-lg:   calc(1.125rem * var(--font-scale));
+  --font-xl:   calc(1.25rem * var(--font-scale));
+  --font-2xl:  calc(1.5rem * var(--font-scale));
+  --font-3xl:  calc(2rem * var(--font-scale));
+  
   /* Base Colors */
   --bg-base: #080810;
   --bg-surface: #0F0F1A;

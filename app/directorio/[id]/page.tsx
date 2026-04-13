@@ -240,7 +240,7 @@ function EmployeeDetailContent({ id }: { id: string }) {
               className="text-white font-bold mt-4"
               style={{ 
                 fontFamily: "'DM Sans', sans-serif",
-                fontSize: '1.3rem',
+                fontSize: 'var(--font-xl)',
                 fontWeight: 700,
               }}
             >
@@ -252,7 +252,7 @@ function EmployeeDetailContent({ id }: { id: string }) {
               className="italic mt-1"
               style={{ 
                 color: config.primary,
-                fontSize: '0.85rem',
+                fontSize: 'var(--font-base)',
                 fontFamily: "'DM Sans', sans-serif",
               }}
             >
@@ -295,7 +295,7 @@ function EmployeeDetailContent({ id }: { id: string }) {
               >
                 Departamento
               </p>
-              <p style={{ fontSize: '0.9rem', color: '#FFFFFF', fontWeight: 500 }}>
+              <p style={{ fontSize: 'var(--font-base)', color: '#FFFFFF', fontWeight: 500 }}>
                 {employee.department || "—"}
               </p>
             </div>
@@ -313,7 +313,7 @@ function EmployeeDetailContent({ id }: { id: string }) {
               >
                 Empresa
               </p>
-              <p style={{ fontSize: '0.9rem', color: '#FFFFFF', fontWeight: 500 }}>
+              <p style={{ fontSize: 'var(--font-base)', color: '#FFFFFF', fontWeight: 500 }}>
                 {company?.name || "—"}
               </p>
             </div>
@@ -331,7 +331,7 @@ function EmployeeDetailContent({ id }: { id: string }) {
               >
                 Telefono
               </p>
-              <p style={{ fontSize: '0.9rem', color: '#FFFFFF', fontWeight: 500 }}>
+              <p style={{ fontSize: 'var(--font-base)', color: '#FFFFFF', fontWeight: 500 }}>
                 {employee.phone || "—"}
               </p>
             </div>
@@ -350,13 +350,13 @@ function EmployeeDetailContent({ id }: { id: string }) {
                 Extension
               </p>
               {employee.extension && employee.extension !== "—" ? (
-                <p style={{ fontSize: '0.9rem', color: '#FFFFFF', fontWeight: 500 }}>
+                <p style={{ fontSize: 'var(--font-base)', color: '#FFFFFF', fontWeight: 500 }}>
                   {employee.extension}
                 </p>
               ) : (
                 <span 
                   style={{ 
-                    fontSize: '0.75rem', 
+                    fontSize: 'var(--font-sm)', 
                     color: 'rgba(255,255,255,0.3)',
                     padding: '2px 8px',
                     background: 'rgba(255,255,255,0.05)',
@@ -389,7 +389,7 @@ function EmployeeDetailContent({ id }: { id: string }) {
                     border: '1px solid rgba(255,255,255,0.10)',
                     borderRadius: '20px',
                     padding: '4px 12px',
-                    fontSize: '0.8rem',
+                    fontSize: 'var(--font-sm)',
                     color: 'white',
                   }}
                 >
@@ -397,7 +397,7 @@ function EmployeeDetailContent({ id }: { id: string }) {
                   {employee.location}
                 </span>
               ) : (
-                <span style={{ fontSize: '0.8rem', color: 'rgba(255,255,255,0.4)' }}>
+                <span style={{ fontSize: 'var(--font-sm)', color: 'rgba(255,255,255,0.4)' }}>
                   Sin sucursal
                 </span>
               )}
@@ -416,7 +416,7 @@ function EmployeeDetailContent({ id }: { id: string }) {
               >
                 Email
               </p>
-              <p style={{ fontSize: '0.9rem', color: '#FFFFFF', fontWeight: 500, wordBreak: 'break-all' }}>
+              <p style={{ fontSize: 'var(--font-base)', color: '#FFFFFF', fontWeight: 500, wordBreak: 'break-all' }}>
                 {employee.email || "—"}
               </p>
             </div>
@@ -441,7 +441,7 @@ function EmployeeDetailContent({ id }: { id: string }) {
               background: copiedField === 'email' ? config.primary : 'rgba(255,255,255,0.04)',
               border: `1px solid ${copiedField === 'email' ? config.primary : 'rgba(255,255,255,0.08)'}`,
               color: copiedField === 'email' ? 'white' : 'rgba(255,255,255,0.44)',
-              fontSize: '0.8rem',
+              fontSize: 'var(--font-sm)',
               boxShadow: copiedField === 'email' ? `0 0 12px ${config.glow}` : 'none',
             }}
             onMouseEnter={(e) => {
@@ -483,7 +483,7 @@ function EmployeeDetailContent({ id }: { id: string }) {
               background: 'rgba(255,255,255,0.04)',
               border: '1px solid rgba(255,255,255,0.08)',
               color: 'rgba(255,255,255,0.44)',
-              fontSize: '0.8rem',
+              fontSize: 'var(--font-sm)',
             }}
             onMouseEnter={(e) => {
               e.currentTarget.style.background = `color-mix(in srgb, ${config.primary} 15%, transparent)`;
@@ -511,7 +511,7 @@ function EmployeeDetailContent({ id }: { id: string }) {
               background: copiedField === 'phone' ? config.primary : 'rgba(255,255,255,0.04)',
               border: `1px solid ${copiedField === 'phone' ? config.primary : 'rgba(255,255,255,0.08)'}`,
               color: copiedField === 'phone' ? 'white' : 'rgba(255,255,255,0.44)',
-              fontSize: '0.8rem',
+              fontSize: 'var(--font-sm)',
               boxShadow: copiedField === 'phone' ? `0 0 12px ${config.glow}` : 'none',
             }}
             onMouseEnter={(e) => {

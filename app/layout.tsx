@@ -3,6 +3,7 @@ import { DM_Sans, Orbitron } from 'next/font/google'
 import localFont from 'next/font/local'
 import { Analytics } from '@vercel/analytics/next'
 import { ThemeProvider } from '@/components/theme-provider'
+import { FontScaleProvider } from '@/lib/FontScaleContext'
 import { RgbSignature } from '@/components/rgb-signature'
 import { Toaster } from 'sonner'
 import { ScrollToTop } from '@/components/scroll-to-top'
@@ -59,13 +60,15 @@ export default function RootLayout({
           defaultTheme="dark"
           enableSystem={false}
         >
-          <div className="dot-grid-overlay" />
-          <div className="pb-7">
-            {children}
-          </div>
-          <RgbSignature />
-          <ScrollToTop />
-          <Toaster position="bottom-right" richColors />
+          <FontScaleProvider>
+            <div className="dot-grid-overlay" />
+            <div className="pb-7">
+              {children}
+            </div>
+            <RgbSignature />
+            <ScrollToTop />
+            <Toaster position="bottom-right" richColors />
+          </FontScaleProvider>
         </ThemeProvider>
         <Analytics />
       </body>

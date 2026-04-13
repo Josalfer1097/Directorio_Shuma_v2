@@ -64,7 +64,7 @@ const ExtensionRow = memo(function ExtensionRow({
       <td
         className="px-3 font-medium text-white group-hover:text-white/90"
         style={{ 
-          fontSize: "0.85rem", 
+          fontSize: "var(--font-base)", 
           fontWeight: 500,
           whiteSpace: "nowrap",
           overflow: "hidden",
@@ -78,7 +78,7 @@ const ExtensionRow = memo(function ExtensionRow({
       <td
         className="px-3 hidden md:table-cell"
         style={{ 
-          fontSize: "0.78rem", 
+          fontSize: "var(--font-sm)", 
           color: "rgba(255,255,255,0.65)",
           whiteSpace: "nowrap",
           overflow: "hidden",
@@ -92,7 +92,7 @@ const ExtensionRow = memo(function ExtensionRow({
       <td
         className="px-3 hidden lg:table-cell"
         style={{ 
-          fontSize: "0.75rem", 
+          fontSize: "var(--font-sm)", 
           color: "rgba(255,255,255,0.45)",
           whiteSpace: "nowrap",
           overflow: "hidden",
@@ -106,7 +106,7 @@ const ExtensionRow = memo(function ExtensionRow({
       <td
         className="px-3 hidden xl:table-cell"
         style={{ 
-          fontSize: "0.72rem", 
+          fontSize: "var(--font-xs)", 
           color: "rgba(255,255,255,0.35)",
           whiteSpace: "nowrap",
           overflow: "hidden",
@@ -281,7 +281,7 @@ const ExtensionCard = memo(function ExtensionCard({
         <p
           className="text-white leading-tight line-clamp-2"
           style={{
-            fontSize: "0.78rem",
+            fontSize: "var(--font-sm)",
             fontWeight: 600,
             wordBreak: "break-word",
           }}
