@@ -132,7 +132,7 @@ export default function HomePage() {
                 <p 
                   className="font-dm-sans"
                   style={{
-                    fontSize: "clamp(1rem, 2vw, 1.25rem)",
+                    fontSize: "var(--font-xl)",
                     fontWeight: 600,
                     color: "#FFFFFF",
                     letterSpacing: "0.01em",
@@ -157,7 +157,7 @@ export default function HomePage() {
                 <p 
                   className="font-dm-sans"
                   style={{
-                    fontSize: "clamp(0.8rem, 1.5vw, 0.95rem)",
+                    fontSize: "var(--font-base)",
                     fontWeight: 400,
                     color: "rgba(255,255,255,0.55)",
                     marginTop: "8px",
@@ -177,8 +177,8 @@ export default function HomePage() {
             >
               <Link href="/directorio" className="w-full sm:w-auto">
                 <button 
-                  className="w-full group flex items-center justify-center gap-3 px-8 py-4 rounded-full bg-text-primary text-bg-base text-xs tracking-widest transition-all hover:scale-105 active:scale-95"
-                  style={{ fontFamily: "var(--font-neuropol), var(--font-orbitron), 'Orbitron', 'Courier New', monospace" }}
+                  className="w-full group flex items-center justify-center gap-3 px-8 py-4 rounded-full bg-text-primary text-bg-base tracking-widest transition-all hover:scale-105 active:scale-95"
+                  style={{ fontFamily: "var(--font-neuropol), var(--font-orbitron), 'Orbitron', 'Courier New', monospace", fontSize: "var(--font-base)" }}
                 >
                   Ver Directorio
                   <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
@@ -186,8 +186,8 @@ export default function HomePage() {
               </Link>
               <Link href="/organigrama" className="w-full sm:w-auto">
                 <button 
-                  className="w-full flex items-center justify-center gap-3 px-8 py-4 rounded-full border border-border-strong text-text-primary text-xs tracking-widest transition-all hover:bg-white/5 active:scale-95"
-                  style={{ fontFamily: "var(--font-neuropol), var(--font-orbitron), 'Orbitron', 'Courier New', monospace" }}
+                  className="w-full flex items-center justify-center gap-3 px-8 py-4 rounded-full border border-border-strong text-text-primary tracking-widest transition-all hover:bg-white/5 active:scale-95"
+                  style={{ fontFamily: "var(--font-neuropol), var(--font-orbitron), 'Orbitron', 'Courier New', monospace", fontSize: "var(--font-base)" }}
                 >
                   <GitBranch className="w-4 h-4" />
                   Estructura
@@ -256,7 +256,7 @@ export default function HomePage() {
                       <div 
                         className="relative p-6 sm:p-8 rounded-[14px] overflow-hidden transition-all duration-[250ms] ease-out"
                         style={{ 
-                          minHeight: '180px',
+                          minHeight: 'calc(180px * var(--font-scale))',
                           borderLeft: `4px solid ${config.primary}`,
                           background: 'rgba(255,255,255,0.03)',
                           border: '1px solid var(--border-subtle)',
@@ -316,7 +316,7 @@ export default function HomePage() {
                             className="text-text-primary mb-3 leading-tight font-bold line-clamp-2"
                             style={{ 
                               fontFamily: "var(--font-neuropol), var(--font-orbitron), 'Orbitron', monospace",
-                              fontSize: "clamp(0.85rem, 1.5vw, 1rem)",
+                              fontSize: "var(--font-md)",
                               minHeight: "2.5em",
                             }}
                           >
@@ -327,20 +327,20 @@ export default function HomePage() {
                           <div className="space-y-1.5 mb-4">
                             <div className="flex items-center gap-2 text-text-muted">
                               <Users className="w-3.5 h-3.5" />
-                              <span className="font-dm-sans text-sm">{company.employeeCount} colaboradores</span>
+                              <span className="font-dm-sans" style={{ fontSize: "var(--font-sm)" }}>{company.employeeCount} colaboradores</span>
                             </div>
                             <div className="flex items-center gap-2 text-text-muted">
                               <Layers className="w-3.5 h-3.5" />
-                              <span className="font-dm-sans text-sm">{company.departmentCount} departamentos</span>
+                              <span className="font-dm-sans" style={{ fontSize: "var(--font-sm)" }}>{company.departmentCount} departamentos</span>
                             </div>
                           </div>
                           
                           {/* Ver equipo link */}
                           <div 
-                            className="flex items-center gap-1 text-sm font-medium transition-all group-hover:gap-2"
+                            className="flex items-center gap-1 font-medium transition-all group-hover:gap-2"
                             style={{ color: config.primary }}
                           >
-                            <span style={{ fontFamily: "var(--font-neuropol), var(--font-orbitron), 'Orbitron', 'Courier New', monospace", fontSize: '11px', letterSpacing: '0.05em' }}>
+                            <span style={{ fontFamily: "var(--font-neuropol), var(--font-orbitron), 'Orbitron', 'Courier New', monospace", fontSize: 'var(--font-sm)', letterSpacing: '0.05em' }}>
                               Ver equipo
                             </span>
                             <ArrowRight className="w-3.5 h-3.5 transition-transform group-hover:translate-x-0.5" />
@@ -359,7 +359,8 @@ export default function HomePage() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ delay: 0.3 }}
-              className="mt-12 flex flex-wrap items-center justify-center gap-x-6 gap-y-2 text-sm text-white/40"
+              className="mt-12 flex flex-wrap items-center justify-center gap-x-6 gap-y-2 text-white/40"
+              style={{ fontSize: "var(--font-sm)" }}
             >
               <span className="flex items-center gap-1.5">
                 <Users className="w-4 h-4" />

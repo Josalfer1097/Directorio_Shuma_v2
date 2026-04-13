@@ -1,7 +1,7 @@
 "use client";
 
 import { motion, AnimatePresence } from "framer-motion";
-import { X, Filter, Download, Star, ChevronRight } from "lucide-react";
+import { X, Filter, Download, Star, ChevronRight, Layers } from "lucide-react";
 import { useFavorites } from "@/lib/useFavorites";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
@@ -269,25 +269,31 @@ export function DirectoryFilters({
         {selectedDepartment !== "all" && (
           <button
             onClick={() => onDeptViewOpen(selectedDepartment)}
-            className="mt-2 flex items-center gap-1 transition-colors cursor-pointer group"
+            className="mt-2 w-full flex items-center justify-center gap-1.5 transition-colors cursor-pointer group"
             style={{
               fontSize: "var(--font-xs)",
-              color: "rgba(255,255,255,0.35)",
+              color: "#00C9A7",
+              background: "rgba(0,201,167,0.06)",
+              border: "1px solid rgba(0,201,167,0.20)",
+              borderRadius: "8px",
+              padding: "6px 12px",
             }}
-            onMouseEnter={(e) => e.currentTarget.style.color = "#00C9A7"}
-            onMouseLeave={(e) => e.currentTarget.style.color = "rgba(255,255,255,0.35)"}
+            onMouseEnter={(e) => e.currentTarget.style.background = "rgba(0,201,167,0.12)"}
+            onMouseLeave={(e) => e.currentTarget.style.background = "rgba(0,201,167,0.06)"}
           >
-            <span>Ver vista de departamento</span>
+            <Layers className="w-3 h-3" />
+            <span>Ver vista de {selectedDepartment}</span>
             <ChevronRight className="w-3 h-3 transition-transform group-hover:translate-x-0.5" />
           </button>
         )}
 
-        {/* Department Quick List with arrows */}
-        <div className="mt-4 space-y-1">
+        {/* Department Quick List with visible Ver buttons */}
+        <div className="mt-4 space-y-1.5">
           {departments.slice(0, 8).map((dept) => (
             <div 
               key={dept}
-              className="flex items-center justify-between group"
+              className="flex items-center gap-2"
+              style={{ minHeight: "40px" }}
             >
               <label 
                 className="flex items-center gap-2 cursor-pointer flex-1 py-1"
@@ -297,30 +303,37 @@ export function DirectoryFilters({
                   onCheckedChange={() => onDepartmentChange(selectedDepartment === dept ? "all" : dept)}
                 />
                 <span 
-                  className="text-xs text-white/60 group-hover:text-white/80 truncate transition-colors"
-                  style={{ maxWidth: "140px" }}
+                  className="text-white/60 hover:text-white/80 truncate transition-colors"
+                  style={{ fontSize: "var(--font-xs)", maxWidth: "120px" }}
                 >
                   {dept}
                 </span>
               </label>
               <button
                 onClick={() => onDeptViewOpen(dept)}
-                className="w-6 h-6 flex items-center justify-center rounded transition-all"
+                className="flex items-center gap-1 transition-all shrink-0"
                 style={{
-                  color: "rgba(255,255,255,0.25)",
-                  background: "transparent",
+                  fontSize: "var(--font-xs)",
+                  color: "rgba(255,255,255,0.35)",
+                  background: "rgba(255,255,255,0.04)",
+                  border: "1px solid rgba(255,255,255,0.08)",
+                  borderRadius: "6px",
+                  padding: "3px 8px",
                 }}
                 onMouseEnter={(e) => {
                   e.currentTarget.style.color = "#00C9A7";
-                  e.currentTarget.style.background = "rgba(255,255,255,0.06)";
+                  e.currentTarget.style.borderColor = "rgba(0,201,167,0.35)";
+                  e.currentTarget.style.background = "rgba(0,201,167,0.08)";
                 }}
                 onMouseLeave={(e) => {
-                  e.currentTarget.style.color = "rgba(255,255,255,0.25)";
-                  e.currentTarget.style.background = "transparent";
+                  e.currentTarget.style.color = "rgba(255,255,255,0.35)";
+                  e.currentTarget.style.borderColor = "rgba(255,255,255,0.08)";
+                  e.currentTarget.style.background = "rgba(255,255,255,0.04)";
                 }}
-                title="Ver departamento"
+                title={`Ver departamento ${dept}`}
               >
-                <ChevronRight className="w-3.5 h-3.5" />
+                <span>Ver</span>
+                <ChevronRight className="w-3 h-3" />
               </button>
             </div>
           ))}
