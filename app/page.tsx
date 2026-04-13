@@ -36,27 +36,53 @@ export default function HomePage() {
     };
   }, [employees, companies, departments]);
 
+  // Strict whitelist for leadership positions
+  const isLeadershipRole = (position: string): boolean => {
+    const p = position?.toLowerCase().trim() ?? '';
+    
+    // Explicit exclusions first
+    const excluded = [
+      'almacén', 'almacen', 'sub gerente',
+      'auxiliar', 'agente', 'analista',
+      'vendedor', 'vendedora', 'caja',
+      'encargado', 'soporte', 'desarrollador',
+      'facturista', 'recepción', 'recepcion'
+    ];
+    if (excluded.some(ex => p.includes(ex))) return false;
+    
+    // Whitelist of leadership positions
+    const included = [
+      'director', 'directora',
+      'gerente general', 'gerenta general',
+      'gerente de sistemas',
+      'gerente de contabilidad',
+      'gerente crédito', 'gerente credito',
+      'gerente de ventas',
+      'gerente de logística', 'gerente de logistica',
+      'gerente de crédito', 'gerente de credito',
+      'gerente de compras',
+      'gerente general administrativo'
+    ];
+    return included.some(inc => p.includes(inc));
+  };
+
   // Leadership tier priority function
   const getLeadershipTier = (position: string): number => {
     const p = position?.toLowerCase() ?? '';
     if (p.includes('director')) return 1;
-    if (p.includes('gerente general')) return 2;
-    if (p.includes('gerente')) return 3;
-    return 4;
+    if (p.includes('gerente general') || p.includes('gerente de compras y asistente')) return 2;
+    return 3;
   };
 
   const featuredEmployees = employees
     .filter(emp => {
       const company = companies.find(c => c.id === emp.company);
-      return company && !company.disabled && (
-        emp.position.toLowerCase().includes("director") ||
-        emp.position.toLowerCase().includes("gerente")
-      );
+      return company && !company.disabled && isLeadershipRole(emp.position);
     })
     .sort((a, b) => {
       const tierDiff = getLeadershipTier(a.position) - getLeadershipTier(b.position);
       if (tierDiff !== 0) return tierDiff;
-      return a.name.localeCompare(b.name, 'es');
+      return a.name.localeCompare(b.name, 'es-MX');
     });
 
   return (
