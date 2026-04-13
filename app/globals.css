@@ -220,7 +220,7 @@
 
 /* ═══════════════════════════════════════════════════════════════════
    CARD CASCADE ANIMATION
-   ═══════════════════════════════════════════════════════════════════ */
+   ══════════════════════════════════════════════════��════════════════ */
 
 @keyframes cardRain {
   0% {
@@ -1214,10 +1214,4 @@ button, a, [role="button"], .clickable {
   animation: rotateAvatarGradient 4s linear infinite;
 }
 
-/* Fallback for browsers that don't support @property */
-@supports not (animation: test) or (not selector(:has(+ *))) {
-  .avatar-animated .avatar-animated-inner {
-    animation: none;
-    /* Static gradient fallback */
-  }
-}
+/* Fallback for browsers that don't support @property - removed complex @supports */
