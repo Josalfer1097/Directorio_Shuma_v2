@@ -88,19 +88,6 @@
       "avatar": null
     },
     {
-      "id": "emp003",
-      "name": "Lourdes Payan Esparza",
-      "department": "Compras",
-      "position": "Asistente De Compras",
-      "phone": "55 55498999",
-      "extension": "218",
-      "email": "lourdes.payan@shuma.mx",
-      "company": "comercializadora",
-      "location": "División",
-      "reportsTo": "emp002",
-      "avatar": null
-    },
-    {
       "id": "emp008",
       "name": "Concepción Castañeda Santa Cruz",
       "department": "Contabilidad",
@@ -452,6 +439,32 @@
       "avatar": null
     },
     {
+      "id": "emp068",
+      "name": "Emiliano Flores",
+      "department": "Ventas",
+      "position": "Vendedor Mostrador",
+      "phone": "-",
+      "extension": "-",
+      "email": "ventas2@ferrecapital.mx",
+      "company": "ferrecapital",
+      "location": "FerreDivisión",
+      "reportsTo": "emp029",
+      "avatar": null
+    },
+    {
+      "id": "emp069",
+      "name": "Juan José Aguirre Martínez",
+      "department": "Ventas",
+      "position": "Agente de Ventas",
+      "phone": "55 55498999",
+      "extension": "-",
+      "email": "juanaguirre@shuma.com.mx",
+      "company": "comercializadora",
+      "location": "División",
+      "reportsTo": "emp029",
+      "avatar": null
+    },
+    {
       "id": "emp031",
       "name": "Guadalupe Yolanda Martínez Rodríguez",
       "department": "Almacén",
@@ -570,7 +583,7 @@
     },
     {
       "id": "emp040",
-      "name": "Juan José Aguirre Martínez",
+      "name": "Juan José Monter",
       "department": "Logística",
       "position": "Sub Gerente de Almacén",
       "phone": "55 55498999",
