@@ -305,10 +305,10 @@ export function FeaturedEmployees({
       <div className="flex items-center justify-between">
         <div>
           <h2 className="text-2xl font-bold text-foreground">
-            Equipo Directivo
+            Liderazgo Shuma
           </h2>
           <p className="text-muted-foreground">
-            Conoce a los líderes de Grupo Shuma
+            Las personas que guían el camino de nuestras empresas
           </p>
         </div>
         <div className="flex items-center gap-2">

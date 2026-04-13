@@ -36,13 +36,28 @@ export default function HomePage() {
     };
   }, [employees, companies, departments]);
 
-  const featuredEmployees = employees.filter(emp => {
-    const company = companies.find(c => c.id === emp.company);
-    return company && !company.disabled && (
-      emp.position.toLowerCase().includes("director") ||
-      emp.position.toLowerCase().includes("gerente")
-    );
-  });
+  // Leadership tier priority function
+  const getLeadershipTier = (position: string): number => {
+    const p = position?.toLowerCase() ?? '';
+    if (p.includes('director')) return 1;
+    if (p.includes('gerente general')) return 2;
+    if (p.includes('gerente')) return 3;
+    return 4;
+  };
+
+  const featuredEmployees = employees
+    .filter(emp => {
+      const company = companies.find(c => c.id === emp.company);
+      return company && !company.disabled && (
+        emp.position.toLowerCase().includes("director") ||
+        emp.position.toLowerCase().includes("gerente")
+      );
+    })
+    .sort((a, b) => {
+      const tierDiff = getLeadershipTier(a.position) - getLeadershipTier(b.position);
+      if (tierDiff !== 0) return tierDiff;
+      return a.name.localeCompare(b.name, 'es');
+    });
 
   return (
     <AdminProvider>
@@ -81,9 +96,31 @@ export default function HomePage() {
                   WebkitTextFillColor: 'transparent'
                 }}>MA</span>
               </h1>
-              <p className="font-dm-sans text-[#64647A] text-lg md:text-xl max-w-2xl mx-auto mb-12">
-                Conectando el talento de nuestras empresas. Acceso rápido a información de contacto y estructura organizacional.
-              </p>
+              <div className="max-w-[560px] mx-auto mb-12 text-center">
+                <p 
+                  className="font-dm-sans"
+                  style={{
+                    fontSize: "clamp(1rem, 2vw, 1.25rem)",
+                    fontWeight: 600,
+                    color: "#FFFFFF",
+                    letterSpacing: "0.01em",
+                  }}
+                >
+                  Cada persona<span style={{ color: "#00C9A7" }}>.</span> Cada empresa<span style={{ color: "#845EC2" }}>.</span> Un solo Grupo Shuma<span style={{ color: "#00C2FF" }}>.</span>
+                </p>
+                <p 
+                  className="font-dm-sans"
+                  style={{
+                    fontSize: "clamp(0.8rem, 1.5vw, 0.95rem)",
+                    fontWeight: 400,
+                    color: "rgba(255,255,255,0.55)",
+                    marginTop: "8px",
+                    fontStyle: "italic",
+                  }}
+                >
+                  El talento que nos mueve, al alcance de todos.
+                </p>
+              </div>
             </motion.div>
 
             <motion.div 
