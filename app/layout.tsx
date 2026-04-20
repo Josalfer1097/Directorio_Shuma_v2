@@ -35,6 +35,20 @@ export const metadata: Metadata = {
   title: 'Directorio Shuma',
   description: 'Directorio de colaboradores de Grupo Shuma',
   robots: 'noindex, nofollow',
+  icons: {
+    icon: [
+      { url: '/favicon.ico', sizes: 'any' },
+      { url: '/favicon.svg', type: 'image/svg+xml' },
+      { url: '/favicon-32x32.png', sizes: '32x32', type: 'image/png' },
+    ],
+    apple: [
+      { url: '/favicon-180x180.png', sizes: '180x180' },
+    ],
+    other: [
+      { url: '/favicon-192x192.png', sizes: '192x192', rel: 'icon' },
+      { url: '/favicon-512x512.png', sizes: '512x512', rel: 'icon' },
+    ],
+  },
 }
 
 export type ViewMode = "grid" | "list";

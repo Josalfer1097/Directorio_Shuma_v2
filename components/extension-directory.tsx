@@ -580,8 +580,82 @@ export function ExtensionDirectory({
   const totalEmployees = employees.length;
 
   const handlePrint = useCallback(() => {
-    window.print();
-  }, []);
+    // Group by company
+    const grouped = {
+      comercializadora: employees.filter(e => e.company === 'comercializadora'),
+      acabados: employees.filter(e => e.company === 'acabados'),
+      ferrecapital: employees.filter(e => e.company === 'ferrecapital'),
+    }
+
+    // Sort each group by extension
+    Object.values(grouped).forEach(group => {
+      group.sort((a, b) => {
+        if (!a.extension) return 1
+        if (!b.extension) return -1
+        return parseInt(a.extension) - parseInt(b.extension)
+      })
+    })
+
+    // Create or update #print-area
+    let printArea = document.getElementById('print-area')
+    if (!printArea) {
+      printArea = document.createElement('div')
+      printArea.id = 'print-area'
+      document.body.appendChild(printArea)
+    }
+
+    const date = new Date().toLocaleDateString('es-MX', {
+      year: 'numeric', month: 'long', day: 'numeric'
+    })
+
+    const companyNames: Record<string, string> = {
+      comercializadora: 'Comercializadora y Ferretería Shuma',
+      acabados: 'Acabados Shuma',
+      ferrecapital: 'Ferrecapital',
+    }
+
+    printArea.innerHTML = `
+      <div class="print-page-header">
+        <span class="print-title">GRUPO SHUMA — DIRECTORIO DE EXTENSIONES</span>
+        <span class="print-date">${date}</span>
+      </div>
+      
+      <div class="print-col-headers">
+        <span>EXT.</span>
+        <span>NOMBRE</span>
+        <span>PUESTO</span>
+        <span>DEPARTAMENTO</span>
+      </div>
+
+      ${Object.entries(grouped).map(([companyId, emps]) => 
+        emps.length === 0 ? '' : `
+        <div class="print-company-section">
+          <div class="print-company-header ${companyId}">
+            ${companyNames[companyId]} 
+            <span style="font-weight:400;font-size:8pt">
+              (${emps.length} colaboradores)
+            </span>
+          </div>
+          ${emps.map(emp => `
+            <div class="print-row">
+              <span class="print-ext">${emp.extension ?? '—'}</span>
+              <span class="print-name">${emp.name}</span>
+              <span class="print-position">${emp.position ?? '—'}</span>
+              <span class="print-dept">${emp.department ?? '—'}</span>
+            </div>
+          `).join('')}
+        </div>
+      `).join('')}
+
+      <div class="print-page-footer">
+        <span>Confidencial — Uso interno Grupo Shuma</span>
+        <span>directorio.gruposhuma.com</span>
+      </div>
+    `
+
+    // Trigger print
+    window.print()
+  }, [employees]);
 
   const handleRowClick = useCallback(
     (employeeId: string) => {
@@ -664,7 +738,14 @@ export function ExtensionDirectory({
             <span className="hidden sm:inline">Imprimir</span>
           </button>
           <button
-            onClick={handlePrint}
+            onClick={() => {
+              const company = selectedCompanies.length === 1 ? selectedCompanies[0] : 'all';
+              window.open(
+                `/print?company=${company}`, 
+                '_blank',
+                'noopener,noreferrer'
+              )
+            }}
             className="flex items-center gap-2 px-3 py-1.5 rounded-lg transition-colors text-xs"
             style={{
               background: "rgba(255,255,255,0.04)",
