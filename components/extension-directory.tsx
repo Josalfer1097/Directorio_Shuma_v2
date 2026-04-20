@@ -182,8 +182,7 @@ const LocationSubHeader = memo(function LocationSubHeader({
     >
       <td colSpan={5} style={{ paddingLeft: "80px" }}>
         <span
-          className="flex items-center gap-1"
-          style={{ fontSize: "var(--font-xs)", color: "rgba(255,255,255,0.3)" }}
+          className="flex items-center gap-1 text-scale-xs text-white/30"
         >
           <MapPin className="w-3 h-3" />
           {location}
@@ -580,81 +579,258 @@ export function ExtensionDirectory({
   const totalEmployees = employees.length;
 
   const handlePrint = useCallback(() => {
-    // Group by company
-    const grouped = {
-      comercializadora: employees.filter(e => e.company === 'comercializadora'),
-      acabados: employees.filter(e => e.company === 'acabados'),
-      ferrecapital: employees.filter(e => e.company === 'ferrecapital'),
-    }
-
-    // Sort each group by extension
-    Object.values(grouped).forEach(group => {
-      group.sort((a, b) => {
-        if (!a.extension) return 1
-        if (!b.extension) return -1
-        return parseInt(a.extension) - parseInt(b.extension)
-      })
-    })
-
-    // Create or update #print-area
-    let printArea = document.getElementById('print-area')
-    if (!printArea) {
-      printArea = document.createElement('div')
-      printArea.id = 'print-area'
-      document.body.appendChild(printArea)
-    }
-
-    const date = new Date().toLocaleDateString('es-MX', {
-      year: 'numeric', month: 'long', day: 'numeric'
-    })
-
+    const companyOrder = ['comercializadora', 'acabados', 'ferrecapital']
+    
     const companyNames: Record<string, string> = {
       comercializadora: 'Comercializadora y Ferretería Shuma',
       acabados: 'Acabados Shuma',
       ferrecapital: 'Ferrecapital',
     }
-
-    printArea.innerHTML = `
-      <div class="print-page-header">
-        <span class="print-title">GRUPO SHUMA — DIRECTORIO DE EXTENSIONES</span>
-        <span class="print-date">${date}</span>
-      </div>
+    
+    const companyColors: Record<string, string> = {
+      comercializadora: '#0047AB',
+      acabados: '#C0152A',
+      ferrecapital: '#2C3338',
+    }
+  
+    const date = new Date().toLocaleDateString('es-MX', {
+      year: 'numeric', month: 'long', day: 'numeric'
+    })
+  
+    const grouped: Record<string, Employee[]> = {}
+    companyOrder.forEach(id => {
+      grouped[id] = employees
+        .filter(e => e.company === id)
+        .sort((a, b) => {
+          if (!a.extension) return 1
+          if (!b.extension) return -1
+          return parseInt(a.extension) - parseInt(b.extension)
+        })
+    })
+  
+    const rowsHtml = companyOrder.map(companyId => {
+      const emps = grouped[companyId]
+      if (!emps || emps.length === 0) return ''
       
-      <div class="print-col-headers">
-        <span>EXT.</span>
-        <span>NOMBRE</span>
-        <span>PUESTO</span>
-        <span>DEPARTAMENTO</span>
-      </div>
-
-      ${Object.entries(grouped).map(([companyId, emps]) => 
-        emps.length === 0 ? '' : `
-        <div class="print-company-section">
-          <div class="print-company-header ${companyId}">
-            ${companyNames[companyId]} 
-            <span style="font-weight:400;font-size:8pt">
+      const empRows = emps.map((emp, i) => `
+        <tr style="background:${i % 2 === 0 ? '#ffffff' : '#f9f9f9'}">
+          <td style="
+            padding:5px 8px;
+            font-family:'Courier New',monospace;
+            font-weight:700;
+            font-size:9pt;
+            text-align:center;
+            border-bottom:1px solid #e8e8e8;
+            color:#000;
+          ">${emp.extension ?? '—'}</td>
+          <td style="
+            padding:5px 8px;
+            font-weight:600;
+            font-size:8.5pt;
+            border-bottom:1px solid #e8e8e8;
+            color:#000;
+          ">${emp.name}</td>
+          <td style="
+            padding:5px 8px;
+            font-size:8pt;
+            color:#333;
+            border-bottom:1px solid #e8e8e8;
+          ">${emp.position ?? '—'}</td>
+          <td style="
+            padding:5px 8px;
+            font-size:8pt;
+            color:#555;
+            border-bottom:1px solid #e8e8e8;
+          ">${emp.department ?? '—'}</td>
+        </tr>
+      `).join('')
+  
+      return `
+        <tr>
+          <td colspan="4" style="
+            padding:8px 10px;
+            background:#f0f0f0;
+            border-left:4px solid ${companyColors[companyId]};
+            font-weight:700;
+            font-size:8.5pt;
+            letter-spacing:0.08em;
+            text-transform:uppercase;
+            color:#000;
+            padding-top:12px;
+          ">
+            ${companyNames[companyId]}
+            <span style="font-weight:400;font-size:7.5pt;margin-left:8px;">
               (${emps.length} colaboradores)
             </span>
-          </div>
-          ${emps.map(emp => `
-            <div class="print-row">
-              <span class="print-ext">${emp.extension ?? '—'}</span>
-              <span class="print-name">${emp.name}</span>
-              <span class="print-position">${emp.position ?? '—'}</span>
-              <span class="print-dept">${emp.department ?? '—'}</span>
-            </div>
-          `).join('')}
-        </div>
-      `).join('')}
-
-      <div class="print-page-footer">
-        <span>Confidencial — Uso interno Grupo Shuma</span>
-        <span>directorio.gruposhuma.com</span>
+          </td>
+        </tr>
+        ${empRows}
+      `
+    }).join('')
+  
+    const html = `<!DOCTYPE html>
+  <html lang="es">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Directorio de Extensiones — Grupo Shuma</title>
+    <style>
+      * { margin: 0; padding: 0; box-sizing: border-box; }
+      body {
+        font-family: Arial, sans-serif;
+        background: white;
+        color: #000;
+        padding: 1.5cm 1.8cm;
+        font-size: 9pt;
+      }
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        table-layout: fixed;
+      }
+      col.col-ext  { width: 70px; }
+      col.col-name { width: 28%; }
+      col.col-pos  { width: 35%; }
+      col.col-dept { width: 25%; }
+      .header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-end;
+        border-bottom: 2px solid #000;
+        padding-bottom: 10px;
+        margin-bottom: 10px;
+      }
+      .header-title {
+        font-size: 14pt;
+        font-weight: 900;
+        letter-spacing: 0.03em;
+      }
+      .header-sub {
+        font-size: 8pt;
+        color: #666;
+        margin-top: 3px;
+      }
+      .header-date {
+        font-size: 8pt;
+        color: #666;
+        text-align: right;
+        line-height: 1.6;
+      }
+      .col-headers th {
+        padding: 5px 8px;
+        font-size: 7pt;
+        font-weight: 700;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+        color: #000;
+        border-bottom: 1.5px solid #000;
+        text-align: left;
+        background: white;
+      }
+      .footer {
+        margin-top: 16px;
+        padding-top: 8px;
+        border-top: 1px solid #ccc;
+        display: flex;
+        justify-content: space-between;
+        font-size: 7pt;
+        color: #888;
+      }
+      .no-print { 
+        position: fixed;
+        top: 16px; right: 16px;
+        background: #0047AB;
+        color: white;
+        border: none;
+        padding: 10px 20px;
+        border-radius: 8px;
+        font-size: 13px;
+        cursor: pointer;
+        font-weight: 600;
+        z-index: 999;
+        font-family: Arial, sans-serif;
+      }
+      .no-print:hover { background: #002D6E; }
+      @media print {
+        .no-print { display: none !important; }
+        @page { 
+          size: Letter portrait; 
+          margin: 1.5cm 1.8cm; 
+        }
+        body { 
+          padding: 0;
+          -webkit-print-color-adjust: exact !important;
+          print-color-adjust: exact !important;
+          color-adjust: exact !important;
+        }
+        tr { page-break-inside: avoid; }
+      }
+    </style>
+  </head>
+  <body>
+    <button class="no-print" onclick="window.print()">
+      🖨️ Imprimir / Guardar PDF
+    </button>
+  
+    <div class="header">
+      <div>
+        <div class="header-title">GRUPO SHUMA — DIRECTORIO DE EXTENSIONES</div>
+        <div class="header-sub">Uso interno · Confidencial</div>
       </div>
-    `
-
-    // Trigger print
-    window.print()
+      <div class="header-date">
+        ${date}<br>directorio.gruposhuma.com
+      </div>
+    </div>
+  
+    <table>
+      <colgroup>
+        <col class="col-ext">
+        <col class="col-name">
+        <col class="col-pos">
+        <col class="col-dept">
+      </colgroup>
+      <thead>
+        <tr class="col-headers">
+          <th>Ext.</th>
+          <th>Nombre</th>
+          <th>Puesto</th>
+          <th>Departamento</th>
+        </tr>
+      </thead>
+      <tbody>
+        ${rowsHtml}
+      </tbody>
+    </table>
+  
+    <div class="footer">
+      <span>Confidencial — Uso interno Grupo Shuma</span>
+      <span>Generado el ${date}</span>
+    </div>
+  </body>
+  </html>`
+  
+    // Open popup window and print from it
+    const popup = window.open('', '_blank', 
+      'width=900,height=700,scrollbars=yes,resizable=yes')
+    
+    if (!popup) {
+      alert('Tu navegador bloqueó la ventana emergente. ' +
+            'Permite popups para directorio.gruposhuma.com')
+      return
+    }
+  
+    popup.document.write(html)
+    popup.document.close()
+    
+    // Wait for content to render then print
+    popup.onload = () => {
+      setTimeout(() => popup.print(), 300)
+    }
+    
+    // Fallback if onload doesn't fire
+    setTimeout(() => {
+      try { popup.print() } catch {}
+    }, 800)
   }, [employees]);
 
   const handleRowClick = useCallback(
@@ -720,7 +896,7 @@ export function ExtensionDirectory({
               title="Resetear anchos de columnas"
             >
               <RotateCcw className="w-3 h-3" />
-              <span className="hidden sm:inline" style={{ fontSize: "var(--font-xs)" }}>Reset columnas</span>
+              <span className="hidden sm:inline text-scale-xs">Reset columnas</span>
             </button>
           )}
 

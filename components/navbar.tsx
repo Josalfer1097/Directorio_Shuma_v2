@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useState, useEffect, useRef, useMemo, useCallback } from "react";
-import { LayoutGrid, List, Menu, X, Phone, Sun, Moon } from "lucide-react";
+import { LayoutGrid, List, Menu, X, Phone } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import type { ViewMode } from "@/types";
 import { cn } from "@/lib/utils";
@@ -18,7 +18,7 @@ export function Navbar() {
   const [viewMode, setViewMode] = useState<ViewMode>("grid");
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [phoneTooltipVisible, setPhoneTooltipVisible] = useState(false);
-  const [theme, setTheme] = useState<'dark' | 'light'>('dark');
+
   const longPressTimer = useRef<NodeJS.Timeout | null>(null);
 
   const pageNames: Record<string, string> = {
@@ -62,19 +62,7 @@ export function Navbar() {
     }
   }, [pathname, router]);
 
-  const toggleTheme = () => {
-    const newTheme = theme === 'dark' ? 'light' : 'dark';
-    setTheme(newTheme);
-    document.documentElement.setAttribute('data-theme', newTheme);
-    localStorage.setItem('shuma-theme', newTheme);
-    if (newTheme === 'light') {
-      document.documentElement.classList.add('light');
-      document.documentElement.classList.remove('dark');
-    } else {
-      document.documentElement.classList.add('dark');
-      document.documentElement.classList.remove('light');
-    }
-  };
+
 
   useEffect(() => {
     setMounted(true);
@@ -82,15 +70,7 @@ export function Navbar() {
     if (savedViewMode) {
       setViewMode(savedViewMode);
     }
-    const savedTheme = localStorage.getItem("shuma-theme") as 'dark' | 'light';
-    if (savedTheme) {
-      setTheme(savedTheme);
-      document.documentElement.setAttribute('data-theme', savedTheme);
-      if (savedTheme === 'light') {
-        document.documentElement.classList.add('light');
-        document.documentElement.classList.remove('dark');
-      }
-    }
+
 
     const handleScroll = () => setScrolled(window.scrollY > 10);
     window.addEventListener("scroll", handleScroll);
@@ -233,25 +213,6 @@ export function Navbar() {
             )}
           </Link>
 
-          {/* Theme Toggle Button */}
-          <button
-            onClick={toggleTheme}
-            className="flex items-center justify-center transition-all duration-150 active:scale-95"
-            style={{
-              width: "36px",
-              height: "36px",
-              borderRadius: "8px",
-              background: "rgba(255,255,255,0.05)",
-              border: "1px solid rgba(255,255,255,0.08)",
-            }}
-            title={theme === 'dark' ? 'Cambiar a tema claro' : 'Cambiar a tema oscuro'}
-          >
-            {theme === 'dark' ? (
-              <Sun className="w-4 h-4 text-white/60" />
-            ) : (
-              <Moon className="w-4 h-4 text-white/60" />
-            )}
-          </button>
 
           {/* Font Scale Control */}
           <FontScaleControl />
