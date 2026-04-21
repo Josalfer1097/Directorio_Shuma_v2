@@ -4,7 +4,7 @@ import { motion } from "framer-motion";
 import { Mail, Phone, Copy, Check, MessageSquare, MapPin, Star } from "lucide-react";
 import { useFavorites } from "@/lib/useFavorites";
 import { haptics } from "@/lib/haptics";
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import Link from "next/link";
 import { toast } from "sonner";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
@@ -60,6 +60,18 @@ export function EmployeeCard({
   const [favoriteAnimating, setFavoriteAnimating] = useState(false);
   const { isFavorite, toggleFavorite } = useFavorites();
   const isEmployeeFavorite = isFavorite(employee.id);
+
+  const avatarRef = useRef<HTMLDivElement>(null);
+  const [isVisible, setIsVisible] = useState(false);
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      ([entry]) => setIsVisible(entry.isIntersecting),
+      { threshold: 0.1 }
+    );
+    if (avatarRef.current) observer.observe(avatarRef.current);
+    return () => observer.disconnect();
+  }, []);
 
   const handleToggleFavorite = (e: React.MouseEvent) => {
     e.preventDefault();
@@ -286,7 +298,8 @@ export function EmployeeCard({
 
   // Card cascade animation - only on first load (index >= 0)
   const shouldAnimate = index >= 0;
-  const animationDelay = shouldAnimate ? `${Math.min(index * 30, 600)}ms` : '0ms';
+  const animationDelay = shouldAnimate ? `${Math.min(index * 25, 500)}ms` : '0ms';
+  const animationStyle = shouldAnimate ? 'cardRain 350ms cubic-bezier(0.16,1,0.3,1) both' : 'none';
 
   // Grid view - reduced height ~200px
   return (
@@ -296,7 +309,8 @@ export function EmployeeCard({
         shouldAnimate && "card-rain"
       )}
       style={{
-        animationDelay: shouldAnimate ? animationDelay : undefined,
+        animationDelay,
+        animation: animationStyle,
       }}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
@@ -373,35 +387,38 @@ export function EmployeeCard({
           
           {/* Top section: Avatar + Info */}
           <div className="flex items-start flex-1 pl-2" style={{ gap: 'calc(12px * var(--font-scale, 1))' }}>
-            <Avatar 
-              className="shrink-0 transition-all duration-[180ms] avatar-animated"
-              style={{
-                width: 'calc(52px * var(--font-scale, 1))',
-                height: 'calc(52px * var(--font-scale, 1))',
-                borderWidth: isHovered ? '2px' : '1.5px',
-                borderStyle: 'solid',
-                borderColor: isHovered 
-                  ? (companyConfig.highlight || companyConfig.primary) 
-                  : `${companyConfig.primary}66`,
-                boxShadow: isHovered 
-                  ? `0 0 12px ${companyConfig.glow}` 
-                  : 'none',
-                transform: isHovered ? 'scale(1.05)' : 'none',
-              }}
-            >
-              <AvatarFallback
-                className="font-semibold avatar-animated-inner"
+            <div ref={avatarRef} className="shrink-0">
+              <Avatar 
+                className="transition-all duration-[180ms]"
                 style={{
-                  fontSize: 'calc(1.1rem * var(--font-scale, 1))',
-                  background: `conic-gradient(from var(--avatar-angle, 0deg), ${companyConfig.secondary} 0%, ${companyConfig.primary} 40%, ${companyConfig.highlight || companyConfig.primary} 60%, ${companyConfig.secondary} 100%)`,
-                  color: 'white',
-                  textShadow: '0 1px 3px rgba(0,0,0,0.4)',
-                  fontWeight: 700,
+                  width: 'calc(52px * var(--font-scale, 1))',
+                  height: 'calc(52px * var(--font-scale, 1))',
+                  borderWidth: isHovered ? '2px' : '1.5px',
+                  borderStyle: 'solid',
+                  borderColor: isHovered 
+                    ? (companyConfig.highlight || companyConfig.primary) 
+                    : `${companyConfig.primary}66`,
+                  boxShadow: isHovered 
+                    ? `0 0 12px ${companyConfig.glow}` 
+                    : 'none',
+                  transform: isHovered ? 'scale(1.05)' : 'none',
                 }}
               >
-                {getInitials(employee.name)}
-              </AvatarFallback>
-            </Avatar>
+                <AvatarFallback
+                  className="font-semibold"
+                  style={{
+                    fontSize: 'calc(1.1rem * var(--font-scale, 1))',
+                    background: `conic-gradient(from var(--avatar-angle, 0deg), ${companyConfig.secondary} 0%, ${companyConfig.primary} 40%, ${companyConfig.highlight || companyConfig.primary} 60%, ${companyConfig.secondary} 100%)`,
+                    color: 'white',
+                    textShadow: '0 1px 3px rgba(0,0,0,0.4)',
+                    fontWeight: 700,
+                    animation: isVisible ? 'rotateGradient 4s linear infinite' : 'none',
+                  }}
+                >
+                  {getInitials(employee.name)}
+                </AvatarFallback>
+              </Avatar>
+            </div>
 
             <div className="flex-1 min-w-0">
               <h3 

@@ -16,8 +16,8 @@ export function ParticleBackground() {
 
     // Reduce particles on mobile for performance
     const isMobile = window.innerWidth < 768;
-    const PARTICLE_COUNT = isMobile ? 25 : 60;
-    const MAX_DIST = 120;
+    const PARTICLE_COUNT = isMobile ? 15 : 40;
+    const MAX_DIST = 100;
     const MOUSE_REPEL_DIST = isMobile ? 0 : 100; // Disable mouse repulsion on mobile
     const COLORS = ['#00C9A7', '#845EC2', '#00C2FF', '#0047AB', '#FFFFFF'];
 
@@ -64,7 +64,14 @@ export function ParticleBackground() {
       window.addEventListener('mouseleave', onMouseLeave);
     }
 
-    const draw = () => {
+    let lastFrame = 0;
+    const TARGET_FPS = 30;
+
+    const draw = (timestamp: number) => {
+      animId = requestAnimationFrame(draw);
+      if (timestamp - lastFrame < 1000 / TARGET_FPS) return;
+      lastFrame = timestamp;
+
       ctx.clearRect(0, 0, canvas.width, canvas.height);
 
       particles.forEach((p) => {
@@ -109,29 +116,29 @@ export function ParticleBackground() {
         ctx.globalAlpha = 1;
       });
 
-      // Draw connections between nearby particles
-      for (let i = 0; i < particles.length; i++) {
-        for (let j = i + 1; j < particles.length; j++) {
-          const dx = particles[i].x - particles[j].x;
-          const dy = particles[i].y - particles[j].y;
-          const dist = Math.sqrt(dx * dx + dy * dy);
-          if (dist < MAX_DIST) {
-            const alpha = (1 - dist / MAX_DIST) * 0.12;
-            ctx.beginPath();
-            ctx.moveTo(particles[i].x, particles[i].y);
-            ctx.lineTo(particles[j].x, particles[j].y);
-            ctx.strokeStyle = '#FFFFFF';
-            ctx.globalAlpha = alpha;
-            ctx.lineWidth = 0.5;
-            ctx.stroke();
-            ctx.globalAlpha = 1;
+      // Draw connections between nearby particles (only on desktop)
+      if (!isMobile) {
+        for (let i = 0; i < particles.length; i++) {
+          for (let j = i + 1; j < particles.length; j++) {
+            const dx = particles[i].x - particles[j].x;
+            const dy = particles[i].y - particles[j].y;
+            const dist = Math.sqrt(dx * dx + dy * dy);
+            if (dist < MAX_DIST) {
+              const alpha = (1 - dist / MAX_DIST) * 0.12;
+              ctx.beginPath();
+              ctx.moveTo(particles[i].x, particles[i].y);
+              ctx.lineTo(particles[j].x, particles[j].y);
+              ctx.strokeStyle = '#FFFFFF';
+              ctx.globalAlpha = alpha;
+              ctx.lineWidth = 0.5;
+              ctx.stroke();
+              ctx.globalAlpha = 1;
+            }
           }
         }
       }
-
-      animId = requestAnimationFrame(draw);
     };
-    draw();
+    animId = requestAnimationFrame(draw);
 
     return () => {
       cancelAnimationFrame(animId);
@@ -155,6 +162,7 @@ export function ParticleBackground() {
         pointerEvents: 'none',
         zIndex: 0,
         opacity: 0.6,
+        willChange: 'transform',
       }}
       aria-hidden="true"
     />

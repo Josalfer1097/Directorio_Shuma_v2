@@ -38,9 +38,9 @@ export function RgbSignature() {
           return (
             <span
               key={index}
-              className="rgb-letter"
+              className={`rgb-letter ${index % 2 === 0 ? 'animate-on-mobile' : ''}`}
               style={{
-                animationDelay: `${index * 0.08}s`,
+                animationDelay: `${index * 0.1}s`,
               }}
             >
               {char}
@@ -75,7 +75,18 @@ export function RgbSignature() {
         }
 
         .rgb-letter {
-          animation: rgbCycle 3s linear infinite;
+          display: inline-block;
+          animation: rgbCycle 4s linear infinite;
+          will-change: color;
+        }
+
+        @media (max-width: 768px) {
+          .rgb-letter {
+            animation: none;
+          }
+          .rgb-letter.animate-on-mobile {
+            animation: rgbCycle 4s linear infinite;
+          }
         }
       `}</style>
     </div>
