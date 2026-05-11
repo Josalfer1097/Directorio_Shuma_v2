@@ -79,24 +79,28 @@ export function SmartSearchBar() {
     setIsLoading(true);
     const normalizedQ = normalizeQuery(q);
 
-    // Search employees and deduplicate by ID (Fuse can return duplicates with includeMatches)
-    const rawEmployeeMatches = fuseIndex.search(q).map((result) => ({
+    // Search employees - deduplicate raw Fuse results by employee ID first
+    const rawFuseResults = fuseIndex.search(q);
+    
+    // Deduplicate at Fuse result level (before mapping) - keep first occurrence only
+    const seenEmployeeIds = new Set<string>();
+    const dedupedFuseResults = rawFuseResults.filter((result) => {
+      const empId = result.item.id;
+      if (seenEmployeeIds.has(empId)) {
+        return false;
+      }
+      seenEmployeeIds.add(empId);
+      return true;
+    });
+
+    // Now map to SearchResult format - this array is already deduplicated
+    const employeeMatches = dedupedFuseResults.map((result) => ({
       type: "employee" as const,
       id: result.item.id,
       label: result.item.nombreCompleto,
       secondary: `${result.item.empresa} • ${result.item.puesto}`,
       data: result.item.data,
     }));
-
-    // Deduplicate by employee ID - keep first occurrence
-    const seenEmployeeIds = new Set<string>();
-    const employeeMatches = rawEmployeeMatches.filter((match) => {
-      if (seenEmployeeIds.has(match.id)) {
-        return false;
-      }
-      seenEmployeeIds.add(match.id);
-      return true;
-    });
 
     // Search for exact extension match
     const extensionMatches: SearchResult[] = [];
