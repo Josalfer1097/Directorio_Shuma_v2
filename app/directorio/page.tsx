@@ -2,7 +2,7 @@
 
 import { useState, useMemo, useEffect, Suspense, useRef, useCallback, useDeferredValue } from "react";
 import { useSearchParams } from "next/navigation";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import Fuse from "fuse.js";
 import { Search, LayoutGrid, List, Users, Filter, Phone } from "lucide-react";
 import { Navbar } from "@/components/navbar";
@@ -33,6 +33,46 @@ const DepartmentView = dynamic(
 );
 
 const ITEMS_PER_PAGE = 12;
+
+// Premium easing curve for stagger animations
+const premiumEase = [0.25, 0.46, 0.45, 0.94];
+
+// Stagger animation variants - performance limited to first 20 cards
+const MAX_ANIMATED_CARDS = 20;
+
+const getContainerVariants = (isMobile: boolean) => ({
+  hidden: {},
+  visible: {
+    transition: {
+      staggerChildren: isMobile ? 0.02 : 0.04,
+      delayChildren: 0.05,
+    },
+  },
+});
+
+const getCardVariants = (isMobile: boolean) => ({
+  hidden: {
+    opacity: 0,
+    y: isMobile ? 8 : 16,
+    scale: 0.97,
+  },
+  visible: {
+    opacity: 1,
+    y: 0,
+    scale: 1,
+    transition: {
+      duration: 0.25,
+      ease: premiumEase,
+    },
+  },
+  exit: {
+    opacity: 0,
+    scale: 0.95,
+    transition: {
+      duration: 0.15,
+    },
+  },
+});
 
 // Premium easing curve
 const premiumEase = [0.25, 0.46, 0.45, 0.94];
@@ -393,8 +433,14 @@ function DirectoryContent() {
                     </p>
 
                     {/* Employee Grid/List - Single column on mobile */}
+                    <AnimatePresence mode="wait">
                     {paginatedEmployees.length > 0 ? (
-                    <div
+                    <motion.div
+                        key={`grid-${currentPage}-${selectedCompanies.join('-')}-${selectedDepartment}-${selectedLocations.join('-')}`}
+                        variants={getContainerVariants(isMobile)}
+                        initial="hidden"
+                        animate="visible"
+                        exit="exit"
                         className={
                           viewMode === "grid"
                               ? "flex flex-col gap-4"
@@ -412,18 +458,28 @@ function DirectoryContent() {
                         const hideCompanyBadge =
                             selectedCompanies.length === 1 &&
                             selectedCompanies.includes(employee.company);
+                        
+                        // Performance: Only animate first MAX_ANIMATED_CARDS cards with stagger
+                        const shouldAnimate = index < MAX_ANIMATED_CARDS && showCardAnimation;
+                        
                         return (
+                          <motion.div
+                            key={employee.id}
+                            variants={shouldAnimate ? getCardVariants(isMobile) : undefined}
+                            initial={shouldAnimate ? "hidden" : { opacity: 1 }}
+                            animate={shouldAnimate ? "visible" : { opacity: 1 }}
+                          >
                             <EmployeeCard
-                                key={employee.id}
                                 employee={employee}
                                 company={company}
                                 view={viewMode as "grid" | "list"}
-                                index={showCardAnimation ? index : -1}
+                                index={-1}
                                 hideCompanyBadge={hideCompanyBadge}
                             />
+                          </motion.div>
                         );
                       })}
-                    </div>
+                    </motion.div>
                 ) : (
                     <motion.div
                         initial={{ opacity: 0 }}
@@ -444,6 +500,7 @@ function DirectoryContent() {
                       </Button>
                     </motion.div>
                 )}
+                </AnimatePresence>
 
                 {/* Pagination */}
                 {totalPages > 1 && (

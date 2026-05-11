@@ -7,6 +7,12 @@ import Link from "next/link";
 import type { Employee, Company } from "@/types";
 import { cn } from "@/lib/utils";
 
+// Premium easing curve for animations
+const premiumEase = [0.25, 0.46, 0.45, 0.94];
+
+// Limit stagger to first N items for performance
+const MAX_ANIMATED_ITEMS = 30;
+
 interface AgendaViewProps {
   employees: Employee[];
   companies: Company[];
@@ -96,13 +102,23 @@ export function AgendaView({
           {group.employees.map((employee, index) => {
             const company = companies.find((c) => c.id === employee.company);
             const companyColor = getCompanyColor(employee.company, companies);
+            
+            // Track global index for animation limiting
+            const globalIndex = groups
+              .slice(0, groups.indexOf(group))
+              .reduce((sum, g) => sum + g.employees.length, 0) + index;
+            const shouldAnimate = globalIndex < MAX_ANIMATED_ITEMS;
 
             return (
               <motion.div
                 key={employee.id}
-                initial={{ opacity: 0, x: -10 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ duration: 0.15, delay: index * 0.02 }}
+                initial={shouldAnimate ? { opacity: 0, x: -8, scale: 0.98 } : { opacity: 1 }}
+                animate={shouldAnimate ? { opacity: 1, x: 0, scale: 1 } : { opacity: 1 }}
+                transition={shouldAnimate ? { 
+                  duration: 0.2, 
+                  delay: globalIndex * 0.02,
+                  ease: premiumEase 
+                } : undefined}
               >
                 <Link
                   href={`/empleado/${employee.id}`}
