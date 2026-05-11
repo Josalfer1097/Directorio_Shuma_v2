@@ -33,8 +33,7 @@ export function SmartSearchBar() {
   const fuseIndex = useMemo(() => {
     const searchableEmployees = employees.map((emp) => ({
       id: emp.id,
-      name: emp.name,
-      apellidos: emp.name.split(" ").slice(1).join(" ") || emp.name,
+      nombreCompleto: `${emp.name}`,
       puesto: emp.position,
       departamento: emp.department || "",
       empresa: emp.company,
@@ -46,16 +45,19 @@ export function SmartSearchBar() {
 
     return new Fuse(searchableEmployees, {
       keys: [
-        { name: "name", weight: 0.35 },
-        { name: "apellidos", weight: 0.35 },
-        { name: "puesto", weight: 0.12 },
-        { name: "departamento", weight: 0.08 },
-        { name: "empresa", weight: 0.05 },
-        { name: "sucursal", weight: 0.03 },
-        { name: "extension", weight: 0.02 },
+        { name: "nombreCompleto", weight: 0.6 },
+        { name: "puesto", weight: 0.15 },
+        { name: "departamento", weight: 0.10 },
+        { name: "empresa", weight: 0.08 },
+        { name: "sucursal", weight: 0.04 },
+        { name: "extension", weight: 0.03 },
       ],
-      threshold: 0.35,
+      threshold: 0.2,
+      distance: 50,
+      minMatchCharLength: 2,
+      useExtendedSearch: false,
       includeMatches: true,
+      shouldSort: true,
     });
   }, [employees]);
 
@@ -81,7 +83,7 @@ export function SmartSearchBar() {
     const employeeMatches = fuseIndex.search(q).map((result) => ({
       type: "employee" as const,
       id: result.item.id,
-      label: result.item.name,
+      label: result.item.nombreCompleto,
       secondary: `${result.item.empresa} • ${result.item.puesto}`,
       data: result.item.data,
     }));
