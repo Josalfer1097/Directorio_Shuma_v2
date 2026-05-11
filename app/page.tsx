@@ -5,6 +5,7 @@ import { motion } from "framer-motion";
 import { ArrowRight, Building2, Users, GitBranch, Layers, MapPin } from "lucide-react";
 import Link from "next/link";
 import { Navbar } from "@/components/navbar";
+import { SmartSearchBar } from "@/components/smart-search-bar";
 import { FeaturedEmployees } from "@/components/featured-employees";
 import { getEmployees, getCompanies, getCompanyStats, getDepartments } from "@/lib/data";
 import { getCompanyConfig } from "@/lib/companyConfig";
@@ -130,10 +131,20 @@ export default function HomePage() {
               </div>
             </motion.div>
 
+            {/* Smart Search Bar */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.3, duration: 0.8 }}
+              className="mt-8 mb-6"
+            >
+              <SmartSearchBar />
+            </motion.div>
+
             <motion.div 
               initial={{ opacity: 0, scale: 0.95 }}
               animate={{ opacity: 1, scale: 1 }}
-              transition={{ delay: 0.2, duration: 0.8 }}
+              transition={{ delay: 0.4, duration: 0.8 }}
               className="flex flex-col sm:flex-row items-center justify-center gap-4"
             >
               <Link href="/directorio" className="w-full sm:w-auto">
