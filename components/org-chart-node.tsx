@@ -50,7 +50,7 @@ function OrgChartNodeComponent({ data }: OrgChartNodeProps) {
               onMouseEnter={() => setIsHovered(true)}
               onMouseLeave={() => setIsHovered(false)}
               className={cn(
-                "relative overflow-hidden bg-[--bg-elevated] rounded-xl transition-all duration-[180ms] group cursor-pointer touch-manipulation",
+                "relative overflow-hidden bg-[--node-bg] rounded-xl transition-all duration-[180ms] group cursor-pointer touch-manipulation",
                 "shadow-xl shadow-black/20",
                 "p-2 md:p-3"
               )}
@@ -61,12 +61,12 @@ function OrgChartNodeComponent({ data }: OrgChartNodeProps) {
                 borderStyle: 'solid',
                 borderLeftWidth: '3px',
                 borderLeftColor: colors.accent || colors.primary,
-                borderColor: isHovered ? colors.primary : 'var(--border-subtle)',
+                borderColor: isHovered ? colors.primary : 'var(--node-border)',
                 boxShadow: isHovered ? `0 8px 32px ${colors.glow}` : undefined,
                 transform: isHovered ? 'scale(1.03)' : 'none',
                 background: isHovered 
-                  ? `linear-gradient(180deg, ${colors.glow} 0%, var(--bg-elevated) 40%)`
-                  : 'var(--bg-elevated)',
+                  ? `linear-gradient(180deg, ${colors.glow} 0%, var(--node-bg) 40%)`
+                  : 'var(--node-bg)',
                 padding: '8px 10px',
               }}
             >
@@ -95,7 +95,7 @@ function OrgChartNodeComponent({ data }: OrgChartNodeProps) {
 
                 <div className="min-w-0 flex-1">
                   <h4 
-                    className="text-text-primary leading-tight line-clamp-2 text-scale-xs font-neuropol"
+                    className="text-[--node-text] leading-tight line-clamp-2 text-scale-xs font-neuropol"
                     style={{ 
                       wordWrap: 'break-word',
                       whiteSpace: 'normal',
@@ -104,7 +104,7 @@ function OrgChartNodeComponent({ data }: OrgChartNodeProps) {
                     {employee.name}
                   </h4>
                   <p 
-                    className="font-dm-sans italic text-text-muted mt-0.5 leading-tight text-scale-xs"
+                    className="font-dm-sans italic text-[--node-text-muted] mt-0.5 leading-tight text-scale-xs"
                   >
                     {employee.position}
                   </p>

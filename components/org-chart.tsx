@@ -14,7 +14,7 @@ import {
 } from "@xyflow/react";
 import "@xyflow/react/dist/style.css";
 import { OrgChartNode } from "./org-chart-node";
-import type { Company, OrgChartLayout } from "@/types";
+import type { Company, OrgChartLayout, Employee } from "@/types";
 import { cn } from "@/lib/utils";
 import { getEmployees, getCompanies } from "@/lib/data";
 import { ZoomIn, ZoomOut, Maximize2 } from "lucide-react";
@@ -121,6 +121,9 @@ function OrgChartInner({ selectedCompany, layout }: OrgChartInnerProps) {
     // Create a Set of valid employee IDs in the current filtered set
     const empIds = new Set(filteredEmployees.map((e) => e.id));
     
+    // Find root nodes (employees with no reportsTo)
+    const rootNodes: typeof filteredEmployees = [];
+    
     filteredEmployees.forEach((emp) => {
       const company = companies.find(c => c.id === emp.company);
       // Skip if company not found (defensive)
@@ -138,6 +141,11 @@ function OrgChartInner({ selectedCompany, layout }: OrgChartInnerProps) {
         },
       });
 
+      // Track root nodes
+      if (!emp.reportsTo || !empIds.has(emp.reportsTo)) {
+        rootNodes.push(emp);
+      }
+
       // Only create edge if BOTH source and target exist in the current filtered set
       // This prevents cross-company edges when filtering by a single company
       if (emp.reportsTo && empIds.has(emp.reportsTo) && empIds.has(emp.id)) {
@@ -154,6 +162,51 @@ function OrgChartInner({ selectedCompany, layout }: OrgChartInnerProps) {
         });
       }
     });
+
+    // If there are multiple root nodes, create a virtual root to connect them
+    if (rootNodes.length > 1) {
+      const virtualRootId = 'virtual-root-shuma';
+      const virtualRootEmployee: Employee = {
+        id: virtualRootId,
+        name: 'Grupo Shuma',
+        position: 'Raíz Organizacional',
+        company: 'comercializadora',
+        department: 'Corporativo',
+        location: '',
+        email: null,
+        phone: null,
+        extension: null,
+        avatar: null,
+        reportsTo: null,
+      };
+      
+      nodes.push({
+        id: virtualRootId,
+        type: "orgNode",
+        position: { x: 0, y: 0 },
+        data: {
+          employee: virtualRootEmployee,
+          company: companies.find(c => c.id === 'comercializadora'),
+          label: 'Grupo Shuma',
+          position: 'Raíz Organizacional',
+        },
+      });
+
+      // Connect all root nodes to the virtual root
+      rootNodes.forEach((root) => {
+        edges.push({
+          id: `edge-${root.id}-${virtualRootId}`,
+          source: virtualRootId,
+          target: root.id,
+          type: "smoothstep",
+          animated: false,
+          style: { 
+            stroke: 'rgba(255,255,255,0.14)', 
+            strokeWidth: 1.5,
+          },
+        });
+      });
+    }
 
     return getLayoutedElements(nodes, edges, layout === 'horizontal' ? 'LR' : 'TB', isMobile);
   }, [filteredEmployees, companies, layout, isMobile]);

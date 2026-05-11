@@ -100,6 +100,12 @@
   --safe-right: env(safe-area-inset-right, 0);
   --safe-bottom: env(safe-area-inset-bottom, 0);
   --safe-left: env(safe-area-inset-left, 0);
+  
+  /* Org-chart node colors (dark mode) */
+  --node-bg: #161625;
+  --node-text: #F2F0EC;
+  --node-text-muted: #64647A;
+  --node-border: rgba(255, 255, 255, 0.12);
 }
 
 /* ═══════════════════════════════════════════════════════════════════
@@ -167,6 +173,12 @@
   --input: var(--border-subtle);
   --ring: var(--gold);
   --radius: 0.75rem;
+  
+  /* Org-chart node colors (light mode) */
+  --node-bg: #ffffff;
+  --node-text: #0a0a0f;
+  --node-text-muted: #555566;
+  --node-border: rgba(0, 0, 0, 0.10);
   
   color-scheme: light;
 }
@@ -489,7 +501,7 @@
 
 /* ═══════════════════════════════════════════════════════════════════
    EMPRESA TABS
-   ═══════════════════════════════════════════════════════════════════ */
+   ════════════════════════════════════���══════════════════════════════ */
 
 .empresa-tabs {
   display: flex;
