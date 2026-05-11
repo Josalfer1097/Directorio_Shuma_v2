@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useState, useEffect, useRef, useMemo, useCallback } from "react";
-import { LayoutGrid, List, Menu, X, Phone } from "lucide-react";
+import { LayoutGrid, List, Menu, X, Phone, AlignJustify } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import type { ViewMode } from "@/types";
 import { cn } from "@/lib/utils";
@@ -78,7 +78,11 @@ export function Navbar() {
   }, []);
 
   const toggleViewMode = () => {
-    const nextView = viewMode === "grid" ? "list" : "grid";
+    // Cycle: grid -> list -> agenda -> grid (desktop only for agenda)
+    const viewCycle: ViewMode[] = ["grid", "list", "agenda"];
+    const currentIndex = viewCycle.indexOf(viewMode);
+    const nextIndex = (currentIndex + 1) % viewCycle.length;
+    const nextView = viewCycle[nextIndex];
     setViewMode(nextView);
     localStorage.setItem("shuma-view-mode", nextView);
     window.dispatchEvent(new CustomEvent("view-mode-change", { detail: nextView }));
@@ -280,16 +284,18 @@ export function Navbar() {
             )}
           </div>
 
-          {/* View Toggle - Always visible */}
+          {/* View Toggle - Hidden on mobile (agenda is default there) */}
           <button
             onClick={toggleViewMode}
-            className="p-2 text-text-muted hover:text-text-primary transition-all active:scale-95 group relative"
-            title={viewMode === "grid" ? "Vista compacta" : "Vista tarjetas"}
+            className="hidden md:block p-2 text-text-muted hover:text-text-primary transition-all active:scale-95 group relative"
+            title={viewMode === "grid" ? "Vista lista" : viewMode === "list" ? "Vista agenda" : "Vista tarjetas"}
           >
             {viewMode === "grid" ? (
               <LayoutGrid className="w-5 h-5 transition-transform group-hover:scale-110" />
-            ) : (
+            ) : viewMode === "list" ? (
               <List className="w-5 h-5 transition-transform group-hover:scale-110" />
+            ) : (
+              <AlignJustify className="w-5 h-5 transition-transform group-hover:scale-110" />
             )}
             <div className="absolute inset-0 rounded-full blur-[8px] opacity-0 group-hover:opacity-100 bg-gradient-to-r from-irid-a to-irid-b transition-opacity -z-10" />
           </button>

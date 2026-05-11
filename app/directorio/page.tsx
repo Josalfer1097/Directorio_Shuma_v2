@@ -20,6 +20,7 @@ import {
 import { MobileFiltersBottomSheet } from "@/components/mobile-filters-bottom-sheet";
 import { ExtensionDirectory } from "@/components/extension-directory";
 import { FilterChips } from "@/components/filter-chips";
+import { AgendaView } from "@/components/agenda-view";
 import dynamic from "next/dynamic";
 import type { ViewMode, Employee } from "@/types";
 import { useFavorites } from "@/lib/useFavorites";
@@ -43,20 +44,58 @@ function DirectoryContent() {
 
   const [searchQuery, setSearchQuery] = useState(initialQuery);
   const deferredSearchQuery = useDeferredValue(searchQuery);
+  const [isMobile, setIsMobile] = useState(() => {
+    if (typeof window !== "undefined") {
+      return window.innerWidth < 768;
+    }
+    return false;
+  });
   const [viewMode, setViewMode] = useState<ViewMode>(() => {
     if (typeof window !== "undefined") {
+      // On mobile, default to agenda view
+      if (window.innerWidth < 768) {
+        return "agenda";
+      }
       const saved = safeGetItem("directorio-viewMode");
-      if (saved === "grid" || saved === "list" || saved === "extensions") {
+      if (saved === "grid" || saved === "list" || saved === "extensions" || saved === "agenda") {
         return saved as ViewMode;
       }
     }
     return "grid";
   });
 
-  // Persist viewMode to localStorage
+  // Detect viewport changes and auto-switch views
   useEffect(() => {
-    safeSetItem("directorio-viewMode", viewMode);
-  }, [viewMode]);
+    const handleResize = () => {
+      const mobile = window.innerWidth < 768;
+      setIsMobile(mobile);
+      
+      // Auto-switch to agenda on mobile, or to grid on desktop if currently on agenda
+      setViewMode((prev) => {
+        if (mobile && prev !== "agenda" && prev !== "extensions") {
+          return "agenda";
+        }
+        if (!mobile && prev === "agenda") {
+          const saved = safeGetItem("directorio-viewMode");
+          if (saved === "grid" || saved === "list") {
+            return saved as ViewMode;
+          }
+          return "grid";
+        }
+        return prev;
+      });
+    };
+
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
+
+  // Persist viewMode to localStorage (only desktop views)
+  useEffect(() => {
+    if (!isMobile && viewMode !== "agenda") {
+      safeSetItem("directorio-viewMode", viewMode);
+    }
+  }, [viewMode, isMobile]);
 
   // Listen for view mode changes from navbar
   useEffect(() => {
@@ -333,6 +372,18 @@ function DirectoryContent() {
                     selectedLocations={selectedLocations}
                     searchQuery={searchQuery}
                   />
+                ) : viewMode === "agenda" ? (
+                  <>
+                    {/* Results count for agenda view */}
+                    <p className="text-sm text-muted-foreground mb-4" role="status" aria-live="polite" aria-atomic="true">
+                      Mostrando {filteredEmployees.length} empleados
+                    </p>
+                    <AgendaView
+                      employees={filteredEmployees}
+                      companies={companies}
+                      selectedCompanies={selectedCompanies}
+                    />
+                  </>
                 ) : (
                   <>
                     {/* Results count - with live region for screen readers */}
@@ -366,7 +417,7 @@ function DirectoryContent() {
                                 key={employee.id}
                                 employee={employee}
                                 company={company}
-                                view={viewMode}
+                                view={viewMode as "grid" | "list"}
                                 index={showCardAnimation ? index : -1}
                                 hideCompanyBadge={hideCompanyBadge}
                             />

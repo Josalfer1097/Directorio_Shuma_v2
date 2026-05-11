@@ -38,7 +38,7 @@ export function FilterChips({
   };
 
   return (
-    <div className="flex flex-wrap items-center gap-2 mb-4">
+    <div className="flex items-center gap-2 mb-4 overflow-x-auto pb-2 -mx-4 px-4 md:mx-0 md:px-0 md:overflow-visible md:flex-wrap scrollbar-hide">
       <AnimatePresence mode="popLayout">
         {/* Company chips */}
         {selectedCompanies.map((companyId) => (
@@ -49,7 +49,7 @@ export function FilterChips({
             exit={{ opacity: 0, scale: 0.8 }}
             transition={{ duration: 0.15 }}
             onClick={() => onRemoveCompany(companyId)}
-            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-primary/10 text-primary text-sm font-medium hover:bg-primary/20 transition-colors group"
+            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-primary/10 text-primary text-sm font-medium hover:bg-primary/20 transition-colors group flex-shrink-0"
             aria-label={`Remover filtro de empresa: ${getCompanyName(companyId)}`}
           >
             <span aria-hidden="true">🏢</span>
@@ -67,7 +67,7 @@ export function FilterChips({
             exit={{ opacity: 0, scale: 0.8 }}
             transition={{ duration: 0.15 }}
             onClick={onRemoveDepartment}
-            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-secondary/50 text-secondary-foreground text-sm font-medium hover:bg-secondary/70 transition-colors group"
+            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-secondary/50 text-secondary-foreground text-sm font-medium hover:bg-secondary/70 transition-colors group flex-shrink-0"
             aria-label={`Remover filtro de departamento: ${selectedDepartment}`}
           >
             <span aria-hidden="true">🏬</span>
@@ -85,7 +85,7 @@ export function FilterChips({
             exit={{ opacity: 0, scale: 0.8 }}
             transition={{ duration: 0.15 }}
             onClick={() => onRemoveLocation(location)}
-            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-muted text-muted-foreground text-sm font-medium hover:bg-muted/80 transition-colors group"
+            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-muted text-muted-foreground text-sm font-medium hover:bg-muted/80 transition-colors group flex-shrink-0"
             aria-label={`Remover filtro de sucursal: ${location}`}
           >
             <span aria-hidden="true">📍</span>
@@ -98,7 +98,7 @@ export function FilterChips({
       {/* Clear all button */}
       <button
         onClick={onClearAll}
-        className="text-sm text-muted-foreground hover:text-foreground transition-colors underline underline-offset-2"
+        className="text-sm text-muted-foreground hover:text-foreground transition-colors underline underline-offset-2 flex-shrink-0 whitespace-nowrap"
         aria-label="Limpiar todos los filtros"
       >
         Limpiar todo
