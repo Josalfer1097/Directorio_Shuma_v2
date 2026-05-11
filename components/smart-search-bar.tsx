@@ -3,7 +3,7 @@
 import { useState, useRef, useEffect, useMemo, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
-import { Search, Loader2, Ghost, Users, Building2, Layers, MapPin, Briefcase, Phone } from "lucide-react";
+import { Search, Loader2, Ghost, Users, Building2, Layers, MapPin, Briefcase, Phone, Mail } from "lucide-react";
 import Fuse from "fuse.js";
 import { getEmployees, getCompanies, getDepartments } from "@/lib/data";
 
@@ -399,6 +399,8 @@ export function SmartSearchBar() {
                       {items.map((result, index) => {
                         const globalIndex = results.indexOf(result);
                         const isSelected = selectedIndex === globalIndex;
+                        const hasContactInfo = result.type === "employee" && 
+                          (result.data?.extension || result.data?.email);
 
                         return (
                           <motion.button
@@ -411,14 +413,14 @@ export function SmartSearchBar() {
                             }}
                             onClick={() => handleSelectResult(result)}
                             onMouseEnter={() => setSelectedIndex(globalIndex)}
-                            className={`w-full px-3 py-2.5 flex items-center gap-3 transition-all text-left group ${
+                            className={`w-full px-3 py-2.5 flex items-start gap-3 transition-all text-left group ${
                               isSelected
                                 ? "bg-white/10"
                                 : "hover:bg-white/5"
                             }`}
                           >
                             <div
-                              className={`flex-shrink-0 w-8 h-8 rounded-lg flex items-center justify-center transition-colors ${
+                              className={`flex-shrink-0 w-8 h-8 rounded-lg flex items-center justify-center transition-colors mt-0.5 ${
                                 isSelected
                                   ? "bg-blue-500/30 text-blue-300"
                                   : "bg-white/5 text-white/50 group-hover:bg-white/10"
@@ -434,6 +436,22 @@ export function SmartSearchBar() {
                               {result.secondary && (
                                 <div className="text-xs text-white/40 truncate">
                                   {result.secondary}
+                                </div>
+                              )}
+                              {hasContactInfo && (
+                                <div className="mt-1.5 flex items-center gap-4 text-xs text-white/40">
+                                  {result.data?.extension && (
+                                    <div className="flex items-center gap-1.5">
+                                      <Phone className="w-3.5 h-3.5 flex-shrink-0" />
+                                      <span>Ext. {result.data.extension}</span>
+                                    </div>
+                                  )}
+                                  {result.data?.email && (
+                                    <div className="flex items-center gap-1.5 truncate">
+                                      <Mail className="w-3.5 h-3.5 flex-shrink-0" />
+                                      <span className="truncate">{result.data.email}</span>
+                                    </div>
+                                  )}
                                 </div>
                               )}
                             </div>
