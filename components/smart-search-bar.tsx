@@ -79,14 +79,24 @@ export function SmartSearchBar() {
     setIsLoading(true);
     const normalizedQ = normalizeQuery(q);
 
-    // Search employees
-    const employeeMatches = fuseIndex.search(q).map((result) => ({
+    // Search employees and deduplicate by ID (Fuse can return duplicates with includeMatches)
+    const rawEmployeeMatches = fuseIndex.search(q).map((result) => ({
       type: "employee" as const,
       id: result.item.id,
       label: result.item.nombreCompleto,
       secondary: `${result.item.empresa} • ${result.item.puesto}`,
       data: result.item.data,
     }));
+
+    // Deduplicate by employee ID - keep first occurrence
+    const seenEmployeeIds = new Set<string>();
+    const employeeMatches = rawEmployeeMatches.filter((match) => {
+      if (seenEmployeeIds.has(match.id)) {
+        return false;
+      }
+      seenEmployeeIds.add(match.id);
+      return true;
+    });
 
     // Search for exact extension match
     const extensionMatches: SearchResult[] = [];
@@ -184,7 +194,7 @@ export function SmartSearchBar() {
       })
     );
 
-    // Combine and limit results
+    // Combine and limit results - employeeMatches already deduplicated
     const allResults = [
       ...employeeMatches.slice(0, 5),
       ...extensionMatches.slice(0, 3),
