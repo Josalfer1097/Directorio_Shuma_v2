@@ -17,6 +17,7 @@ import { OrgChartNode } from "./org-chart-node";
 import type { Company, OrgChartLayout } from "@/types";
 import { cn } from "@/lib/utils";
 import { getEmployees, getCompanies } from "@/lib/data";
+import { ZoomIn, ZoomOut, Maximize2 } from "lucide-react";
 
 import dagre from 'dagre';
 
@@ -169,6 +170,31 @@ function OrgChartInner({ selectedCompany, layout }: OrgChartInnerProps) {
     return () => clearTimeout(timer);
   }, [selectedCompany, layout, reactFlowInstance, hierarchyData.nodes]);
 
+  // Zoom handlers
+  const handleZoomIn = () => {
+    try {
+      reactFlowInstance.zoomIn({ duration: 200 });
+    } catch (e) {
+      console.warn('[v0] zoomIn failed:', e);
+    }
+  };
+
+  const handleZoomOut = () => {
+    try {
+      reactFlowInstance.zoomOut({ duration: 200 });
+    } catch (e) {
+      console.warn('[v0] zoomOut failed:', e);
+    }
+  };
+
+  const handleFitView = () => {
+    try {
+      reactFlowInstance.fitView({ padding: 0.15, duration: 300 });
+    } catch (e) {
+      console.warn('[v0] fitView failed:', e);
+    }
+  };
+
   return (
     <ReactFlow
       nodes={hierarchyData.nodes}
@@ -195,11 +221,11 @@ function OrgChartInner({ selectedCompany, layout }: OrgChartInnerProps) {
         style={{ opacity: 0.8 }}
       />
 
-      {/* Controls - hidden on mobile */}
+      {/* Controls - hidden, using custom zoom buttons instead */}
       <Controls
         showInteractive={false}
         position="bottom-right"
-        className="!bg-[--bg-surface]/90 !backdrop-blur-xl !border-border-subtle !shadow-xl !rounded-xl hidden md:flex"
+        className="!hidden"
       />
 
       {/* MiniMap - hidden on mobile */}
@@ -211,6 +237,35 @@ function OrgChartInner({ selectedCompany, layout }: OrgChartInnerProps) {
         maskColor="rgba(8, 8, 16, 0.8)"
         className="!bg-[--bg-surface]/80 !backdrop-blur-md !border-border-subtle !rounded-lg hidden md:block"
       />
+
+      {/* Custom Zoom Buttons - Always visible */}
+      <div className="absolute bottom-4 right-4 z-10 flex flex-col gap-1 bg-[--bg-surface]/90 backdrop-blur-xl border border-border-subtle rounded-xl p-1 shadow-xl">
+        <button
+          onClick={handleZoomIn}
+          className="flex items-center justify-center w-9 h-9 md:w-10 md:h-10 rounded-lg text-text-muted hover:text-text-primary hover:bg-white/10 transition-colors touch-manipulation"
+          aria-label="Acercar"
+          title="Acercar"
+        >
+          <ZoomIn className="w-5 h-5" />
+        </button>
+        <button
+          onClick={handleZoomOut}
+          className="flex items-center justify-center w-9 h-9 md:w-10 md:h-10 rounded-lg text-text-muted hover:text-text-primary hover:bg-white/10 transition-colors touch-manipulation"
+          aria-label="Alejar"
+          title="Alejar"
+        >
+          <ZoomOut className="w-5 h-5" />
+        </button>
+        <div className="h-px bg-border-subtle mx-1" />
+        <button
+          onClick={handleFitView}
+          className="flex items-center justify-center w-9 h-9 md:w-10 md:h-10 rounded-lg text-text-muted hover:text-text-primary hover:bg-white/10 transition-colors touch-manipulation"
+          aria-label="Ajustar a pantalla"
+          title="Ajustar a pantalla"
+        >
+          <Maximize2 className="w-5 h-5" />
+        </button>
+      </div>
     </ReactFlow>
   );
 }
