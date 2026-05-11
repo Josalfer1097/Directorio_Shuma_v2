@@ -160,7 +160,7 @@ export function Navbar() {
             {/* Separator — only shown if pageName exists */}
             {pageName && (
               <span className="nav-separator" style={{
-                color: 'rgba(255,255,255,0.18)',
+                color: 'var(--border-subtle)',
                 fontSize: '0.85rem',
                 fontWeight: 300,
                 lineHeight: 1,
@@ -178,7 +178,7 @@ export function Navbar() {
                   fontFamily: 'Neuropol, var(--font-orbitron), monospace',
                   fontSize: '0.75rem',
                   fontWeight: 400,
-                  color: 'rgba(255,255,255,0.60)',
+                  color: 'var(--muted-foreground)',
                   letterSpacing: '0.14em',
                   marginTop: '1px',
                 }}
@@ -198,7 +198,7 @@ export function Navbar() {
             )}
           >
             Directorio
-            <span className="px-1.5 py-0.5 rounded-full text-[9px] bg-white/8 border border-white/12 text-white/60">
+            <span className="px-1.5 py-0.5 rounded-full text-[9px] bg-muted border border-border-subtle text-muted-foreground">
               {employeeCount}
             </span>
             {pathname === "/directorio" && (
@@ -233,8 +233,8 @@ export function Navbar() {
                 width: "36px",
                 height: "36px",
                 borderRadius: "8px",
-                background: isQuickSoloActive ? "rgba(0,201,167,0.15)" : "rgba(255,255,255,0.05)",
-                border: isQuickSoloActive ? "1px solid #00C9A7" : "1px solid rgba(255,255,255,0.08)",
+                background: isQuickSoloActive ? "rgba(0,201,167,0.15)" : "var(--bg-elevated)",
+                border: isQuickSoloActive ? "1px solid #00C9A7" : "1px solid var(--border-subtle)",
                 boxShadow: isQuickSoloActive ? "0 0 8px rgba(0,201,167,0.25)" : "none",
               }}
               onMouseOver={(e) => {
@@ -247,16 +247,16 @@ export function Navbar() {
               }}
               onMouseOut={(e) => {
                 if (!isQuickSoloActive) {
-                  e.currentTarget.style.background = "rgba(255,255,255,0.05)";
-                  e.currentTarget.style.borderColor = "rgba(255,255,255,0.08)";
+                  e.currentTarget.style.background = "var(--bg-elevated)";
+                  e.currentTarget.style.borderColor = "var(--border-subtle)";
                   const icon = e.currentTarget.querySelector("svg");
-                  if (icon) (icon as SVGElement).style.color = "rgba(255,255,255,0.6)";
+                  if (icon) (icon as SVGElement).style.color = "var(--muted-foreground)";
                 }
               }}
             >
               <Phone 
                 className="w-4 h-4" 
-                style={{ color: isQuickSoloActive ? "#00C9A7" : "rgba(255,255,255,0.6)" }} 
+                style={{ color: isQuickSoloActive ? "#00C9A7" : "var(--muted-foreground)" }} 
               />
             </button>
             
@@ -265,10 +265,10 @@ export function Navbar() {
               <div
                 className="absolute top-full left-1/2 -translate-x-1/2 mt-2 px-2 py-1 whitespace-nowrap pointer-events-none z-50 text-scale-xs"
                 style={{
-                  background: "#1A1A1A",
-                  border: "1px solid rgba(255,255,255,0.10)",
+                  background: "var(--bg-surface)",
+                  border: "1px solid var(--border-subtle)",
                   borderRadius: "6px",
-                  color: "rgba(255,255,255,0.8)",
+                  color: "var(--foreground)",
                 }}
               >
                 Extensiones rapidas
@@ -347,10 +347,10 @@ export function Navbar() {
             transition={{ duration: 0.25, ease: [0.25, 0.46, 0.45, 0.94] }}
             className="fixed top-[56px] md:top-[64px] left-0 right-0 z-50 md:hidden"
             style={{
-              background: "rgba(15, 15, 26, 0.95)",
+              background: "var(--bg-surface)",
               WebkitBackdropFilter: "blur(20px)",
               backdropFilter: "blur(20px)",
-              borderBottom: "1px solid rgba(255,255,255,0.08)",
+              borderBottom: "1px solid var(--border-subtle)",
             }}
           >
             <nav className="container mx-auto px-4 py-4 flex flex-col gap-2">
@@ -360,8 +360,8 @@ export function Navbar() {
                 className={cn(
                   "font-neuropol text-base uppercase tracking-wider py-3 px-4 rounded-lg transition-all min-h-[52px] flex items-center touch-manipulation",
                   pathname === "/directorio" 
-                    ? "text-text-primary bg-white/5" 
-                    : "text-text-muted hover:text-text-primary hover:bg-white/5"
+                    ? "text-text-primary bg-muted" 
+                    : "text-text-muted hover:text-text-primary hover:bg-muted"
                 )}
               >
                 Directorio
@@ -372,8 +372,8 @@ export function Navbar() {
                 className={cn(
                   "font-neuropol text-base uppercase tracking-wider py-3 px-4 rounded-lg transition-all min-h-[52px] flex items-center touch-manipulation",
                   pathname === "/organigrama" 
-                    ? "text-text-primary bg-white/5" 
-                    : "text-text-muted hover:text-text-primary hover:bg-white/5"
+                    ? "text-text-primary bg-muted" 
+                    : "text-text-muted hover:text-text-primary hover:bg-muted"
                 )}
               >
                 Organigrama

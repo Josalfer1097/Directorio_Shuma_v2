@@ -76,7 +76,7 @@ export default function HomePage() {
                   letterSpacing: "-0.03em"
                 }}
               >
-                <span className="text-[#F2F0EC]" style={{ fontFamily: "var(--font-neuropol), var(--font-orbitron), 'Orbitron', 'Courier New', monospace" }}>SHU</span>
+                <span style={{ fontFamily: "var(--font-neuropol), var(--font-orbitron), 'Orbitron', 'Courier New', monospace", color: "var(--foreground)" }}>SHU</span>
                 <span style={{
                   fontFamily: "var(--font-neuropol), var(--font-orbitron), 'Orbitron', 'Courier New', monospace",
                   background: 'linear-gradient(135deg, #3B82F6, #8B5CF6, #EC4899)',
@@ -97,7 +97,7 @@ export default function HomePage() {
                   className="font-dm-sans text-scale-xl"
                   style={{
                     fontWeight: 600,
-                    color: "#FFFFFF",
+                    color: "var(--foreground)",
                     letterSpacing: "0.01em",
                   }}
                 >
@@ -121,7 +121,7 @@ export default function HomePage() {
                   className="font-dm-sans text-scale-base"
                   style={{
                     fontWeight: 400,
-                    color: "rgba(255,255,255,0.55)",
+                    color: "var(--muted-foreground)",
                     marginTop: "8px",
                     fontStyle: "italic",
                   }}
@@ -330,23 +330,23 @@ export default function HomePage() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ delay: 0.3 }}
-              className="mt-12 flex flex-wrap items-center justify-center gap-x-6 gap-y-2 text-white/40 text-scale-sm"
+              className="mt-12 flex flex-wrap items-center justify-center gap-x-6 gap-y-2 text-muted-foreground text-scale-sm"
             >
               <span className="flex items-center gap-1.5">
                 <Users className="w-4 h-4" />
                 {stats.employeeCount} colaboradores
               </span>
-              <span className="hidden sm:inline text-white/20">|</span>
+              <span className="hidden sm:inline text-border-subtle">|</span>
               <span className="flex items-center gap-1.5">
                 <Building2 className="w-4 h-4" />
                 {stats.companyCount} empresas
               </span>
-              <span className="hidden sm:inline text-white/20">|</span>
+              <span className="hidden sm:inline text-border-subtle">|</span>
               <span className="flex items-center gap-1.5">
                 <Layers className="w-4 h-4" />
                 {stats.departmentCount} departamentos
               </span>
-              <span className="hidden sm:inline text-white/20">|</span>
+              <span className="hidden sm:inline text-border-subtle">|</span>
               <span className="flex items-center gap-1.5">
                 <MapPin className="w-4 h-4" />
                 {stats.locationCount} sucursales
