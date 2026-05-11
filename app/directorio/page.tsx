@@ -19,6 +19,7 @@ import {
 } from "@/lib/data";
 import { MobileFiltersBottomSheet } from "@/components/mobile-filters-bottom-sheet";
 import { ExtensionDirectory } from "@/components/extension-directory";
+import { FilterChips } from "@/components/filter-chips";
 import dynamic from "next/dynamic";
 import type { ViewMode, Employee } from "@/types";
 import { useFavorites } from "@/lib/useFavorites";
@@ -303,6 +304,26 @@ function DirectoryContent() {
                     </div>
                   </div>
                 </div>
+
+                {/* Active Filter Chips */}
+                <FilterChips
+                  selectedCompanies={selectedCompanies}
+                  selectedDepartment={selectedDepartment}
+                  selectedLocations={selectedLocations}
+                  companies={companies}
+                  onRemoveCompany={(companyId) =>
+                    setSelectedCompanies((prev) =>
+                      prev.filter((id) => id !== companyId)
+                    )
+                  }
+                  onRemoveDepartment={() => setSelectedDepartment("all")}
+                  onRemoveLocation={(location) =>
+                    setSelectedLocations((prev) =>
+                      prev.filter((loc) => loc !== location)
+                    )
+                  }
+                  onClearAll={clearFilters}
+                />
 
                 {/* Extensions View - Full width table */}
                 {viewMode === "extensions" ? (
