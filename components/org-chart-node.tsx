@@ -51,12 +51,11 @@ function OrgChartNodeComponent({ data }: OrgChartNodeProps) {
               onMouseLeave={() => setIsHovered(false)}
               className={cn(
                 "relative overflow-hidden bg-[--node-bg] rounded-xl transition-all duration-[180ms] group cursor-pointer touch-manipulation",
-                "shadow-xl shadow-black/20",
-                "p-2 md:p-3"
+                "shadow-xl shadow-black/20"
               )}
               style={{ 
-                minWidth: '150px',
-                maxWidth: '190px',
+                width: '220px',
+                height: '80px',
                 borderWidth: '1px',
                 borderStyle: 'solid',
                 borderLeftWidth: '3px',
