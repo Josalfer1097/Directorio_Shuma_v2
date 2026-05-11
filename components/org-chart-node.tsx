@@ -95,19 +95,16 @@ function OrgChartNodeComponent({ data }: OrgChartNodeProps) {
 
                 <div className="min-w-0 flex-1">
                   <h4 
-                    className="text-text-primary leading-tight line-clamp-2"
+                    className="text-text-primary leading-tight line-clamp-2 text-scale-xs font-neuropol"
                     style={{ 
-                      fontFamily: "var(--font-neuropol), var(--font-orbitron), 'Orbitron', 'Courier New', monospace",
                       wordWrap: 'break-word',
                       whiteSpace: 'normal',
-                      fontSize: 'var(--font-xs)',
                     }}
                   >
                     {employee.name}
                   </h4>
                   <p 
-                    className="font-dm-sans italic text-text-muted mt-0.5 leading-tight"
-                    style={{ fontSize: 'var(--font-xs)' }}
+                    className="font-dm-sans italic text-text-muted mt-0.5 leading-tight text-scale-xs"
                   >
                     {employee.position}
                   </p>

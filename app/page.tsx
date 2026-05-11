@@ -311,7 +311,7 @@ export default function HomePage() {
                             className="flex items-center gap-1 font-medium transition-all group-hover:gap-2"
                             style={{ color: config.primary }}
                           >
-                            <span style={{ fontFamily: "var(--font-neuropol), var(--font-orbitron), 'Orbitron', 'Courier New', monospace", fontSize: 'var(--font-sm)', letterSpacing: '0.05em' }}>
+                            <span className="text-scale-sm font-neuropol tracking-wide">
                               Ver equipo
                             </span>
                             <ArrowRight className="w-3.5 h-3.5 transition-transform group-hover:translate-x-0.5" />

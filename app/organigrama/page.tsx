@@ -13,27 +13,20 @@ const OrgChart = dynamic(
 function OrgChartLoading() {
   return (
     <div 
-      style={{
-        height: '60vh',
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'center',
-        justifyContent: 'center',
-        gap: '12px',
-        color: 'rgba(255,255,255,0.2)',
-      }}
+      className="h-[60vh] flex flex-col items-center justify-center gap-3"
+      style={{ color: 'var(--muted-foreground)' }}
     >
       <div 
         style={{ 
           width: '32px', 
           height: '32px',
-          border: '2px solid rgba(255,255,255,0.08)',
+          border: '2px solid var(--border-subtle)',
           borderTop: '2px solid #0047AB',
           borderRadius: '50%',
           animation: 'spin 1s linear infinite'
         }} 
       />
-      <span style={{ fontSize: 'var(--font-sm)', letterSpacing: '0.1em' }}>
+      <span className="text-scale-sm tracking-widest">
         Cargando organigrama...
       </span>
       <style>{`@keyframes spin { to { transform: rotate(360deg) } }`}</style>
@@ -85,7 +78,7 @@ export default function OrganigramaPage() {
           
           {/* Row 2: Subtitle */}
           <p 
-            className="text-[0.75rem] text-white/50 px-4 pb-3 truncate"
+            className="text-scale-xs text-muted-foreground px-4 pb-3 truncate"
           >
             Estructura organizacional de las empresas Shuma
           </p>

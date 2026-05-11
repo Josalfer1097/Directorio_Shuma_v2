@@ -61,56 +61,28 @@ const ExtensionRow = memo(function ExtensionRow({
       </td>
       {/* Name */}
       <td
-        className="px-3 font-medium text-white group-hover:text-white/90"
-        style={{ 
-          fontSize: "var(--font-base)", 
-          fontWeight: 500,
-          whiteSpace: "nowrap",
-          overflow: "hidden",
-          textOverflow: "ellipsis",
-        }}
+        className="px-3 font-medium text-foreground group-hover:text-foreground/90 text-scale-base truncate"
         title={employee.name}
       >
         {employee.name}
       </td>
       {/* Position */}
       <td
-        className="px-3 hidden md:table-cell"
-        style={{ 
-          fontSize: "var(--font-sm)", 
-          color: "rgba(255,255,255,0.65)",
-          whiteSpace: "nowrap",
-          overflow: "hidden",
-          textOverflow: "ellipsis",
-        }}
+        className="px-3 hidden md:table-cell text-scale-sm text-muted-foreground truncate"
         title={employee.position ?? ""}
       >
         {employee.position ?? "--"}
       </td>
       {/* Department */}
       <td
-        className="px-3 hidden lg:table-cell"
-        style={{ 
-          fontSize: "var(--font-sm)", 
-          color: "rgba(255,255,255,0.45)",
-          whiteSpace: "nowrap",
-          overflow: "hidden",
-          textOverflow: "ellipsis",
-        }}
+        className="px-3 hidden lg:table-cell text-scale-sm text-muted-foreground/70 truncate"
         title={employee.department ?? ""}
       >
         {employee.department ?? "--"}
       </td>
       {/* Location */}
       <td
-        className="px-3 hidden xl:table-cell"
-        style={{ 
-          fontSize: "var(--font-xs)", 
-          color: "rgba(255,255,255,0.35)",
-          whiteSpace: "nowrap",
-          overflow: "hidden",
-          textOverflow: "ellipsis",
-        }}
+        className="px-3 hidden xl:table-cell text-scale-xs text-muted-foreground/50 truncate"
         title={employee.location ?? ""}
       >
         {employee.location ?? "--"}
@@ -140,24 +112,13 @@ const CompanyHeader = memo(function CompanyHeader({
       <td colSpan={5} className="px-4">
         <div className="flex items-center justify-between">
           <span
-            className="font-neuropol uppercase tracking-wider"
-            style={{
-              fontFamily: "var(--font-neuropol), var(--font-orbitron), 'Orbitron', monospace",
-              fontSize: "var(--font-xs)",
-              letterSpacing: "0.15em",
-              color: companyConfig.primary,
-            }}
+            className="font-neuropol uppercase tracking-widest text-scale-xs"
+            style={{ color: companyConfig.primary }}
           >
             {companyName}
           </span>
           <span
-            className="px-2 py-0.5 rounded-full"
-            style={{
-              background: "rgba(255,255,255,0.08)",
-              border: "1px solid rgba(255,255,255,0.12)",
-              color: "rgba(255,255,255,0.6)",
-              fontSize: "var(--font-xs)",
-            }}
+            className="px-2 py-0.5 rounded-full text-scale-xs bg-muted border border-border-subtle text-muted-foreground"
           >
             {employeeCount}
           </span>
@@ -175,14 +136,11 @@ const LocationSubHeader = memo(function LocationSubHeader({
 }) {
   return (
     <tr
-      style={{
-        height: "28px",
-        borderTop: "1px solid rgba(255,255,255,0.06)",
-      }}
+      className="h-7 border-t border-border-subtle"
     >
       <td colSpan={5} style={{ paddingLeft: "80px" }}>
         <span
-          className="flex items-center gap-1 text-scale-xs text-white/30"
+          className="flex items-center gap-1 text-scale-xs text-muted-foreground/50"
         >
           <MapPin className="w-3 h-3" />
           {location}
@@ -277,12 +235,8 @@ const ExtensionCard = memo(function ExtensionCard({
       <div className="relative flex flex-col h-full" style={{ zIndex: 1 }}>
         {/* Employee name */}
         <p
-          className="text-white leading-tight line-clamp-2"
-          style={{
-            fontSize: "var(--font-sm)",
-            fontWeight: 600,
-            wordBreak: "break-word",
-          }}
+          className="text-foreground leading-tight line-clamp-2 text-scale-sm font-semibold"
+          style={{ wordBreak: "break-word" }}
         >
           {displayName}
         </p>
@@ -290,36 +244,25 @@ const ExtensionCard = memo(function ExtensionCard({
         {/* Extension pill */}
         {employee.extension ? (
           <div
-            className="inline-flex items-center gap-[4px] w-fit"
+            className="inline-flex items-center gap-[4px] w-fit mt-1.5"
             style={{
               background: `rgba(${hexToRgb(companyConfig.primary)}, 0.12)`,
               border: `1px solid rgba(${hexToRgb(companyConfig.primary)}, 0.25)`,
               borderRadius: "5px",
               padding: "2px 8px",
-              marginTop: "6px",
             }}
           >
             <Phone size={9} style={{ color: companyConfig.primary }} />
             <span
-              style={{
-                fontFamily: "monospace",
-                fontSize: "var(--font-base)",
-                fontWeight: 700,
-                color: companyConfig.primary,
-                letterSpacing: "0.05em",
-              }}
+              className="text-scale-base font-bold font-mono tracking-wide"
+              style={{ color: companyConfig.primary }}
             >
               {employee.extension}
             </span>
           </div>
         ) : (
           <span
-            style={{
-              fontSize: "var(--font-xs)",
-              color: "rgba(255,255,255,0.20)",
-              fontStyle: "italic",
-              marginTop: "6px",
-            }}
+            className="text-scale-xs italic mt-1.5 text-muted-foreground/40"
           >
             Sin ext.
           </span>
@@ -845,15 +788,10 @@ export function ExtensionDirectory({
   return (
     <div className="w-full" style={{ background: "#0A0C0F" }}>
       {/* Header Bar */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 px-4 py-3 border-b border-white/5 print-hidden">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 px-4 py-3 border-b border-border-subtle print-hidden">
         <span
-          className="uppercase tracking-widest shrink-0"
-          style={{
-            fontFamily: "var(--font-neuropol), var(--font-orbitron), 'Orbitron', monospace",
-            fontSize: "var(--font-xs)",
-            letterSpacing: "0.2em",
-            color: "rgba(255,255,255,0.5)",
-          }}
+          className="uppercase tracking-widest shrink-0 font-neuropol text-scale-xs text-muted-foreground"
+          style={{ letterSpacing: "0.2em" }}
         >
           DIRECTORIO RAPIDO -- EXTENSIONES
         </span>
@@ -989,16 +927,7 @@ export function ExtensionDirectory({
           </div>
           {/* Result count pill */}
           <div
-            className="inline-block"
-            style={{
-              marginTop: "8px",
-              padding: "3px 12px",
-              borderRadius: "20px",
-              background: "rgba(255,255,255,0.05)",
-              border: "1px solid rgba(255,255,255,0.08)",
-              fontSize: "var(--font-xs)",
-              color: "rgba(255,255,255,0.5)",
-            }}
+            className="inline-block mt-2 px-3 py-0.5 rounded-full text-scale-xs bg-muted border border-border-subtle text-muted-foreground"
           >
             {totalCount} resultado{totalCount !== 1 ? "s" : ""}
           </div>
@@ -1083,17 +1012,7 @@ export function ExtensionDirectory({
                   return (
                     <th
                       key={header}
-                      className={`px-3 relative select-none ${hiddenClasses} ${idx === 0 ? "text-center" : ""}`}
-                      style={{
-                        fontFamily: "var(--font-neuropol), var(--font-orbitron), 'Orbitron', monospace",
-                        fontSize: "var(--font-xs)",
-                        letterSpacing: "0.1em",
-                        color: "rgba(255,255,255,0.35)",
-                        textTransform: "uppercase",
-                        overflow: "hidden",
-                        textOverflow: "ellipsis",
-                        whiteSpace: "nowrap",
-                      }}
+                      className={`px-3 relative select-none font-neuropol text-scale-xs tracking-wide text-muted-foreground/60 uppercase truncate ${hiddenClasses} ${idx === 0 ? "text-center" : ""}`}
                     >
                       {header}
                       {idx < 4 && (

@@ -46,8 +46,6 @@ export function DeleteConfirmModal({
         description: "Los cambios se reflejarán después de actualizar los datos.",
       });
 
-      console.log("[v0] Employee deleted:", employee.id);
-
       onClose();
     } catch (error) {
       toast.error("Error al eliminar el empleado");

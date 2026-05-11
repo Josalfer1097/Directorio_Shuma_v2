@@ -10,48 +10,37 @@ export default function Error({
   reset: () => void;
 }) {
   useEffect(() => {
-    console.error('[App Error]', error);
+    // Error logging for production debugging
+    if (process.env.NODE_ENV === 'production') {
+      // Could send to error tracking service here
+    }
   }, [error]);
 
   return (
     <div
+      className="min-h-screen flex flex-col items-center justify-center gap-4 p-6"
       style={{
-        minHeight: '100vh',
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'center',
-        justifyContent: 'center',
-        background: '#0C0E11',
-        color: 'white',
+        background: 'var(--bg-base)',
+        color: 'var(--foreground)',
         fontFamily: 'DM Sans, sans-serif',
-        gap: '16px',
-        padding: '24px',
       }}
     >
       <div
-        style={{
-          fontSize: 'var(--font-xs)',
-          letterSpacing: '0.2em',
-          color: 'rgba(255,255,255,0.3)',
-          textTransform: 'uppercase',
-        }}
+        className="text-scale-xs uppercase tracking-widest"
+        style={{ color: 'var(--muted-foreground)' }}
       >
         Error del sistema
       </div>
-      <div style={{ fontSize: 'var(--font-lg)', color: 'rgba(255,255,255,0.5)' }}>
+      <div className="text-scale-lg" style={{ color: 'var(--muted-foreground)' }}>
         Algo salio mal. Por favor intenta de nuevo.
       </div>
       <button
         onClick={reset}
+        className="text-scale-base mt-2 px-6 py-2.5 rounded-xl cursor-pointer transition-colors hover:opacity-80"
         style={{
-          marginTop: '8px',
-          padding: '10px 24px',
-          background: 'rgba(255,255,255,0.06)',
-          border: '1px solid rgba(255,255,255,0.12)',
-          borderRadius: '10px',
-          color: 'white',
-          cursor: 'pointer',
-          fontSize: 'var(--font-base)',
+          background: 'var(--bg-elevated)',
+          border: '1px solid var(--border-subtle)',
+          color: 'var(--foreground)',
         }}
       >
         Reintentar

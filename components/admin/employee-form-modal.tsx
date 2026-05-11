@@ -118,14 +118,6 @@ export function EmployeeFormModal({
         });
       }
 
-      // Log the data that would be saved
-      console.log("[v0] Employee data to save:", {
-        ...formData,
-        location: formData.location || "",
-        reportsTo: formData.reportsTo || null,
-        avatar: null,
-      });
-
       onClose();
     } catch (error) {
       toast.error("Error al guardar los cambios");
