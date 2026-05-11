@@ -83,7 +83,7 @@ function OrgChartNodeComponent({ data }: OrgChartNodeProps) {
 
               <div className="flex items-center gap-3 relative z-10 pl-1">
                 <div 
-                  className="w-9 h-9 rounded-full flex items-center justify-center text-xs font-bold text-white shrink-0 shadow-lg transition-all duration-[180ms]"
+                  className="w-9 h-9 rounded-full flex items-center justify-center text-xs font-bold text-foreground shrink-0 shadow-lg transition-all duration-[180ms]"
                   style={{ 
                     background: `linear-gradient(135deg, ${colors.primary}, ${colors.secondary})`,
                     border: colors.accent ? `2px solid ${colors.accent}` : 'none',

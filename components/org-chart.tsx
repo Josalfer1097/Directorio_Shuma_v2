@@ -217,8 +217,8 @@ function OrgChartInner({ selectedCompany, layout }: OrgChartInnerProps) {
         variant={BackgroundVariant.Dots}
         gap={20}
         size={1}
-        color="#1E1E30"
-        style={{ opacity: 0.8 }}
+        color="var(--foreground)"
+        style={{ opacity: 0.1 }}
       />
 
       {/* Controls - hidden, using custom zoom buttons instead */}
@@ -234,7 +234,7 @@ function OrgChartInner({ selectedCompany, layout }: OrgChartInnerProps) {
           const data = node.data as { company: Company };
           return data?.company?.colors?.primary || "var(--irid-a)";
         }}
-        maskColor="rgba(8, 8, 16, 0.8)"
+        maskColor="rgba(0, 0, 0, 0.3)"
         className="!bg-[--bg-surface]/80 !backdrop-blur-md !border-border-subtle !rounded-lg hidden md:block"
       />
 
@@ -242,7 +242,7 @@ function OrgChartInner({ selectedCompany, layout }: OrgChartInnerProps) {
       <div className="absolute bottom-4 right-4 z-10 flex flex-col gap-1 bg-[--bg-surface]/90 backdrop-blur-xl border border-border-subtle rounded-xl p-1 shadow-xl">
         <button
           onClick={handleZoomIn}
-          className="flex items-center justify-center w-9 h-9 md:w-10 md:h-10 rounded-lg text-text-muted hover:text-text-primary hover:bg-white/10 transition-colors touch-manipulation"
+          className="flex items-center justify-center w-9 h-9 md:w-10 md:h-10 rounded-lg text-text-muted hover:text-text-primary hover:bg-muted/50 transition-colors touch-manipulation"
           aria-label="Acercar"
           title="Acercar"
         >
@@ -250,7 +250,7 @@ function OrgChartInner({ selectedCompany, layout }: OrgChartInnerProps) {
         </button>
         <button
           onClick={handleZoomOut}
-          className="flex items-center justify-center w-9 h-9 md:w-10 md:h-10 rounded-lg text-text-muted hover:text-text-primary hover:bg-white/10 transition-colors touch-manipulation"
+          className="flex items-center justify-center w-9 h-9 md:w-10 md:h-10 rounded-lg text-text-muted hover:text-text-primary hover:bg-muted/50 transition-colors touch-manipulation"
           aria-label="Alejar"
           title="Alejar"
         >
@@ -259,7 +259,7 @@ function OrgChartInner({ selectedCompany, layout }: OrgChartInnerProps) {
         <div className="h-px bg-border-subtle mx-1" />
         <button
           onClick={handleFitView}
-          className="flex items-center justify-center w-9 h-9 md:w-10 md:h-10 rounded-lg text-text-muted hover:text-text-primary hover:bg-white/10 transition-colors touch-manipulation"
+          className="flex items-center justify-center w-9 h-9 md:w-10 md:h-10 rounded-lg text-text-muted hover:text-text-primary hover:bg-muted/50 transition-colors touch-manipulation"
           aria-label="Ajustar a pantalla"
           title="Ajustar a pantalla"
         >
@@ -279,12 +279,12 @@ export function OrgChart({ initialCompany }: OrgChartProps) {
   const [layout, setLayout] = useState<OrgChartLayout>("vertical");
 
   return (
-    <div className="h-full w-full flex flex-col overflow-hidden bg-[--bg-base] md:rounded-xl md:border md:border-border-subtle">
+    <div className="h-full w-full flex flex-col overflow-hidden bg-background md:rounded-xl md:border md:border-border-subtle">
       {/* Mobile Controls */}
       <div 
         className="md:hidden flex flex-col shrink-0 border-b border-border-subtle"
         style={{
-          background: "rgba(15, 15, 26, 0.90)",
+          background: "var(--bg-surface)",
           WebkitBackdropFilter: "blur(12px)",
           backdropFilter: "blur(12px)",
         }}
@@ -307,7 +307,7 @@ export function OrgChart({ initialCompany }: OrgChartProps) {
                 "px-3 py-1.5 rounded-full uppercase tracking-wider font-neuropol transition-all duration-[180ms] whitespace-nowrap shrink-0 touch-manipulation min-h-[32px] text-scale-xs",
                 selectedCompany === filter.id 
                   ? "text-white shadow-lg" 
-                  : "bg-white/5 text-white/50 border border-white/10"
+                  : "bg-muted text-muted-foreground border border-border-subtle"
               )}
               style={{
                 backgroundColor: selectedCompany === filter.id ? filter.color : undefined,
@@ -321,12 +321,12 @@ export function OrgChart({ initialCompany }: OrgChartProps) {
 
         {/* Row 4: Layout toggle - right aligned */}
         <div className="flex justify-end px-4 py-1.5">
-          <div className="flex gap-1 bg-white/5 rounded-md p-0.5">
+          <div className="flex gap-1 bg-muted rounded-md p-0.5">
             <button
               onClick={() => setLayout("vertical")}
               className={cn(
                 "px-2 py-1 rounded font-neuropol uppercase transition-colors touch-manipulation text-scale-xs",
-                layout === "vertical" ? "bg-white/10 text-white" : "text-white/40"
+                layout === "vertical" ? "bg-bg-elevated text-text-primary" : "text-muted-foreground"
               )}
             >
               Vertical
@@ -335,7 +335,7 @@ export function OrgChart({ initialCompany }: OrgChartProps) {
               onClick={() => setLayout("horizontal")}
               className={cn(
                 "px-2 py-1 rounded font-neuropol uppercase transition-colors touch-manipulation text-scale-xs",
-                layout === "horizontal" ? "bg-white/10 text-white" : "text-white/40"
+                layout === "horizontal" ? "bg-bg-elevated text-text-primary" : "text-muted-foreground"
               )}
             >
               Horizontal

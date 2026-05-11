@@ -56,7 +56,7 @@ export default function OrganigramaPage() {
   }, []);
 
   return (
-    <div className="h-screen flex flex-col bg-bg-base relative overflow-hidden">
+    <div className="h-screen flex flex-col bg-background relative overflow-hidden">
       <div className="dot-grid fixed inset-0" />
       
       {/* Navbar - fixed height */}
