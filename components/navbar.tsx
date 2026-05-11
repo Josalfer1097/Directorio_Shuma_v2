@@ -9,6 +9,7 @@ import type { ViewMode } from "@/types";
 import { cn } from "@/lib/utils";
 import { getEmployees } from "@/lib/data";
 import { FontScaleControl } from "./font-scale-control";
+import { ThemeToggle } from "./theme-toggle";
 
 export function Navbar() {
   const pathname = usePathname();
@@ -283,6 +284,9 @@ export function Navbar() {
               </div>
             )}
           </div>
+
+          {/* Theme Toggle */}
+          <ThemeToggle />
 
           {/* View Toggle - Hidden on mobile (agenda is default there) */}
           <button
