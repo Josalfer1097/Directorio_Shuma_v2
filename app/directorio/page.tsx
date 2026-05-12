@@ -44,8 +44,8 @@ const getContainerVariants = (isMobile: boolean) => ({
   hidden: {},
   visible: {
     transition: {
-      staggerChildren: isMobile ? 0.02 : 0.04,
-      delayChildren: 0.05,
+      staggerChildren: isMobile ? 0.01 : 0.04,
+      delayChildren: isMobile ? 0.02 : 0.05,
     },
   },
 });
@@ -53,23 +53,16 @@ const getContainerVariants = (isMobile: boolean) => ({
 const getCardVariants = (isMobile: boolean) => ({
   hidden: {
     opacity: 0,
-    y: isMobile ? 8 : 16,
-    scale: 0.97,
+    y: isMobile ? 4 : 16,
+    scale: isMobile ? 1 : 0.97,
   },
   visible: {
     opacity: 1,
     y: 0,
     scale: 1,
     transition: {
-      duration: 0.25,
-      ease: premiumEase,
-    },
-  },
-  exit: {
-    opacity: 0,
-    scale: 0.95,
-    transition: {
-      duration: 0.15,
+      duration: isMobile ? 0.2 : 0.3,
+      ease: [0.25, 0.46, 0.45, 0.94],
     },
   },
 });

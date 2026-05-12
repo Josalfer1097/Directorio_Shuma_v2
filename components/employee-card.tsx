@@ -136,7 +136,7 @@ export function EmployeeCard({
       >
         <Link href={`/directorio/${employee.id}`}>
           <div 
-            className="group flex items-center gap-4 p-4 rounded-lg border bg-card relative overflow-hidden"
+            className="group flex items-center gap-4 p-4 rounded-lg border bg-card relative overflow-hidden min-h-[56px]"
             style={{ 
               ["--bracket-color" as string]: companyConfig.primary,
               borderColor: isHovered ? companyConfig.primary : 'var(--border)',
