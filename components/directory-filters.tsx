@@ -153,21 +153,20 @@ export function DirectoryFilters({
         <div>
           <button
             onClick={() => onFavoritesToggle(!showFavoritesOnly)}
-            className="w-full flex items-center justify-between gap-2 px-3 py-2.5 rounded-lg transition-all duration-[180ms]"
+            className="w-full flex items-center justify-between gap-2 px-3 py-2.5 rounded-lg transition-all duration-[180ms] border"
             style={{
-              background: showFavoritesOnly ? 'rgba(245,196,0,0.12)' : 'rgba(255,255,255,0.03)',
-              border: showFavoritesOnly ? '1px solid rgba(245,196,0,0.30)' : '1px solid rgba(255,255,255,0.08)',
-              color: showFavoritesOnly ? '#F5C400' : 'rgba(255,255,255,0.7)',
+              background: showFavoritesOnly ? 'rgba(245,196,0,0.12)' : 'rgba(0,0,0,0.03) dark:rgba(255,255,255,0.03)',
+              borderColor: showFavoritesOnly ? 'rgba(245,196,0,0.30)' : 'rgba(0,0,0,0.1) dark:rgba(255,255,255,0.08)',
+              color: showFavoritesOnly ? '#F5C400' : 'rgba(0,0,0,0.6) dark:rgba(255,255,255,0.7)',
             }}
           >
             <span className="flex items-center gap-2 text-sm font-medium">
               <Star className={`w-4 h-4 ${showFavoritesOnly ? 'fill-[#F5C400]' : ''}`} />
               Mis Contactos
               <span 
-                className="px-1.5 py-0.5 text-xs rounded"
+                className="px-1.5 py-0.5 text-xs rounded text-gray-600 dark:text-white/40"
                 style={{
-                  background: 'rgba(255,255,255,0.08)',
-                  color: 'rgba(255,255,255,0.5)',
+                  background: 'rgba(0,0,0,0.05) dark:rgba(255,255,255,0.08)',
                 }}
               >
                 {favorites.length}
@@ -180,7 +179,7 @@ export function DirectoryFilters({
                 clearAllFavorites();
                 onFavoritesToggle(false);
               }}
-              className="mt-2 text-xs text-white/40 hover:text-white/70 transition-colors"
+              className="mt-2 text-xs text-blue-600 dark:text-blue-400 hover:underline transition-colors"
             >
               Limpiar todos
             </button>
@@ -190,7 +189,7 @@ export function DirectoryFilters({
 
       {/* Companies */}
       <div>
-        <h4 className="font-medium text-foreground mb-3" style={{ fontFamily: "var(--font-neuropol), var(--font-orbitron), 'Orbitron', 'Courier New', monospace" }}>Empresas</h4>
+        <h4 className="font-medium text-gray-900 dark:text-foreground mb-3" style={{ fontFamily: "var(--font-neuropol), var(--font-orbitron), 'Orbitron', 'Courier New', monospace" }}>Empresas</h4>
         <div className="space-y-2">
           {companies.filter(c => !c.disabled).map((company) => {
             const companyConf = getCompanyConfig(company.id);
@@ -231,9 +230,9 @@ export function DirectoryFilters({
                       style={{ backgroundColor: companyColor }}
                     />
                   )}
-                  <span className="text-sm text-muted-foreground group-hover:text-foreground transition-colors" style={{ fontFamily: "var(--font-neuropol), var(--font-orbitron), 'Orbitron', 'Courier New', monospace" }}>
+                  <span className="text-sm text-gray-700 dark:text-muted-foreground group-hover:text-gray-900 dark:group-hover:text-foreground transition-colors" style={{ fontFamily: "var(--font-neuropol), var(--font-orbitron), 'Orbitron', 'Courier New', monospace" }}>
                     {company.shortName || company.name}
-                    <span className="ml-1 text-xs text-white/30">[{filterCounts.companyCounts[company.id] || 0}]</span>
+                    <span className="ml-1 text-xs text-gray-400 dark:text-white/30">[{filterCounts.companyCounts[company.id] || 0}]</span>
                   </span>
                 </div>
               </label>
@@ -244,7 +243,7 @@ export function DirectoryFilters({
 
       {/* Departments */}
       <div>
-        <h4 className="font-medium text-foreground mb-3" style={{ fontFamily: "var(--font-neuropol), var(--font-orbitron), 'Orbitron', 'Courier New', monospace" }}>Departamento</h4>
+        <h4 className="font-medium text-gray-900 dark:text-foreground mb-3" style={{ fontFamily: "var(--font-neuropol), var(--font-orbitron), 'Orbitron', 'Courier New', monospace" }}>Departamento</h4>
         <Select value={selectedDepartment} onValueChange={onDepartmentChange}>
           <SelectTrigger style={{ fontFamily: "var(--font-neuropol), var(--font-orbitron), 'Orbitron', 'Courier New', monospace" }}>
             <SelectValue placeholder="Todos los departamentos" />
@@ -296,7 +295,7 @@ export function DirectoryFilters({
                   onCheckedChange={() => onDepartmentChange(selectedDepartment === dept ? "all" : dept)}
                 />
                 <span 
-                  className="text-white/60 hover:text-white/80 truncate transition-colors text-scale-xs"
+                  className="text-gray-700 dark:text-white/60 hover:text-gray-900 dark:hover:text-white/80 truncate transition-colors text-scale-xs"
                   style={{ maxWidth: "120px" }}
                 >
                   {dept}
@@ -304,13 +303,13 @@ export function DirectoryFilters({
               </label>
               <button
                 onClick={() => onDeptViewOpen(dept)}
-                className="flex items-center gap-1 transition-all shrink-0 text-scale-xs"
+                className="flex items-center gap-1 transition-all shrink-0 text-scale-xs border rounded-md"
                 style={{
-                  color: "rgba(255,255,255,0.35)",
-                  background: "rgba(255,255,255,0.04)",
-                  border: "1px solid rgba(255,255,255,0.08)",
-                  borderRadius: "6px",
+                  color: "rgba(0,0,0,0.5) dark:rgba(255,255,255,0.35)",
+                  background: "rgba(0,0,0,0.03) dark:rgba(255,255,255,0.04)",
+                  borderColor: "rgba(0,0,0,0.1) dark:rgba(255,255,255,0.08)",
                   padding: "3px 8px",
+                  borderRadius: "6px",
                 }}
                 onMouseEnter={(e) => {
                   e.currentTarget.style.color = "#00C9A7";
@@ -318,9 +317,10 @@ export function DirectoryFilters({
                   e.currentTarget.style.background = "rgba(0,201,167,0.08)";
                 }}
                 onMouseLeave={(e) => {
-                  e.currentTarget.style.color = "rgba(255,255,255,0.35)";
-                  e.currentTarget.style.borderColor = "rgba(255,255,255,0.08)";
-                  e.currentTarget.style.background = "rgba(255,255,255,0.04)";
+                  const isDark = document.documentElement.classList.contains('dark');
+                  e.currentTarget.style.color = isDark ? "rgba(255,255,255,0.35)" : "rgba(0,0,0,0.5)";
+                  e.currentTarget.style.borderColor = isDark ? "rgba(255,255,255,0.08)" : "rgba(0,0,0,0.1)";
+                  e.currentTarget.style.background = isDark ? "rgba(255,255,255,0.04)" : "rgba(0,0,0,0.03)";
                 }}
                 title={`Ver departamento ${dept}`}
               >
@@ -335,7 +335,7 @@ export function DirectoryFilters({
       {/* Locations */}
       {locations.length > 0 && (
         <div>
-          <h4 className="font-medium text-foreground mb-3" style={{ fontFamily: "var(--font-neuropol), var(--font-orbitron), 'Orbitron', 'Courier New', monospace" }}>Sucursal</h4>
+          <h4 className="font-medium text-gray-900 dark:text-foreground mb-3" style={{ fontFamily: "var(--font-neuropol), var(--font-orbitron), 'Orbitron', 'Courier New', monospace" }}>Sucursal</h4>
           <div className="space-y-2">
             {locations.map((location) => {
               const isChecked = selectedLocations.includes(location);
@@ -349,9 +349,9 @@ export function DirectoryFilters({
                     checked={isChecked}
                     onCheckedChange={() => toggleLocation(location)}
                   />
-                  <span className="text-sm text-muted-foreground group-hover:text-foreground transition-colors" style={{ fontFamily: "var(--font-neuropol), var(--font-orbitron), 'Orbitron', 'Courier New', monospace" }}>
+                  <span className="text-sm text-gray-700 dark:text-muted-foreground group-hover:text-gray-900 dark:group-hover:text-foreground transition-colors" style={{ fontFamily: "var(--font-neuropol), var(--font-orbitron), 'Orbitron', 'Courier New', monospace" }}>
                     {location}
-                    <span className="ml-1 text-xs text-white/30">[{filterCounts.locationCounts[location] || 0}]</span>
+                    <span className="ml-1 text-xs text-gray-400 dark:text-white/30">[{filterCounts.locationCounts[location] || 0}]</span>
                   </span>
                 </label>
               );
