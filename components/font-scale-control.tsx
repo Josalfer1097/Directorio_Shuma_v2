@@ -75,17 +75,17 @@ export function FontScaleControl() {
           width: '36px',
           height: '36px',
           borderRadius: '8px',
-          background: isActive ? 'rgba(0,201,167,0.10)' : 'rgba(255,255,255,0.05)',
-          border: isActive ? '1px solid #00C9A7' : '1px solid rgba(255,255,255,0.08)',
+          background: isActive ? 'rgba(0,201,167,0.10)' : 'var(--bg-elevated)',
+          border: isActive ? '1px solid #00C9A7' : '1px solid var(--border-subtle)',
         }}
         onMouseOver={(e) => {
           if (!isActive) {
-            e.currentTarget.style.background = 'rgba(255,255,255,0.10)'
+            e.currentTarget.style.background = 'rgba(0,201,167,0.12)'
           }
         }}
         onMouseOut={(e) => {
           if (!isActive) {
-            e.currentTarget.style.background = 'rgba(255,255,255,0.05)'
+            e.currentTarget.style.background = 'var(--bg-elevated)'
           }
         }}
       >
@@ -94,7 +94,7 @@ export function FontScaleControl() {
           style={{
             fontFamily: 'var(--font-dm-sans), system-ui, sans-serif',
             fontWeight: 700,
-            color: isActive ? '#00C9A7' : 'rgba(255,255,255,0.7)',
+            color: isActive ? '#00C9A7' : 'var(--foreground)',
             display: 'flex',
             alignItems: 'baseline',
             lineHeight: 1,
@@ -108,22 +108,21 @@ export function FontScaleControl() {
       {/* Tooltip */}
       {tooltipVisible && !isOpen && (
         <div
-          className="absolute top-full left-1/2 -translate-x-1/2 mt-2 px-2 py-1 whitespace-nowrap pointer-events-none z-50"
+          className="absolute top-full left-1/2 -translate-x-1/2 mt-2 px-2 py-1 whitespace-nowrap pointer-events-none z-50 text-scale-xs"
           style={{
-            background: '#1A1A1A',
-            border: '1px solid rgba(255,255,255,0.10)',
+            background: 'var(--bg-surface)',
+            border: '1px solid var(--border-subtle)',
             borderRadius: '6px',
-            fontSize: 'var(--font-xs)',
-            color: 'rgba(255,255,255,0.8)',
+            color: 'var(--foreground)',
           }}
         >
           Tamaño de texto
           <div
             className="absolute -top-1 left-1/2 -translate-x-1/2 w-2 h-2 rotate-45"
             style={{
-              background: '#1A1A1A',
-              borderTop: '1px solid rgba(255,255,255,0.10)',
-              borderLeft: '1px solid rgba(255,255,255,0.10)',
+              background: 'var(--bg-surface)',
+              borderTop: '1px solid var(--border-subtle)',
+              borderLeft: '1px solid var(--border-subtle)',
             }}
           />
         </div>
@@ -161,19 +160,19 @@ export function FontScaleControl() {
                 : "absolute top-full right-0 mt-2 z-[9000]"
               }
               style={isMobile ? {
-                background: '#141618',
+                background: 'var(--bg-surface)',
                 borderRadius: '20px 20px 0 0',
-                border: '1px solid rgba(255,255,255,0.10)',
+                border: '1px solid var(--border-subtle)',
                 borderBottom: 'none',
-                boxShadow: '0 -8px 32px rgba(0,0,0,0.5)',
+                boxShadow: '0 -8px 32px rgba(0,0,0,0.1)',
                 padding: '16px',
                 paddingBottom: 'calc(16px + env(safe-area-inset-bottom, 0px))',
               } : {
                 width: '220px',
-                background: '#141618',
-                border: '1px solid rgba(255,255,255,0.10)',
+                background: 'var(--bg-surface)',
+                border: '1px solid var(--border-subtle)',
                 borderRadius: '14px',
-                boxShadow: '0 8px 32px rgba(0,0,0,0.5)',
+                boxShadow: '0 8px 32px rgba(0,0,0,0.1)',
                 padding: '16px',
               }}
             >
@@ -184,7 +183,7 @@ export function FontScaleControl() {
                     style={{ 
                       width: '32px', 
                       height: '4px', 
-                      background: 'rgba(255,255,255,0.18)',
+                      background: 'var(--border-subtle)',
                       borderRadius: '2px',
                     }} 
                   />
@@ -193,10 +192,9 @@ export function FontScaleControl() {
 
               {/* Header */}
               <div 
-                className="flex items-center gap-2 mb-3"
+                className="flex items-center gap-2 mb-3 text-scale-sm"
                 style={{ 
-                  fontSize: 'var(--font-sm)', 
-                  color: 'rgba(255,255,255,0.5)',
+                  color: 'var(--muted-foreground)',
                 }}
               >
                 <Type size={14} />
@@ -215,15 +213,14 @@ export function FontScaleControl() {
                       key={option.value}
                       onClick={() => setScale(option.value)}
                       aria-pressed={isSelected}
-                      className="flex items-center justify-between transition-all touch-manipulation"
+                      className="flex items-center justify-between transition-all touch-manipulation text-scale-sm"
                       style={{
                         height: isMobile ? '52px' : '40px',
                         borderRadius: '10px',
                         padding: '0 12px',
-                        fontSize: 'var(--font-sm)',
-                        background: isSelected ? 'rgba(0,201,167,0.15)' : 'rgba(255,255,255,0.04)',
-                        border: isSelected ? '1px solid #00C9A7' : '1px solid rgba(255,255,255,0.08)',
-                        color: isSelected ? 'white' : 'rgba(255,255,255,0.7)',
+                        background: isSelected ? 'rgba(0,201,167,0.15)' : 'var(--bg-elevated)',
+                        border: isSelected ? '1px solid #00C9A7' : '1px solid var(--border-subtle)',
+                        color: isSelected ? '#00C9A7' : 'var(--foreground)',
                       }}
                     >
                       <span>{option.label}</span>
@@ -237,17 +234,17 @@ export function FontScaleControl() {
               <div 
                 style={{ 
                   height: '1px', 
-                  background: 'rgba(255,255,255,0.08)', 
+                  background: 'var(--border-subtle)', 
                   margin: '12px 0',
                 }} 
               />
 
               {/* Preview */}
               <div>
-                <p style={{ fontSize: 'var(--font-xs)', color: 'rgba(255,255,255,0.4)', marginBottom: '6px' }}>
+                <p className="text-scale-xs" style={{ color: 'var(--muted-foreground)', marginBottom: '6px' }}>
                   Vista previa:
                 </p>
-                <p style={{ fontSize: 'var(--font-base)', color: 'white' }}>
+                <p className="text-scale-base" style={{ color: 'var(--foreground)' }}>
                   El talento que nos mueve.
                 </p>
               </div>
@@ -256,17 +253,16 @@ export function FontScaleControl() {
               {scale !== 1 && (
                 <button
                   onClick={() => setScale(1)}
-                  className="w-full mt-3 transition-colors touch-manipulation"
+                  className="w-full mt-3 transition-colors touch-manipulation text-scale-xs"
                   style={{
-                    fontSize: 'var(--font-xs)',
-                    color: 'rgba(255,255,255,0.3)',
+                    color: 'var(--muted-foreground)',
                     cursor: 'pointer',
                     background: 'none',
                     border: 'none',
                     textAlign: 'center',
                   }}
-                  onMouseOver={(e) => e.currentTarget.style.color = 'rgba(255,255,255,0.6)'}
-                  onMouseOut={(e) => e.currentTarget.style.color = 'rgba(255,255,255,0.3)'}
+                  onMouseOver={(e) => e.currentTarget.style.color = 'var(--foreground)'}
+                  onMouseOut={(e) => e.currentTarget.style.color = 'var(--muted-foreground)'}
                 >
                   Restablecer
                 </button>

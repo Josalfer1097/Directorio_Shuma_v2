@@ -2,7 +2,7 @@
 
 import { useState, useMemo, useEffect, Suspense, useRef, useCallback, useDeferredValue } from "react";
 import { useSearchParams } from "next/navigation";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import Fuse from "fuse.js";
 import { Search, LayoutGrid, List, Users, Filter, Phone } from "lucide-react";
 import { Navbar } from "@/components/navbar";
@@ -19,6 +19,8 @@ import {
 } from "@/lib/data";
 import { MobileFiltersBottomSheet } from "@/components/mobile-filters-bottom-sheet";
 import { ExtensionDirectory } from "@/components/extension-directory";
+import { FilterChips } from "@/components/filter-chips";
+import { AgendaView } from "@/components/agenda-view";
 import dynamic from "next/dynamic";
 import type { ViewMode, Employee } from "@/types";
 import { useFavorites } from "@/lib/useFavorites";
@@ -32,8 +34,45 @@ const DepartmentView = dynamic(
 
 const ITEMS_PER_PAGE = 12;
 
-// Premium easing curve
+// Premium easing curve for stagger animations
 const premiumEase = [0.25, 0.46, 0.45, 0.94];
+
+// Stagger animation variants - performance limited to first 20 cards
+const MAX_ANIMATED_CARDS = 20;
+
+const getContainerVariants = (isMobile: boolean) => ({
+  hidden: {},
+  visible: {
+    transition: {
+      staggerChildren: isMobile ? 0.02 : 0.04,
+      delayChildren: 0.05,
+    },
+  },
+});
+
+const getCardVariants = (isMobile: boolean) => ({
+  hidden: {
+    opacity: 0,
+    y: isMobile ? 8 : 16,
+    scale: 0.97,
+  },
+  visible: {
+    opacity: 1,
+    y: 0,
+    scale: 1,
+    transition: {
+      duration: 0.25,
+      ease: premiumEase,
+    },
+  },
+  exit: {
+    opacity: 0,
+    scale: 0.95,
+    transition: {
+      duration: 0.15,
+    },
+  },
+});
 
 function DirectoryContent() {
   const searchParams = useSearchParams();
@@ -42,20 +81,58 @@ function DirectoryContent() {
 
   const [searchQuery, setSearchQuery] = useState(initialQuery);
   const deferredSearchQuery = useDeferredValue(searchQuery);
+  const [isMobile, setIsMobile] = useState(() => {
+    if (typeof window !== "undefined") {
+      return window.innerWidth < 768;
+    }
+    return false;
+  });
   const [viewMode, setViewMode] = useState<ViewMode>(() => {
     if (typeof window !== "undefined") {
+      // On mobile, default to agenda view
+      if (window.innerWidth < 768) {
+        return "agenda";
+      }
       const saved = safeGetItem("directorio-viewMode");
-      if (saved === "grid" || saved === "list" || saved === "extensions") {
+      if (saved === "grid" || saved === "list" || saved === "extensions" || saved === "agenda") {
         return saved as ViewMode;
       }
     }
     return "grid";
   });
 
-  // Persist viewMode to localStorage
+  // Detect viewport changes and auto-switch views
   useEffect(() => {
-    safeSetItem("directorio-viewMode", viewMode);
-  }, [viewMode]);
+    const handleResize = () => {
+      const mobile = window.innerWidth < 768;
+      setIsMobile(mobile);
+      
+      // Auto-switch to agenda on mobile, or to grid on desktop if currently on agenda
+      setViewMode((prev) => {
+        if (mobile && prev !== "agenda" && prev !== "extensions") {
+          return "agenda";
+        }
+        if (!mobile && prev === "agenda") {
+          const saved = safeGetItem("directorio-viewMode");
+          if (saved === "grid" || saved === "list") {
+            return saved as ViewMode;
+          }
+          return "grid";
+        }
+        return prev;
+      });
+    };
+
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
+
+  // Persist viewMode to localStorage (only desktop views)
+  useEffect(() => {
+    if (!isMobile && viewMode !== "agenda") {
+      safeSetItem("directorio-viewMode", viewMode);
+    }
+  }, [viewMode, isMobile]);
 
   // Listen for view mode changes from navbar
   useEffect(() => {
@@ -304,6 +381,26 @@ function DirectoryContent() {
                   </div>
                 </div>
 
+                {/* Active Filter Chips */}
+                <FilterChips
+                  selectedCompanies={selectedCompanies}
+                  selectedDepartment={selectedDepartment}
+                  selectedLocations={selectedLocations}
+                  companies={companies}
+                  onRemoveCompany={(companyId) =>
+                    setSelectedCompanies((prev) =>
+                      prev.filter((id) => id !== companyId)
+                    )
+                  }
+                  onRemoveDepartment={() => setSelectedDepartment("all")}
+                  onRemoveLocation={(location) =>
+                    setSelectedLocations((prev) =>
+                      prev.filter((loc) => loc !== location)
+                    )
+                  }
+                  onClearAll={clearFilters}
+                />
+
                 {/* Extensions View - Full width table */}
                 {viewMode === "extensions" ? (
                   <ExtensionDirectory
@@ -312,6 +409,18 @@ function DirectoryContent() {
                     selectedLocations={selectedLocations}
                     searchQuery={searchQuery}
                   />
+                ) : viewMode === "agenda" ? (
+                  <>
+                    {/* Results count for agenda view */}
+                    <p className="text-sm text-muted-foreground mb-4" role="status" aria-live="polite" aria-atomic="true">
+                      Mostrando {filteredEmployees.length} empleados
+                    </p>
+                    <AgendaView
+                      employees={filteredEmployees}
+                      companies={companies}
+                      selectedCompanies={selectedCompanies}
+                    />
+                  </>
                 ) : (
                   <>
                     {/* Results count - with live region for screen readers */}
@@ -321,8 +430,14 @@ function DirectoryContent() {
                     </p>
 
                     {/* Employee Grid/List - Single column on mobile */}
+                    <AnimatePresence mode="wait">
                     {paginatedEmployees.length > 0 ? (
-                    <div
+                    <motion.div
+                        key={`grid-${currentPage}-${selectedCompanies.join('-')}-${selectedDepartment}-${selectedLocations.join('-')}`}
+                        variants={getContainerVariants(isMobile)}
+                        initial="hidden"
+                        animate="visible"
+                        exit="exit"
                         className={
                           viewMode === "grid"
                               ? "flex flex-col gap-4"
@@ -340,18 +455,28 @@ function DirectoryContent() {
                         const hideCompanyBadge =
                             selectedCompanies.length === 1 &&
                             selectedCompanies.includes(employee.company);
+                        
+                        // Performance: Only animate first MAX_ANIMATED_CARDS cards with stagger
+                        const shouldAnimate = index < MAX_ANIMATED_CARDS && showCardAnimation;
+                        
                         return (
+                          <motion.div
+                            key={employee.id}
+                            variants={shouldAnimate ? getCardVariants(isMobile) : undefined}
+                            initial={shouldAnimate ? "hidden" : { opacity: 1 }}
+                            animate={shouldAnimate ? "visible" : { opacity: 1 }}
+                          >
                             <EmployeeCard
-                                key={employee.id}
                                 employee={employee}
                                 company={company}
-                                view={viewMode}
-                                index={showCardAnimation ? index : -1}
+                                view={viewMode as "grid" | "list"}
+                                index={-1}
                                 hideCompanyBadge={hideCompanyBadge}
                             />
+                          </motion.div>
                         );
                       })}
-                    </div>
+                    </motion.div>
                 ) : (
                     <motion.div
                         initial={{ opacity: 0 }}
@@ -372,6 +497,7 @@ function DirectoryContent() {
                       </Button>
                     </motion.div>
                 )}
+                </AnimatePresence>
 
                 {/* Pagination */}
                 {totalPages > 1 && (

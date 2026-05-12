@@ -56,7 +56,6 @@ export type ViewMode = "grid" | "list";
 export const viewport: Viewport = {
   themeColor: '#0C0E11',
   viewportFit: 'cover',
-  colorScheme: 'dark',
   width: 'device-width',
   initialScale: 1,
 }
@@ -67,7 +66,7 @@ export default function RootLayout({
   children: React.ReactNode
 }>) {
   return (
-    <html lang="es" className={`${neuropol.variable} ${orbitron.variable} dark`} style={{ colorScheme: 'dark' }} suppressHydrationWarning>
+    <html lang="es" className={`${neuropol.variable} ${orbitron.variable}`} suppressHydrationWarning>
       <head>
       </head>
       <body className={`${dmSans.variable} font-dm-sans antialiased`}>
@@ -75,6 +74,8 @@ export default function RootLayout({
           attribute="class"
           defaultTheme="dark"
           enableSystem={false}
+          storageKey="shuma-theme"
+          themes={['dark', 'light']}
         >
           <FontScaleProvider>
             <CompanyThemeProvider>

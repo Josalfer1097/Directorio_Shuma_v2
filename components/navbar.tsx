@@ -3,12 +3,13 @@
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useState, useEffect, useRef, useMemo, useCallback } from "react";
-import { LayoutGrid, List, Menu, X, Phone } from "lucide-react";
+import { LayoutGrid, List, Menu, X, Phone, AlignJustify } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import type { ViewMode } from "@/types";
 import { cn } from "@/lib/utils";
 import { getEmployees } from "@/lib/data";
 import { FontScaleControl } from "./font-scale-control";
+import { ThemeToggle } from "./theme-toggle";
 
 export function Navbar() {
   const pathname = usePathname();
@@ -78,7 +79,11 @@ export function Navbar() {
   }, []);
 
   const toggleViewMode = () => {
-    const nextView = viewMode === "grid" ? "list" : "grid";
+    // Cycle: grid -> list -> agenda -> grid (desktop only for agenda)
+    const viewCycle: ViewMode[] = ["grid", "list", "agenda"];
+    const currentIndex = viewCycle.indexOf(viewMode);
+    const nextIndex = (currentIndex + 1) % viewCycle.length;
+    const nextView = viewCycle[nextIndex];
     setViewMode(nextView);
     localStorage.setItem("shuma-view-mode", nextView);
     window.dispatchEvent(new CustomEvent("view-mode-change", { detail: nextView }));
@@ -155,7 +160,7 @@ export function Navbar() {
             {/* Separator — only shown if pageName exists */}
             {pageName && (
               <span className="nav-separator" style={{
-                color: 'rgba(255,255,255,0.18)',
+                color: 'var(--border-subtle)',
                 fontSize: '0.85rem',
                 fontWeight: 300,
                 lineHeight: 1,
@@ -173,7 +178,7 @@ export function Navbar() {
                   fontFamily: 'Neuropol, var(--font-orbitron), monospace',
                   fontSize: '0.75rem',
                   fontWeight: 400,
-                  color: 'rgba(255,255,255,0.60)',
+                  color: 'var(--muted-foreground)',
                   letterSpacing: '0.14em',
                   marginTop: '1px',
                 }}
@@ -193,26 +198,13 @@ export function Navbar() {
             )}
           >
             Directorio
-            <span className="px-1.5 py-0.5 rounded-full text-[9px] bg-white/8 border border-white/12 text-white/60">
+            <span className="px-1.5 py-0.5 rounded-full text-[9px] bg-muted border border-border-subtle text-muted-foreground">
               {employeeCount}
             </span>
             {pathname === "/directorio" && (
               <span className="absolute -bottom-1.5 left-0 right-0 h-0.5 bg-gradient-to-r from-[#C9A84C] to-[#E0C060] rounded-full" />
             )}
           </Link>
-          <Link 
-            href="/organigrama" 
-            className={cn(
-              "hidden md:block font-neuropol text-[12px] uppercase tracking-wider transition-colors active:scale-95 relative",
-              pathname === "/organigrama" ? "text-text-primary" : "text-text-muted hover:text-text-primary"
-            )}
-          >
-            Organigrama
-            {pathname === "/organigrama" && (
-              <span className="absolute -bottom-1.5 left-0 right-0 h-0.5 bg-gradient-to-r from-[#C9A84C] to-[#E0C060] rounded-full" />
-            )}
-          </Link>
-
 
           {/* Font Scale Control */}
           <FontScaleControl />
@@ -228,8 +220,8 @@ export function Navbar() {
                 width: "36px",
                 height: "36px",
                 borderRadius: "8px",
-                background: isQuickSoloActive ? "rgba(0,201,167,0.15)" : "rgba(255,255,255,0.05)",
-                border: isQuickSoloActive ? "1px solid #00C9A7" : "1px solid rgba(255,255,255,0.08)",
+                background: isQuickSoloActive ? "rgba(0,201,167,0.15)" : "var(--bg-elevated)",
+                border: isQuickSoloActive ? "1px solid #00C9A7" : "1px solid var(--border-subtle)",
                 boxShadow: isQuickSoloActive ? "0 0 8px rgba(0,201,167,0.25)" : "none",
               }}
               onMouseOver={(e) => {
@@ -242,16 +234,16 @@ export function Navbar() {
               }}
               onMouseOut={(e) => {
                 if (!isQuickSoloActive) {
-                  e.currentTarget.style.background = "rgba(255,255,255,0.05)";
-                  e.currentTarget.style.borderColor = "rgba(255,255,255,0.08)";
+                  e.currentTarget.style.background = "var(--bg-elevated)";
+                  e.currentTarget.style.borderColor = "var(--border-subtle)";
                   const icon = e.currentTarget.querySelector("svg");
-                  if (icon) (icon as SVGElement).style.color = "rgba(255,255,255,0.6)";
+                  if (icon) (icon as SVGElement).style.color = "var(--muted-foreground)";
                 }
               }}
             >
               <Phone 
                 className="w-4 h-4" 
-                style={{ color: isQuickSoloActive ? "#00C9A7" : "rgba(255,255,255,0.6)" }} 
+                style={{ color: isQuickSoloActive ? "#00C9A7" : "var(--muted-foreground)" }} 
               />
             </button>
             
@@ -260,10 +252,10 @@ export function Navbar() {
               <div
                 className="absolute top-full left-1/2 -translate-x-1/2 mt-2 px-2 py-1 whitespace-nowrap pointer-events-none z-50 text-scale-xs"
                 style={{
-                  background: "#1A1A1A",
-                  border: "1px solid rgba(255,255,255,0.10)",
+                  background: "var(--bg-surface)",
+                  border: "1px solid var(--border-subtle)",
                   borderRadius: "6px",
-                  color: "rgba(255,255,255,0.8)",
+                  color: "var(--foreground)",
                 }}
               >
                 Extensiones rapidas
@@ -280,16 +272,21 @@ export function Navbar() {
             )}
           </div>
 
-          {/* View Toggle - Always visible */}
+          {/* Theme Toggle */}
+          <ThemeToggle />
+
+          {/* View Toggle - Hidden on mobile (agenda is default there) */}
           <button
             onClick={toggleViewMode}
-            className="p-2 text-text-muted hover:text-text-primary transition-all active:scale-95 group relative"
-            title={viewMode === "grid" ? "Vista compacta" : "Vista tarjetas"}
+            className="hidden md:block p-2 text-text-muted hover:text-text-primary transition-all active:scale-95 group relative"
+            title={viewMode === "grid" ? "Vista lista" : viewMode === "list" ? "Vista agenda" : "Vista tarjetas"}
           >
             {viewMode === "grid" ? (
               <LayoutGrid className="w-5 h-5 transition-transform group-hover:scale-110" />
-            ) : (
+            ) : viewMode === "list" ? (
               <List className="w-5 h-5 transition-transform group-hover:scale-110" />
+            ) : (
+              <AlignJustify className="w-5 h-5 transition-transform group-hover:scale-110" />
             )}
             <div className="absolute inset-0 rounded-full blur-[8px] opacity-0 group-hover:opacity-100 bg-gradient-to-r from-irid-a to-irid-b transition-opacity -z-10" />
           </button>
@@ -337,10 +334,10 @@ export function Navbar() {
             transition={{ duration: 0.25, ease: [0.25, 0.46, 0.45, 0.94] }}
             className="fixed top-[56px] md:top-[64px] left-0 right-0 z-50 md:hidden"
             style={{
-              background: "rgba(15, 15, 26, 0.95)",
+              background: "var(--bg-surface)",
               WebkitBackdropFilter: "blur(20px)",
               backdropFilter: "blur(20px)",
-              borderBottom: "1px solid rgba(255,255,255,0.08)",
+              borderBottom: "1px solid var(--border-subtle)",
             }}
           >
             <nav className="container mx-auto px-4 py-4 flex flex-col gap-2">
@@ -350,23 +347,11 @@ export function Navbar() {
                 className={cn(
                   "font-neuropol text-base uppercase tracking-wider py-3 px-4 rounded-lg transition-all min-h-[52px] flex items-center touch-manipulation",
                   pathname === "/directorio" 
-                    ? "text-text-primary bg-white/5" 
-                    : "text-text-muted hover:text-text-primary hover:bg-white/5"
+                    ? "text-text-primary bg-muted" 
+                    : "text-text-muted hover:text-text-primary hover:bg-muted"
                 )}
               >
                 Directorio
-              </Link>
-              <Link 
-                href="/organigrama"
-                onClick={() => setMobileMenuOpen(false)}
-                className={cn(
-                  "font-neuropol text-base uppercase tracking-wider py-3 px-4 rounded-lg transition-all min-h-[52px] flex items-center touch-manipulation",
-                  pathname === "/organigrama" 
-                    ? "text-text-primary bg-white/5" 
-                    : "text-text-muted hover:text-text-primary hover:bg-white/5"
-                )}
-              >
-                Organigrama
               </Link>
             </nav>
           </motion.div>

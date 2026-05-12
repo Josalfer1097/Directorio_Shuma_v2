@@ -100,6 +100,100 @@
   --safe-right: env(safe-area-inset-right, 0);
   --safe-bottom: env(safe-area-inset-bottom, 0);
   --safe-left: env(safe-area-inset-left, 0);
+  
+  /* Org-chart node colors (dark mode) */
+  --node-bg: #161625;
+  --node-text: #F2F0EC;
+  --node-text-muted: #64647A;
+  --node-border: rgba(255, 255, 255, 0.12);
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   LIGHT MODE THEME
+   ═══════════════════════════════════════════════════════════════════ */
+
+.light {
+  --theme-primary: #00C9A7;
+  --theme-secondary: #845EC2;
+  --theme-glow: rgba(0,201,167,0.15);
+  --theme-navbar-tint: rgba(255,255,255,0.8);
+  --theme-bg-glow-a: rgba(0,201,167,0.08);
+  --theme-bg-glow-b: rgba(132,94,194,0.06);
+  
+  /* Base Colors - Light Mode */
+  --bg-base: #f4f4f8;
+  --bg-surface: #ffffff;
+  --bg-elevated: #fafafd;
+  --border-subtle: rgba(0, 0, 0, 0.08);
+  --border-strong: rgba(0, 0, 0, 0.12);
+  --text-primary: #0a0a0f;
+  --text-muted: #555566;
+  --text-faint: #888899;
+  
+  /* Global Accent */
+  --gold: #C9A84C;
+  --gold-glow: rgba(201, 168, 76, 0.2);
+  --danger: #E05252;
+  
+  /* Company Colors remain the same */
+  --comercializadora-primary: #0047AB;
+  --comercializadora-secondary: #002D6E;
+  --comercializadora-accent: #4D9FFF;
+  
+  --acabados-primary: #C0152A;
+  --acabados-secondary: #8B0000;
+  --acabados-accent: #FF4D5E;
+  
+  --ferrecapital-primary: #4A525A;
+  --ferrecapital-secondary: #1A1A1A;
+  --ferrecapital-accent: #CC0000;
+  
+  --arkiramica-primary: #F5C400;
+  --arkiramica-secondary: #C49A00;
+  --arkiramica-accent: #FFE566;
+  
+  /* Shadcn mapping */
+  --background: var(--bg-base);
+  --foreground: var(--text-primary);
+  --card: var(--bg-surface);
+  --card-foreground: var(--text-primary);
+  --popover: var(--bg-surface);
+  --popover-foreground: var(--text-primary);
+  --primary: var(--gold);
+  --primary-foreground: #f4f4f8;
+  --secondary: var(--bg-elevated);
+  --secondary-foreground: var(--text-primary);
+  --muted: var(--bg-elevated);
+  --muted-foreground: var(--text-muted);
+  --accent: var(--bg-elevated);
+  --accent-foreground: var(--text-primary);
+  --destructive: var(--danger);
+  --destructive-foreground: #ffffff;
+  --border: var(--border-subtle);
+  --input: var(--border-subtle);
+  --ring: var(--gold);
+  --radius: 0.75rem;
+  
+  /* Org-chart node colors (light mode) */
+  --node-bg: #ffffff;
+  --node-text: #0a0a0f;
+  --node-text-muted: #555566;
+  --node-border: rgba(0, 0, 0, 0.10);
+  
+  color-scheme: light;
+}
+
+.light ::-webkit-scrollbar-thumb {
+  background: rgba(0, 0, 0, 0.15);
+  border-radius: 2px;
+}
+
+.light ::-webkit-scrollbar-thumb:hover {
+  background: rgba(0, 0, 0, 0.25);
+}
+
+.light {
+  scrollbar-color: rgba(0, 0, 0, 0.15) transparent;
 }
 
 /* ═══════════════════════════════════════════════════════════════════
@@ -156,6 +250,10 @@
     color-scheme: dark;
     -webkit-text-size-adjust: 100%;
     text-size-adjust: 100%;
+  }
+  
+  .light html {
+    color-scheme: light;
   }
   
   body {
@@ -403,7 +501,7 @@
 
 /* ═══════════════════════════════════════════════════════════════════
    EMPRESA TABS
-   ═══════════════════════════════════════════════════════════════════ */
+   ════════════════════════════════════���══════════════════════════════ */
 
 .empresa-tabs {
   display: flex;
@@ -493,7 +591,7 @@
 
 /* ═══════════════════════════════════════════════════════════════════
    EMPLOYEE CARDS
-   ═══════════════════════════════════════════════════════════════════ */
+   ═════════════════════════════════════════════════════════════════��═ */
 
 .employee-card {
   background: var(--bg-surface);
@@ -989,7 +1087,7 @@
 
 /* ═══════════════════════════════════════════════════════════════════
    TOUCH & INTERACTION POLISH
-   ═══════════════════════════════════════════════════════════════════ */
+   ═════════════════════════════════════════════════════��═════════════ */
 
 /* All tap targets minimum 44x44px */
 .touch-target {
@@ -1300,4 +1398,25 @@ button, a, [role="button"], .clickable {
 }
 *:focus:not(:focus-visible) {
   outline: none;
+}
+
+/* Organigrama "Próximamente" animations */
+@keyframes float-node {
+  0%   { transform: translateY(0px); opacity: 0; }
+  8%   { opacity: 1; }
+  92%  { opacity: 1; }
+  100% { transform: translateY(-60px); opacity: 0; }
+}
+
+@keyframes spin-slow {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+.animate-float-node {
+  animation: float-node linear infinite;
+}
+
+.animate-spin-slow {
+  animation: spin-slow 3s linear infinite;
 }

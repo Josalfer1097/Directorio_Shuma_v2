@@ -79,8 +79,22 @@ export function SmartSearchBar() {
     setIsLoading(true);
     const normalizedQ = normalizeQuery(q);
 
-    // Search employees
-    const employeeMatches = fuseIndex.search(q).map((result) => ({
+    // Search employees - deduplicate raw Fuse results by employee ID first
+    const rawFuseResults = fuseIndex.search(q);
+    
+    // Deduplicate at Fuse result level (before mapping) - keep first occurrence only
+    const seenEmployeeIds = new Set<string>();
+    const dedupedFuseResults = rawFuseResults.filter((result) => {
+      const empId = result.item.id;
+      if (seenEmployeeIds.has(empId)) {
+        return false;
+      }
+      seenEmployeeIds.add(empId);
+      return true;
+    });
+
+    // Now map to SearchResult format - this array is already deduplicated
+    const employeeMatches = dedupedFuseResults.map((result) => ({
       type: "employee" as const,
       id: result.item.id,
       label: result.item.nombreCompleto,
@@ -184,7 +198,7 @@ export function SmartSearchBar() {
       })
     );
 
-    // Combine and limit results
+    // Combine and limit results - employeeMatches already deduplicated
     const allResults = [
       ...employeeMatches.slice(0, 5),
       ...extensionMatches.slice(0, 3),
@@ -341,15 +355,15 @@ export function SmartSearchBar() {
             }}
             onFocus={() => query.length >= 2 && setIsOpen(true)}
             placeholder="Buscar por nombre, empresa, puesto, departamento, extensión..."
-            className="w-full px-4 py-3 pl-12 pr-24 bg-[rgba(15,17,20,0.8)] border border-[rgba(255,255,255,0.1)] rounded-2xl text-white placeholder:text-white/40 focus:outline-none focus:ring-2 focus:ring-offset-0 focus:ring-[rgba(59,130,246,0.4)] transition-all text-scale-base"
+            className="w-full px-4 py-3 pl-12 pr-24 bg-[--bg-surface] border border-border-subtle rounded-2xl text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-offset-0 focus:ring-primary/40 transition-all text-scale-base"
           />
 
           {/* Left icon */}
-          <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-white/30 group-focus-within:text-blue-400 transition-colors" />
+          <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground group-focus-within:text-blue-400 transition-colors" />
 
           {/* Right side: keyboard shortcut or loading */}
           {!isLoading && !query && (
-            <div className="absolute right-4 top-1/2 -translate-y-1/2 flex items-center gap-1 px-2 py-1 rounded bg-white/5 border border-white/10 text-xs text-white/40">
+            <div className="absolute right-4 top-1/2 -translate-y-1/2 flex items-center gap-1 px-2 py-1 rounded bg-muted border border-border-subtle text-xs text-muted-foreground">
               <kbd className="font-mono">⌘K</kbd>
             </div>
           )}
@@ -361,7 +375,7 @@ export function SmartSearchBar() {
           )}
 
           {query && !isLoading && results.length > 0 && (
-            <div className="absolute right-4 top-1/2 -translate-y-1/2 px-2 py-1 rounded bg-white/5 border border-white/10 text-xs text-white/60 font-medium">
+            <div className="absolute right-4 top-1/2 -translate-y-1/2 px-2 py-1 rounded bg-muted border border-border-subtle text-xs text-foreground font-medium">
               {results.length} resultados
             </div>
           )}
@@ -376,12 +390,12 @@ export function SmartSearchBar() {
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -8 }}
             transition={{ duration: 0.15, ease: "easeOut" }}
-            className="absolute top-full left-0 right-0 mt-2 z-50 bg-[rgba(15,17,20,0.95)] backdrop-blur-lg border border-white/10 rounded-xl shadow-2xl max-h-[400px] overflow-y-auto"
+            className="absolute top-full left-0 right-0 mt-2 z-50 bg-[--bg-surface] backdrop-blur-lg border border-border-subtle rounded-xl shadow-2xl max-h-[400px] overflow-y-auto"
           >
             {results.length === 0 ? (
               <div className="flex flex-col items-center justify-center py-12 px-4">
-                <Ghost className="w-8 h-8 text-white/20 mb-2" />
-                <p className="text-white/40 text-sm">Sin resultados para "{query}"</p>
+                <Ghost className="w-8 h-8 text-muted-foreground mb-2" />
+                <p className="text-muted-foreground text-sm">Sin resultados para "{query}"</p>
               </div>
             ) : (
               <div className="py-2">
@@ -391,9 +405,9 @@ export function SmartSearchBar() {
                   return (
                     <div key={type}>
                       {groupIndex > 0 && (
-                        <div className="my-1 mx-2 border-t border-white/5" />
+                        <div className="my-1 mx-2 border-t border-border-subtle" />
                       )}
-                      <div className="px-3 py-1.5 text-xs font-semibold text-white/40 uppercase tracking-wider">
+                      <div className="px-3 py-1.5 text-xs font-semibold text-muted-foreground uppercase tracking-wider">
                         {groupLabels[type]}
                       </div>
                       {items.map((result, index) => {
@@ -415,31 +429,31 @@ export function SmartSearchBar() {
                             onMouseEnter={() => setSelectedIndex(globalIndex)}
                             className={`w-full px-3 py-2.5 flex items-start gap-3 transition-all text-left group ${
                               isSelected
-                                ? "bg-white/10"
-                                : "hover:bg-white/5"
+                                ? "bg-muted"
+                                : "hover:bg-muted/50"
                             }`}
                           >
                             <div
                               className={`flex-shrink-0 w-8 h-8 rounded-lg flex items-center justify-center transition-colors mt-0.5 ${
                                 isSelected
                                   ? "bg-blue-500/30 text-blue-300"
-                                  : "bg-white/5 text-white/50 group-hover:bg-white/10"
+                                  : "bg-muted text-muted-foreground group-hover:bg-muted/80"
                               }`}
                             >
                               {getResultIcon(result.type)}
                             </div>
 
                             <div className="flex-1 min-w-0">
-                              <div className="font-medium text-white text-sm truncate">
+                              <div className="font-medium text-foreground text-sm truncate">
                                 {result.label}
                               </div>
                               {result.secondary && (
-                                <div className="text-xs text-white/40 truncate">
+                                <div className="text-xs text-muted-foreground truncate">
                                   {result.secondary}
                                 </div>
                               )}
                               {hasContactInfo && (
-                                <div className="mt-1.5 flex items-center gap-4 text-xs text-white/40">
+                                <div className="mt-1.5 flex items-center gap-4 text-xs text-muted-foreground">
                                   {result.data?.extension && (
                                     <div className="flex items-center gap-1.5">
                                       <Phone className="w-3.5 h-3.5 flex-shrink-0" />
