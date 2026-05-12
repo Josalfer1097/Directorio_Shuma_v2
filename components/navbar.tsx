@@ -205,19 +205,6 @@ export function Navbar() {
               <span className="absolute -bottom-1.5 left-0 right-0 h-0.5 bg-gradient-to-r from-[#C9A84C] to-[#E0C060] rounded-full" />
             )}
           </Link>
-          <Link 
-            href="/organigrama" 
-            className={cn(
-              "hidden md:block font-neuropol text-[12px] uppercase tracking-wider transition-colors active:scale-95 relative",
-              pathname === "/organigrama" ? "text-text-primary" : "text-text-muted hover:text-text-primary"
-            )}
-          >
-            Organigrama
-            {pathname === "/organigrama" && (
-              <span className="absolute -bottom-1.5 left-0 right-0 h-0.5 bg-gradient-to-r from-[#C9A84C] to-[#E0C060] rounded-full" />
-            )}
-          </Link>
-
 
           {/* Font Scale Control */}
           <FontScaleControl />
@@ -365,18 +352,6 @@ export function Navbar() {
                 )}
               >
                 Directorio
-              </Link>
-              <Link 
-                href="/organigrama"
-                onClick={() => setMobileMenuOpen(false)}
-                className={cn(
-                  "font-neuropol text-base uppercase tracking-wider py-3 px-4 rounded-lg transition-all min-h-[52px] flex items-center touch-manipulation",
-                  pathname === "/organigrama" 
-                    ? "text-text-primary bg-muted" 
-                    : "text-text-muted hover:text-text-primary hover:bg-muted"
-                )}
-              >
-                Organigrama
               </Link>
             </nav>
           </motion.div>
