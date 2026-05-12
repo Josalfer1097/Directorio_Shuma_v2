@@ -1087,7 +1087,7 @@
 
 /* ═══════════════════════════════════════════════════════════════════
    TOUCH & INTERACTION POLISH
-   ═══════════════════════════════════════════════════════════════════ */
+   ═════════════════════════════════════════════════════��═════════════ */
 
 /* All tap targets minimum 44x44px */
 .touch-target {
@@ -1398,4 +1398,25 @@ button, a, [role="button"], .clickable {
 }
 *:focus:not(:focus-visible) {
   outline: none;
+}
+
+/* Organigrama "Próximamente" animations */
+@keyframes float-node {
+  0%   { transform: translateY(0px); opacity: 0; }
+  8%   { opacity: 1; }
+  92%  { opacity: 1; }
+  100% { transform: translateY(-60px); opacity: 0; }
+}
+
+@keyframes spin-slow {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+.animate-float-node {
+  animation: float-node linear infinite;
+}
+
+.animate-spin-slow {
+  animation: spin-slow 3s linear infinite;
 }
