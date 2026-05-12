@@ -56,9 +56,9 @@ export function DepartmentView({ department, onClose }: DepartmentViewProps) {
     );
   }, [employees, department]);
 
-  // Find manager (highest tier role)
-  const manager = useMemo(() => {
-    if (departmentEmployees.length === 0) return null;
+  // Find managers (highest tier roles, including multiple at same level)
+  const managers = useMemo(() => {
+    if (departmentEmployees.length === 0) return [];
 
     const tierPriority = (position: string | null | undefined): number => {
       if (!position) return 0;
@@ -69,20 +69,27 @@ export function DepartmentView({ department, onClose }: DepartmentViewProps) {
       return 0;
     };
 
-    const sorted = [...departmentEmployees].sort(
-      (a, b) => tierPriority(b.position) - tierPriority(a.position)
-    );
+    const withTier = departmentEmployees.map((emp) => ({
+      ...emp,
+      tier: tierPriority(emp.position),
+    }));
 
-    return tierPriority(sorted[0]?.position) > 0 ? sorted[0] : null;
+    const maxTier = Math.max(...withTier.map((emp) => emp.tier));
+    if (maxTier === 0) return [];
+
+    return withTier
+      .filter((emp) => emp.tier === maxTier)
+      .sort((a, b) => a.name.localeCompare(b.name, "es"));
   }, [departmentEmployees]);
 
-  // Team members (excluding manager)
+  // Team members (excluding managers)
   const teamMembers = useMemo(() => {
-    if (!manager) return departmentEmployees.sort((a, b) => a.name.localeCompare(b.name, "es"));
+    if (managers.length === 0) return departmentEmployees.sort((a, b) => a.name.localeCompare(b.name, "es"));
+    const managerIds = new Set(managers.map((m) => m.id));
     return departmentEmployees
-      .filter((emp) => emp.id !== manager.id)
+      .filter((emp) => !managerIds.has(emp.id))
       .sort((a, b) => a.name.localeCompare(b.name, "es"));
-  }, [departmentEmployees, manager]);
+  }, [departmentEmployees, managers]);
 
   // Group team by company if they span multiple companies
   const teamByCompany = useMemo(() => {
@@ -272,7 +279,7 @@ export function DepartmentView({ department, onClose }: DepartmentViewProps) {
               ) : (
                 <>
                   {/* Manager Section */}
-                  {manager && (
+                  {managers.length > 0 && (
                     <section
                       style={{
                         padding: "24px",
@@ -284,27 +291,48 @@ export function DepartmentView({ department, onClose }: DepartmentViewProps) {
                         className="mb-3 text-scale-xs"
                         style={{
                           letterSpacing: "0.18em",
-                          color: getCompanyConfig(manager.company).primary,
+                          color: getCompanyConfig(managers[0].company).primary,
                           textTransform: "uppercase",
                         }}
                       >
-                        RESPONSABLE DEL AREA
+                        RESPONSABLE{managers.length > 1 ? "S" : ""} DEL AREA
                       </p>
 
-                      <div className="max-w-[480px] mx-auto">
-                        <EmployeeCard
-                          employee={manager}
-                          company={getCompany(manager)}
-                          view="grid"
-                          index={-1}
-                          hideCompanyBadge={false}
-                        />
-                      </div>
+                      {managers.length === 1 ? (
+                        <div className="max-w-[480px] mx-auto">
+                          <EmployeeCard
+                            employee={managers[0]}
+                            company={getCompany(managers[0])}
+                            view="grid"
+                            index={-1}
+                            hideCompanyBadge={false}
+                          />
+                        </div>
+                      ) : (
+                        <div
+                          className="grid gap-3"
+                          style={{
+                            gridTemplateColumns: "repeat(auto-fit, minmax(calc(260px * var(--font-scale, 1)), 1fr))",
+                            gap: "calc(12px * var(--font-scale, 1))",
+                          }}
+                        >
+                          {managers.map((emp) => (
+                            <EmployeeCard
+                              key={emp.id}
+                              employee={emp}
+                              company={getCompany(emp)}
+                              view="grid"
+                              index={-1}
+                              hideCompanyBadge={false}
+                            />
+                          ))}
+                        </div>
+                      )}
                     </section>
                   )}
 
                   {/* Divider */}
-                  {manager && teamMembers.length > 0 && (
+                  {managers.length > 0 && teamMembers.length > 0 && (
                     <div 
                       className="relative flex items-center justify-center"
                       style={{ 
