@@ -1,143 +1,84 @@
-"use client";
+'use client';
 
-import { memo, useState } from "react";
-import { Handle, Position } from "@xyflow/react";
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
-import type { Employee } from "@/types";
-import { cn } from "@/lib/utils";
-import { getCompanyConfig } from "@/lib/companyConfig";
+import { memo } from 'react';
+import type { Employee, Company } from '@/types';
 
-interface OrgNodeData {
-  employee: Employee;
-  isCollapsed?: boolean;
-  hasChildren?: boolean;
-  onToggle?: () => void;
-  onSelect?: () => void;
-}
+const NODE_WIDTH = 220;
+const NODE_HEIGHT = 88;
 
 interface OrgChartNodeProps {
-  data: OrgNodeData;
+  employee: Employee;
+  company: Company;
+  isHovered: boolean;
+  onHover: (id: string | null) => void;
 }
 
-function OrgChartNodeComponent({ data }: OrgChartNodeProps) {
-  const { employee, onSelect } = data;
-  const [isHovered, setIsHovered] = useState(false);
-  
-  const colors = getCompanyConfig(employee.company);
-
-  const getInitials = (name: string) => {
-    return name
-      .split(" ")
-      .map((n) => n[0])
-      .slice(0, 2)
-      .join("")
-      .toUpperCase();
+const getCompanyColor = (companyId: string): string => {
+  const colors: Record<string, string> = {
+    comercializadora: '#2563eb',
+    acabados: '#dc2626',
+    ferrecapital: '#7c3aed',
+    grupo: '#059669',
   };
+  return colors[companyId] || '#6b7280';
+};
+
+const getInitials = (name: string): string => {
+  return name
+    .split(' ')
+    .map((n) => n[0])
+    .join('')
+    .toUpperCase()
+    .slice(0, 2);
+};
+
+export const OrgChartNode = memo(function OrgChartNode({
+  employee,
+  company,
+  isHovered,
+  onHover,
+}: OrgChartNodeProps) {
+  const bgColor = getCompanyColor(company.id);
 
   return (
-    <>
-      <Handle
-        type="target"
-        position={Position.Top}
-        className="!w-2 !h-2 !bg-primary/50 !border-none"
-      />
+    <div
+      style={{
+        width: NODE_WIDTH,
+        height: NODE_HEIGHT,
+      }}
+      className="node-card"
+      onMouseEnter={() => onHover(employee.id)}
+      onMouseLeave={() => onHover(null)}
+    >
+      <div
+        className="flex h-full gap-2 rounded-xl border bg-[--node-bg] p-2 transition-all duration-[180ms]"
+        style={{
+          borderColor: 'var(--node-border)',
+          boxShadow: isHovered ? '0 8px 24px rgba(0,0,0,0.2)' : 'none',
+          transform: isHovered ? 'scale(1.05)' : 'scale(1)',
+        }}
+      >
+        {/* Avatar */}
+        <div
+          className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-full text-xs font-bold text-white"
+          style={{ backgroundColor: bgColor }}
+        >
+          {getInitials(employee.name)}
+        </div>
 
-      <TooltipProvider>
-        <Tooltip>
-          <TooltipTrigger asChild>
-            <div
-              onClick={onSelect}
-              onMouseEnter={() => setIsHovered(true)}
-              onMouseLeave={() => setIsHovered(false)}
-              className={cn(
-                "relative overflow-hidden bg-[--node-bg] rounded-xl transition-all duration-[180ms] group cursor-pointer touch-manipulation",
-                "shadow-xl shadow-black/20"
-              )}
-              style={{ 
-                width: '220px',
-                height: '80px',
-                borderWidth: '1px',
-                borderStyle: 'solid',
-                borderLeftWidth: '3px',
-                borderLeftColor: colors.accent || colors.primary,
-                borderColor: isHovered ? colors.primary : 'var(--node-border)',
-                boxShadow: isHovered ? `0 8px 32px ${colors.glow}` : undefined,
-                transform: isHovered ? 'scale(1.03)' : 'none',
-                background: isHovered 
-                  ? `linear-gradient(180deg, ${colors.glow} 0%, var(--node-bg) 40%)`
-                  : 'var(--node-bg)',
-                padding: '8px 10px',
-              }}
-            >
-              {/* Left Accent Bar */}
-              <div 
-                className="absolute left-0 top-0 bottom-0 rounded-l-xl transition-all duration-[180ms] z-20"
-                style={{ 
-                  width: isHovered ? '5px' : '3px',
-                  background: colors.accent 
-                    ? `linear-gradient(180deg, ${colors.accent}, ${colors.primary})` 
-                    : `linear-gradient(180deg, ${colors.primary}, ${colors.secondary})`
-                }}
-              />
-
-              <div className="flex items-center gap-3 relative z-10 pl-1">
-                <div 
-                  className="w-9 h-9 rounded-full flex items-center justify-center text-xs font-bold text-foreground shrink-0 shadow-lg transition-all duration-[180ms]"
-                  style={{ 
-                    background: `linear-gradient(135deg, ${colors.primary}, ${colors.secondary})`,
-                    border: colors.accent ? `2px solid ${colors.accent}` : 'none',
-                    transform: isHovered ? 'scale(1.1)' : 'none',
-                  }}
-                >
-                  {getInitials(employee.name)}
-                </div>
-
-                <div className="min-w-0 flex-1">
-                  <h4 
-                    className="text-[--node-text] leading-tight line-clamp-2 text-scale-xs font-neuropol"
-                    style={{ 
-                      wordWrap: 'break-word',
-                      whiteSpace: 'normal',
-                    }}
-                  >
-                    {employee.name}
-                  </h4>
-                  <p 
-                    className="font-dm-sans italic text-[--node-text-muted] mt-0.5 leading-tight text-scale-xs"
-                  >
-                    {employee.position}
-                  </p>
-                </div>
-              </div>
-
-              {/* Company watermark in node */}
-              <div 
-                className="absolute bottom-[-10px] right-[-5px] font-neuropol text-[40px] pointer-events-none select-none transition-opacity duration-[180ms]"
-                style={{ 
-                  color: colors.primary,
-                  opacity: isHovered ? 0.08 : 0.04,
-                }}
-              >
-                {colors.initial}
-              </div>
-            </div>
-          </TooltipTrigger>
-          <TooltipContent side="top" className="bg-[--bg-surface] border-border-subtle">
-            <div className="text-xs">
-              <p className="font-medium text-text-primary">{employee.department}</p>
-              <p className="text-text-muted">{employee.email}</p>
-            </div>
-          </TooltipContent>
-        </Tooltip>
-      </TooltipProvider>
-
-      <Handle
-        type="source"
-        position={Position.Bottom}
-        className="!w-2 !h-2 !bg-primary/50 !border-none"
-      />
-    </>
+        {/* Content */}
+        <div className="min-w-0 flex-1">
+          <div className="line-clamp-1 text-scale-xs font-semibold text-[--node-text]">
+            {employee.name}
+          </div>
+          <div className="line-clamp-1 text-scale-xs text-[--node-text-muted]">
+            {employee.position}
+          </div>
+          <div className="line-clamp-1 text-scale-xs text-[--node-text-muted]">
+            • {company.shortName || company.name}
+          </div>
+        </div>
+      </div>
+    </div>
   );
-}
-
-export const OrgChartNode = memo(OrgChartNodeComponent);
+});

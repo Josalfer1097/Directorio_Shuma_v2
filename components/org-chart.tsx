@@ -1,175 +1,80 @@
-"use client";
+'use client';
 
-import { useState, useMemo, useEffect } from "react";
-import {
-  ReactFlow,
-  Controls,
-  MiniMap,
-  Background,
-  useReactFlow,
-  ReactFlowProvider,
-  type Node,
-  type Edge,
-  BackgroundVariant,
-} from "@xyflow/react";
-import "@xyflow/react/dist/style.css";
-import { OrgChartNode } from "./org-chart-node";
-import type { Company, OrgChartLayout, Employee } from "@/types";
-import { cn } from "@/lib/utils";
-import { getEmployees, getCompanies } from "@/lib/data";
-import { ZoomIn, ZoomOut, Maximize2 } from "lucide-react";
+import { useEffect, useRef, useState, useMemo, useCallback } from 'react';
+import * as d3 from 'd3';
+import { createRoot } from 'react-dom/client';
+import { ZoomIn, ZoomOut, Maximize2 } from 'lucide-react';
+import { OrgChartNode } from './org-chart-node';
+import type { Employee, Company } from '@/types';
+import { cn } from '@/lib/utils';
+import { getEmployees, getCompanies } from '@/lib/data';
 
-import dagre from 'dagre';
+const NODE_WIDTH = 220;
+const NODE_HEIGHT = 88;
+const HORIZONTAL_GAP = 40;
+const VERTICAL_GAP = 80;
 
-const nodeTypes = {
-  orgNode: OrgChartNode,
-};
-
-const getLayoutedElements = (nodes: Node[], edges: Edge[], direction = 'TB', isMobile = false) => {
-  if (nodes.length === 0) {
-    return { nodes: [], edges: [] };
-  }
-
-  const g = new dagre.graphlib.Graph();
-  g.setDefaultEdgeLabel(() => ({}));
-  g.setGraph({ 
-    rankdir: direction,
-    nodesep: direction === 'TB' ? 60 : 40,
-    ranksep: direction === 'TB' ? 100 : 80,
-    marginx: 20,
-    marginy: 20
-  });
-
-  // Node dimensions based on screen size
-  const nodeWidth = isMobile ? 170 : 220;
-  const nodeHeight = isMobile ? 70 : 80;
-
-  nodes.forEach(node => g.setNode(node.id, { width: nodeWidth, height: nodeHeight }));
-  edges.forEach(edge => g.setEdge(edge.source, edge.target));
-  
-  try {
-    dagre.layout(g);
-  } catch (e) {
-    console.warn('[v0] dagre layout failed:', e);
-    // Return nodes with basic positioning if layout fails
-    return {
-      nodes: nodes.map((node, i) => ({
-        ...node,
-        position: { x: (i % 4) * 250, y: Math.floor(i / 4) * 120 }
-      })),
-      edges
-    };
-  }
-
-  return {
-    nodes: nodes.map(node => {
-      const pos = g.node(node.id);
-      if (!pos) {
-        return { ...node, position: { x: 0, y: 0 } };
-      }
-      return { ...node, position: { x: pos.x - nodeWidth / 2, y: pos.y - nodeHeight / 2 } };
-    }),
-    edges
-  };
-};
-
-// Company filter config
-const companyFilters = [
-  { id: "all", label: "Todos", shortLabel: "Todos", color: "#C9A84C" },
-  { id: "comercializadora", label: "Com. Shuma", shortLabel: "C.S", color: "#0047AB" },
-  { id: "acabados", label: "Acabados", shortLabel: "Acab", color: "#C0152A" },
-  { id: "ferrecapital", label: "Ferrecapital", shortLabel: "Ferre", color: "#2C3338" },
-];
-
-interface OrgChartInnerProps {
-  selectedCompany: string;
-  layout: OrgChartLayout;
+interface HierarchyNode extends d3.HierarchyNode<Employee> {
+  x: number;
+  y: number;
 }
 
-function OrgChartInner({ selectedCompany, layout }: OrgChartInnerProps) {
-  const reactFlowInstance = useReactFlow();
-  const employees = getEmployees();
-  const companies = getCompanies().filter(c => !c.disabled);
-  const [isMobile, setIsMobile] = useState(false);
+interface OrgChartProps {
+  initialCompany?: string;
+}
 
-  // Detect mobile on client side only
+export function OrgChart({ initialCompany }: OrgChartProps) {
+  const svgRef = useRef<SVGSVGElement>(null);
+  const gRef = useRef<SVGGElement>(null);
+  const zoomRef = useRef<d3.ZoomBehavior<SVGSVGElement, unknown> | null>(null);
+
+  const [employees, setEmployees] = useState<Employee[]>([]);
+  const [companies, setCompanies] = useState<Company[]>([]);
+  const [selectedCompany, setSelectedCompany] = useState<string>(initialCompany || 'all');
+  const [layout, setLayout] = useState<'vertical' | 'horizontal'>('vertical');
+  const [hoveredNodeId, setHoveredNodeId] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+
+  // Load data
   useEffect(() => {
-    setIsMobile(window.innerWidth < 768);
-    const handleResize = () => setIsMobile(window.innerWidth < 768);
-    window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
+    try {
+      const emps = getEmployees();
+      const comps = getCompanies().filter((c) => !c.disabled);
+      setEmployees(emps);
+      setCompanies(comps);
+    } catch (error) {
+      console.error('Error loading org chart data:', error);
+    } finally {
+      setIsLoading(false);
+    }
   }, []);
 
   // Filter employees by company
   const filteredEmployees = useMemo(() => {
-    const activeEmps = employees.filter(emp => {
-      const company = companies.find(c => c.id === emp.company);
-      return company && !company.disabled;
-    });
-
-    if (selectedCompany === "all") {
-      return activeEmps;
+    if (selectedCompany === 'all') {
+      return employees.filter((emp) => companies.some((c) => c.id === emp.company && !c.disabled));
     }
-    return activeEmps.filter(emp => emp.company === selectedCompany);
-  }, [selectedCompany, employees, companies]);
+    return employees.filter((emp) => emp.company === selectedCompany);
+  }, [employees, selectedCompany, companies]);
 
-  // Create nodes and edges with validation
-  const hierarchyData = useMemo(() => {
-    const nodes: Node[] = [];
-    const edges: Edge[] = [];
+  // Build hierarchy
+  const hierarchyRoot = useMemo(() => {
+    if (filteredEmployees.length === 0) return null;
 
-    // Create a Set of valid employee IDs in the current filtered set
+    // Find root nodes
     const empIds = new Set(filteredEmployees.map((e) => e.id));
-    
-    // Find root nodes (employees with no reportsTo)
-    const rootNodes: typeof filteredEmployees = [];
-    
-    filteredEmployees.forEach((emp) => {
-      const company = companies.find(c => c.id === emp.company);
-      // Skip if company not found (defensive)
-      if (!company) return;
+    const roots = filteredEmployees.filter((emp) => !emp.reportsTo || !empIds.has(emp.reportsTo));
 
-      nodes.push({
-        id: emp.id,
-        type: "orgNode",
-        position: { x: 0, y: 0 },
-        data: {
-          employee: emp,
-          company,
-          label: emp.name ?? 'Sin nombre',
-          position: emp.position ?? '',
-        },
-      });
+    // Create map for building tree
+    const empMap = new Map(filteredEmployees.map((emp) => [emp.id, { ...emp }]));
 
-      // Track root nodes
-      if (!emp.reportsTo || !empIds.has(emp.reportsTo)) {
-        rootNodes.push(emp);
-      }
-
-      // Only create edge if BOTH source and target exist in the current filtered set
-      // This prevents cross-company edges when filtering by a single company
-      if (emp.reportsTo && empIds.has(emp.reportsTo) && empIds.has(emp.id)) {
-        edges.push({
-          id: `edge-${emp.id}-${emp.reportsTo}`,
-          source: emp.reportsTo,
-          target: emp.id,
-          type: "smoothstep",
-          animated: false,
-          style: { 
-            stroke: 'rgba(255,255,255,0.14)', 
-            strokeWidth: 1.5,
-          },
-        });
-      }
-    });
-
-    // If there are multiple root nodes, create a virtual root to connect them
-    if (rootNodes.length > 1) {
-      const virtualRootId = 'virtual-root-shuma';
-      const virtualRootEmployee: Employee = {
-        id: virtualRootId,
+    // If multiple roots, create virtual root
+    let rootEmployee: Employee;
+    if (roots.length > 1) {
+      rootEmployee = {
+        id: '__root__',
         name: 'Grupo Shuma',
-        position: 'Raíz Organizacional',
+        position: 'Holding',
         company: 'comercializadora',
         department: 'Corporativo',
         location: '',
@@ -179,265 +84,307 @@ function OrgChartInner({ selectedCompany, layout }: OrgChartInnerProps) {
         avatar: null,
         reportsTo: null,
       };
-      
-      nodes.push({
-        id: virtualRootId,
-        type: "orgNode",
-        position: { x: 0, y: 0 },
-        data: {
-          employee: virtualRootEmployee,
-          company: companies.find(c => c.id === 'comercializadora'),
-          label: 'Grupo Shuma',
-          position: 'Raíz Organizacional',
-        },
+      // Reassign roots to point to virtual root
+      roots.forEach((root) => {
+        const emp = empMap.get(root.id);
+        if (emp) {
+          emp.reportsTo = '__root__';
+        }
       });
-
-      // Connect all root nodes to the virtual root
-      rootNodes.forEach((root) => {
-        edges.push({
-          id: `edge-${root.id}-${virtualRootId}`,
-          source: virtualRootId,
-          target: root.id,
-          type: "smoothstep",
-          animated: false,
-          style: { 
-            stroke: 'rgba(255,255,255,0.14)', 
-            strokeWidth: 1.5,
-          },
-        });
-      });
+    } else {
+      rootEmployee = roots[0] || filteredEmployees[0];
     }
 
-    return getLayoutedElements(nodes, edges, layout === 'horizontal' ? 'LR' : 'TB', isMobile);
-  }, [filteredEmployees, companies, layout, isMobile]);
+    // Build tree recursively
+    const buildTree = (
+      emp: Employee
+    ): Employee & { children?: (Employee & { children?: any[] })[] } => {
+      const children = filteredEmployees
+        .filter((e) => e.reportsTo === emp.id)
+        .map((child) => buildTree(child));
 
-  // Fit view on layout/filter changes with defensive try-catch
+      return {
+        ...emp,
+        ...(children.length > 0 && { children }),
+      };
+    };
+
+    const tree = buildTree(rootEmployee);
+    return d3.hierarchy(tree);
+  }, [filteredEmployees]);
+
+  // Layout calculation
+  const layoutData = useMemo(() => {
+    if (!hierarchyRoot) return { nodes: [], links: [] };
+
+    const treeLayout = d3
+      .tree<Employee>()
+      .nodeSize([NODE_WIDTH + HORIZONTAL_GAP, NODE_HEIGHT + VERTICAL_GAP]);
+
+    const root = treeLayout(hierarchyRoot);
+    const nodes = root.descendants() as HierarchyNode[];
+    const links = root.links();
+
+    return { nodes, links };
+  }, [hierarchyRoot, layout]);
+
+  // Setup zoom behavior
   useEffect(() => {
-    const timer = setTimeout(() => {
-      try {
-        reactFlowInstance.fitView({ padding: 0.15, duration: 400 });
-      } catch (e) {
-        console.warn('[v0] fitView failed:', e);
+    if (!svgRef.current) return;
+
+    const svg = d3.select(svgRef.current);
+    const zoom = d3
+      .zoom<SVGSVGElement, unknown>()
+      .on('zoom', (event) => {
+        d3.select(gRef.current).attr('transform', event.transform);
+      });
+
+    zoomRef.current = zoom;
+    svg.call(zoom);
+  }, []);
+
+  // Render D3
+  useEffect(() => {
+    if (!svgRef.current || !gRef.current || !layoutData.nodes.length) return;
+
+    const svg = d3.select(svgRef.current);
+    const g = d3.select(gRef.current);
+    const { nodes, links } = layoutData;
+
+    // Clear previous
+    g.selectAll('*').remove();
+
+    // Draw links
+    const linkGen =
+      layout === 'horizontal'
+        ? d3
+            .linkHorizontal<any, HierarchyNode>()
+            .x((d) => d.y)
+            .y((d) => d.x)
+        : d3
+            .linkVertical<any, HierarchyNode>()
+            .x((d) => d.x)
+            .y((d) => d.y);
+
+    g.selectAll('path.link')
+      .data(links)
+      .join('path')
+      .attr('class', 'link')
+      .attr('d', linkGen as any)
+      .attr('stroke', 'var(--node-link)')
+      .attr('stroke-width', 1.5)
+      .attr('fill', 'none');
+
+    // Draw nodes
+    const nodeGroups = g
+      .selectAll('g.node')
+      .data(nodes, (d: any) => d.data.id)
+      .join((enter) => {
+        const g = enter.append('g').attr('class', 'node');
+        g.append('foreignObject')
+          .attr('width', NODE_WIDTH)
+          .attr('height', NODE_HEIGHT)
+          .attr('x', -NODE_WIDTH / 2)
+          .attr('y', -NODE_HEIGHT / 2);
+        return g;
+      });
+
+    nodeGroups.attr('transform', (d) =>
+      layout === 'horizontal' ? `translate(${d.y},${d.x})` : `translate(${d.x},${d.y})`
+    );
+
+    // Render React components in foreignObject
+    nodeGroups.select('foreignObject').each((d, i, nodes) => {
+      const node = d as HierarchyNode;
+      const company = companies.find((c) => c.id === node.data.company);
+      if (!company) return;
+
+      const container = nodes[i] as any;
+      container.innerHTML = '';
+
+      const div = document.createElement('div');
+      div.className = 'flex items-center justify-center';
+      div.style.width = NODE_WIDTH + 'px';
+      div.style.height = NODE_HEIGHT + 'px';
+      container.appendChild(div);
+
+      const root = createRoot(div);
+      root.render(
+        <OrgChartNode
+          employee={node.data}
+          company={company}
+          isHovered={hoveredNodeId === node.data.id}
+          onHover={setHoveredNodeId}
+        />
+      );
+    });
+
+    // Auto-fit to view
+    const bounds = g.node()?.getBBox();
+    if (bounds && svgRef.current) {
+      const fullWidth = svgRef.current.clientWidth;
+      const fullHeight = svgRef.current.clientHeight;
+      const midX = bounds.x + bounds.width / 2;
+      const midY = bounds.y + bounds.height / 2;
+      const scale = Math.min(
+        (fullWidth - 80) / bounds.width,
+        (fullHeight - 80) / bounds.height,
+        2
+      );
+
+      svg
+        .transition()
+        .duration(750)
+        .call(
+          zoomRef.current!.transform as any,
+          d3.zoomIdentity
+            .translate(fullWidth / 2, fullHeight / 2)
+            .scale(scale)
+            .translate(-midX, -midY)
+        );
+    }
+  }, [layoutData, layout, companies, hoveredNodeId]);
+
+  const handleZoom = useCallback((direction: 'in' | 'out' | 'fit') => {
+    if (!svgRef.current || !zoomRef.current) return;
+
+    const svg = d3.select(svgRef.current);
+
+    if (direction === 'fit') {
+      const bounds = gRef.current?.getBBox();
+      if (bounds) {
+        const fullWidth = svgRef.current.clientWidth;
+        const fullHeight = svgRef.current.clientHeight;
+        const midX = bounds.x + bounds.width / 2;
+        const midY = bounds.y + bounds.height / 2;
+        const newScale = Math.min(
+          (fullWidth - 80) / bounds.width,
+          (fullHeight - 80) / bounds.height,
+          2
+        );
+        svg
+          .transition()
+          .duration(750)
+          .call(
+            zoomRef.current.transform as any,
+            d3.zoomIdentity
+              .translate(fullWidth / 2, fullHeight / 2)
+              .scale(newScale)
+              .translate(-midX, -midY)
+          );
       }
-    }, 200);
-    return () => clearTimeout(timer);
-  }, [selectedCompany, layout, reactFlowInstance, hierarchyData.nodes]);
-
-  // Zoom handlers
-  const handleZoomIn = () => {
-    try {
-      reactFlowInstance.zoomIn({ duration: 200 });
-    } catch (e) {
-      console.warn('[v0] zoomIn failed:', e);
+    } else {
+      const factor = direction === 'in' ? 1.3 : 0.77;
+      svg
+        .transition()
+        .duration(300)
+        .call(zoomRef.current.scaleBy as any, factor);
     }
-  };
+  }, []);
 
-  const handleZoomOut = () => {
-    try {
-      reactFlowInstance.zoomOut({ duration: 200 });
-    } catch (e) {
-      console.warn('[v0] zoomOut failed:', e);
-    }
-  };
-
-  const handleFitView = () => {
-    try {
-      reactFlowInstance.fitView({ padding: 0.15, duration: 300 });
-    } catch (e) {
-      console.warn('[v0] fitView failed:', e);
-    }
-  };
-
-  return (
-    <ReactFlow
-      nodes={hierarchyData.nodes}
-      edges={hierarchyData.edges}
-      nodeTypes={nodeTypes}
-      nodesDraggable={false}
-      nodesConnectable={false}
-      fitView
-      fitViewOptions={{ padding: 0.12 }}
-      minZoom={0.1}
-      maxZoom={2}
-      proOptions={{ hideAttribution: true }}
-      panOnDrag={true}
-      panOnScroll={!isMobile}
-      zoomOnScroll={!isMobile}
-      zoomOnPinch={true}
-      selectionOnDrag={false}
-    >
-      <Background
-        variant={BackgroundVariant.Dots}
-        gap={20}
-        size={1}
-        color="var(--foreground)"
-        style={{ opacity: 0.1 }}
-      />
-
-      {/* Controls - hidden, using custom zoom buttons instead */}
-      <Controls
-        showInteractive={false}
-        position="bottom-right"
-        className="!hidden"
-      />
-
-      {/* MiniMap - hidden on mobile */}
-      <MiniMap
-        nodeColor={(node) => {
-          const data = node.data as { company: Company };
-          return data?.company?.colors?.primary || "var(--irid-a)";
-        }}
-        maskColor="rgba(0, 0, 0, 0.3)"
-        className="!bg-[--bg-surface]/80 !backdrop-blur-md !border-border-subtle !rounded-lg hidden md:block"
-      />
-
-      {/* Custom Zoom Buttons - Always visible */}
-      <div className="absolute bottom-4 right-4 z-10 flex flex-col gap-1 bg-[--bg-surface]/90 backdrop-blur-xl border border-border-subtle rounded-xl p-1 shadow-xl">
-        <button
-          onClick={handleZoomIn}
-          className="flex items-center justify-center w-9 h-9 md:w-10 md:h-10 rounded-lg text-text-muted hover:text-text-primary hover:bg-muted/50 transition-colors touch-manipulation"
-          aria-label="Acercar"
-          title="Acercar"
-        >
-          <ZoomIn className="w-5 h-5" />
-        </button>
-        <button
-          onClick={handleZoomOut}
-          className="flex items-center justify-center w-9 h-9 md:w-10 md:h-10 rounded-lg text-text-muted hover:text-text-primary hover:bg-muted/50 transition-colors touch-manipulation"
-          aria-label="Alejar"
-          title="Alejar"
-        >
-          <ZoomOut className="w-5 h-5" />
-        </button>
-        <div className="h-px bg-border-subtle mx-1" />
-        <button
-          onClick={handleFitView}
-          className="flex items-center justify-center w-9 h-9 md:w-10 md:h-10 rounded-lg text-text-muted hover:text-text-primary hover:bg-muted/50 transition-colors touch-manipulation"
-          aria-label="Ajustar a pantalla"
-          title="Ajustar a pantalla"
-        >
-          <Maximize2 className="w-5 h-5" />
-        </button>
+  if (isLoading) {
+    return (
+      <div className="flex h-full items-center justify-center bg-background">
+        <div className="text-muted-foreground">Cargando organigrama...</div>
       </div>
-    </ReactFlow>
-  );
-}
+    );
+  }
 
-interface OrgChartProps {
-  initialCompany?: string;
-}
-
-export function OrgChart({ initialCompany }: OrgChartProps) {
-  const [selectedCompany, setSelectedCompany] = useState(initialCompany || "all");
-  const [layout, setLayout] = useState<OrgChartLayout>("vertical");
+  const companyOptions = [
+    { id: 'all', label: 'Todos' },
+    { id: 'comercializadora', label: 'Com. Shuma' },
+    { id: 'acabados', label: 'Acabados' },
+    { id: 'ferrecapital', label: 'Ferrecapital' },
+  ];
 
   return (
-    <div className="h-full w-full flex flex-col overflow-hidden bg-background md:rounded-xl md:border md:border-border-subtle">
+    <div className="flex h-full flex-col overflow-hidden bg-background md:rounded-xl md:border md:border-border-subtle">
       {/* Mobile Controls */}
-      <div 
-        className="md:hidden flex flex-col shrink-0 border-b border-border-subtle"
-        style={{
-          background: "var(--bg-surface)",
-          WebkitBackdropFilter: "blur(12px)",
-          backdropFilter: "blur(12px)",
-        }}
-      >
-        {/* Row 3: Company filter pills - horizontal scroll */}
-        <div 
-          className="flex gap-2 px-4 py-2 overflow-x-auto touch-scroll"
-          style={{ 
-            scrollbarWidth: "none", 
-            msOverflowStyle: "none",
-            WebkitOverflowScrolling: "touch",
-          }}
-        >
-          <style jsx>{`div::-webkit-scrollbar { display: none; }`}</style>
-          {companyFilters.map((filter) => (
+      <div className="md:hidden flex flex-col shrink-0 border-b border-border-subtle bg-bg-surface/90 backdrop-blur">
+        {/* Company Filter */}
+        <div className="flex gap-1.5 overflow-x-auto px-3 py-2 scrollbar-hide">
+          {companyOptions.map((option) => (
             <button
-              key={filter.id}
-              onClick={() => setSelectedCompany(filter.id)}
+              key={option.id}
+              onClick={() => setSelectedCompany(option.id)}
               className={cn(
-                "px-3 py-1.5 rounded-full uppercase tracking-wider font-neuropol transition-all duration-[180ms] whitespace-nowrap shrink-0 touch-manipulation min-h-[32px] text-scale-xs",
-                selectedCompany === filter.id 
-                  ? "text-white shadow-lg" 
-                  : "bg-muted text-muted-foreground border border-border-subtle"
-              )}
-              style={{
-                backgroundColor: selectedCompany === filter.id ? filter.color : undefined,
-                boxShadow: selectedCompany === filter.id ? `0 4px 12px ${filter.color}40` : undefined,
-              }}
-            >
-              {filter.shortLabel}
-            </button>
-          ))}
-        </div>
-
-        {/* Row 4: Layout toggle - right aligned */}
-        <div className="flex justify-end px-4 py-1.5">
-          <div className="flex gap-1 bg-muted rounded-md p-0.5">
-            <button
-              onClick={() => setLayout("vertical")}
-              className={cn(
-                "px-2 py-1 rounded font-neuropol uppercase transition-colors touch-manipulation text-scale-xs",
-                layout === "vertical" ? "bg-bg-elevated text-text-primary" : "text-muted-foreground"
+                'rounded-full px-3 py-1 text-scale-xs font-semibold whitespace-nowrap transition-all',
+                selectedCompany === option.id
+                  ? 'bg-primary text-primary-foreground'
+                  : 'bg-muted text-muted-foreground'
               )}
             >
-              Vertical
-            </button>
-            <button
-              onClick={() => setLayout("horizontal")}
-              className={cn(
-                "px-2 py-1 rounded font-neuropol uppercase transition-colors touch-manipulation text-scale-xs",
-                layout === "horizontal" ? "bg-bg-elevated text-text-primary" : "text-muted-foreground"
-              )}
-            >
-              Horizontal
-            </button>
-          </div>
-        </div>
-      </div>
-
-      {/* Desktop Controls */}
-      <div className="hidden md:block relative">
-        {/* Company Filter Pills */}
-        <div className="absolute top-4 left-4 z-10 flex gap-2 flex-wrap">
-          {companyFilters.map((filter) => (
-            <button
-              key={filter.id}
-              onClick={() => setSelectedCompany(filter.id)}
-              className={cn(
-                "px-3 py-1.5 rounded-full text-[10px] uppercase tracking-wider font-neuropol transition-all duration-[180ms]",
-                selectedCompany === filter.id 
-                  ? "text-white shadow-lg" 
-                  : "bg-[--bg-surface]/80 text-text-muted hover:text-text-primary border border-border-subtle"
-              )}
-              style={{
-                backgroundColor: selectedCompany === filter.id ? filter.color : undefined,
-                boxShadow: selectedCompany === filter.id ? `0 4px 12px ${filter.color}40` : undefined,
-              }}
-            >
-              {filter.label}
+              {option.label}
             </button>
           ))}
         </div>
 
         {/* Layout Toggle */}
-        <div className="absolute top-4 right-4 z-10">
-          <div className="bg-[--bg-surface]/80 backdrop-blur-md border border-border-subtle rounded-lg p-1.5 shadow-lg flex gap-1">
+        <div className="flex justify-end gap-1 px-3 py-1.5">
+          <button
+            onClick={() => setLayout('vertical')}
+            className={cn(
+              'rounded px-2 py-1 text-scale-xs font-semibold transition-all',
+              layout === 'vertical' ? 'bg-primary text-primary-foreground' : 'bg-muted text-muted-foreground'
+            )}
+          >
+            V
+          </button>
+          <button
+            onClick={() => setLayout('horizontal')}
+            className={cn(
+              'rounded px-2 py-1 text-scale-xs font-semibold transition-all',
+              layout === 'horizontal'
+                ? 'bg-primary text-primary-foreground'
+                : 'bg-muted text-muted-foreground'
+            )}
+          >
+            H
+          </button>
+        </div>
+      </div>
+
+      {/* Desktop Controls */}
+      <div className="hidden md:block relative h-12 border-b border-border-subtle bg-bg-surface/50 px-4 py-2">
+        <div className="flex items-center justify-between">
+          {/* Company Filter */}
+          <div className="flex gap-1">
+            {companyOptions.map((option) => (
+              <button
+                key={option.id}
+                onClick={() => setSelectedCompany(option.id)}
+                className={cn(
+                  'rounded-lg px-3 py-1 text-scale-xs font-semibold transition-all',
+                  selectedCompany === option.id
+                    ? 'bg-primary text-primary-foreground'
+                    : 'bg-muted text-muted-foreground hover:bg-muted/80'
+                )}
+              >
+                {option.label}
+              </button>
+            ))}
+          </div>
+
+          {/* Layout Toggle */}
+          <div className="flex gap-1 bg-muted rounded-lg p-1">
             <button
-              onClick={() => setLayout("vertical")}
+              onClick={() => setLayout('vertical')}
               className={cn(
-                "px-3 py-1 rounded-md font-neuropol text-[10px] uppercase transition-colors",
-                layout === "vertical" ? "bg-[--bg-elevated] text-text-primary" : "text-text-faint hover:text-text-muted"
+                'rounded px-2 py-1 text-scale-xs font-semibold transition-all',
+                layout === 'vertical'
+                  ? 'bg-bg-elevated text-text-primary'
+                  : 'text-muted-foreground'
               )}
             >
               Vertical
             </button>
             <button
-              onClick={() => setLayout("horizontal")}
+              onClick={() => setLayout('horizontal')}
               className={cn(
-                "px-3 py-1 rounded-md font-neuropol text-[10px] uppercase transition-colors",
-                layout === "horizontal" ? "bg-[--bg-elevated] text-text-primary" : "text-text-faint hover:text-text-muted"
+                'rounded px-2 py-1 text-scale-xs font-semibold transition-all',
+                layout === 'horizontal'
+                  ? 'bg-bg-elevated text-text-primary'
+                  : 'text-muted-foreground'
               )}
             >
               Horizontal
@@ -446,11 +393,41 @@ export function OrgChart({ initialCompany }: OrgChartProps) {
         </div>
       </div>
 
-      {/* ReactFlow Container */}
-      <div className="flex-1 relative">
-        <ReactFlowProvider>
-          <OrgChartInner selectedCompany={selectedCompany} layout={layout} />
-        </ReactFlowProvider>
+      {/* SVG Container */}
+      <div className="relative flex-1 overflow-hidden">
+        <svg
+          ref={svgRef}
+          className="h-full w-full"
+          style={{ display: 'block' }}
+        >
+          <g ref={gRef} />
+        </svg>
+
+        {/* Zoom Buttons */}
+        <div className="absolute bottom-4 right-4 flex flex-col gap-1 rounded-xl border border-border-subtle bg-bg-surface/90 p-1 backdrop-blur">
+          <button
+            onClick={() => handleZoom('in')}
+            className="rounded-lg p-2 text-muted-foreground hover:text-text-primary hover:bg-muted transition-colors"
+            title="Zoom in"
+          >
+            <ZoomIn className="h-5 w-5" />
+          </button>
+          <button
+            onClick={() => handleZoom('out')}
+            className="rounded-lg p-2 text-muted-foreground hover:text-text-primary hover:bg-muted transition-colors"
+            title="Zoom out"
+          >
+            <ZoomOut className="h-5 w-5" />
+          </button>
+          <div className="h-px bg-border-subtle" />
+          <button
+            onClick={() => handleZoom('fit')}
+            className="rounded-lg p-2 text-muted-foreground hover:text-text-primary hover:bg-muted transition-colors"
+            title="Fit to screen"
+          >
+            <Maximize2 className="h-5 w-5" />
+          </button>
+        </div>
       </div>
     </div>
   );
