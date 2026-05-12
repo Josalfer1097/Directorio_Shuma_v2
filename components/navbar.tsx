@@ -107,7 +107,7 @@ export function Navbar() {
     <>
     <header
       className={cn(
-        "fixed top-0 left-0 right-0 z-50 transition-all duration-300 h-[56px] md:h-[64px] flex items-center safe-top",
+        "fixed top-0 left-0 right-0 z-50 transition-all duration-300 h-[56px] md:h-[64px] flex items-center",
         scrolled
           ? "bg-[--bg-base]/88 -webkit-backdrop-filter-blur-xl backdrop-blur-xl border-b border-white/8 saturate-[180%]"
           : "bg-transparent border-b border-transparent"
@@ -126,9 +126,10 @@ export function Navbar() {
         }}
         aria-hidden="true"
       />
-      <nav className="container mx-auto px-4 flex items-center justify-between">
+      <nav className="container mx-auto px-4 flex items-center justify-between h-full">
           <Link
             href="/"
+            prefetch={false}
             style={{
               display: 'flex', alignItems: 'center',
               gap: '8px', textDecoration: 'none',
@@ -191,7 +192,8 @@ export function Navbar() {
         <div className="flex items-center gap-6">
           {/* Desktop Navigation Links */}
           <Link 
-            href="/directorio" 
+            href="/directorio"
+            prefetch={false}
             className={cn(
               "hidden md:flex items-center gap-2 font-neuropol text-[12px] uppercase tracking-wider transition-colors active:scale-95 relative",
               pathname === "/directorio" ? "text-text-primary" : "text-text-muted hover:text-text-primary"
@@ -294,7 +296,7 @@ export function Navbar() {
           {/* Mobile Hamburger Menu Button */}
           <button
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            className="md:hidden p-2 text-text-muted hover:text-text-primary transition-all active:scale-95 relative z-[60]"
+            className="md:hidden p-2 min-w-[44px] min-h-[44px] flex items-center justify-center text-text-muted hover:text-text-primary transition-all active:scale-95 relative z-[60]"
             aria-label={mobileMenuOpen ? "Cerrar menú" : "Abrir menú"}
           >
             <motion.div

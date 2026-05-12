@@ -58,6 +58,8 @@ export const viewport: Viewport = {
   viewportFit: 'cover',
   width: 'device-width',
   initialScale: 1,
+  maximumScale: 1,
+  userScalable: false,
 }
 
 export default function RootLayout({
@@ -68,8 +70,10 @@ export default function RootLayout({
   return (
     <html lang="es" className={`${neuropol.variable} ${orbitron.variable}`} suppressHydrationWarning>
       <head>
+        <meta name="apple-mobile-web-app-capable" content="yes" />
+        <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
       </head>
-      <body className={`${dmSans.variable} font-dm-sans antialiased`}>
+      <body className={`${dmSans.variable} font-dm-sans antialiased`} style={{ paddingBottom: 'env(safe-area-inset-bottom)', paddingTop: 'env(safe-area-inset-top)' }}>
         <ThemeProvider
           attribute="class"
           defaultTheme="dark"
