@@ -1,20 +1,10 @@
 import Link from 'next/link'
+import FloatingNodes from '@/components/floating-nodes'
 import type { Metadata } from 'next'
 
 export const metadata: Metadata = {
   title: 'Organigrama — Próximamente | Directorio Shuma',
 }
-
-const floatingNodes = [
-  { initials: 'JF', name: 'Gerente Sistemas',   color: '#185FA5', bg: '#E6F1FB' },
-  { initials: 'CM', name: 'Directora General',  color: '#A32D2D', bg: '#FCEBEB' },
-  { initials: 'AL', name: 'Ventas CDMX',        color: '#0F6E56', bg: '#E1F5EE' },
-  { initials: 'RG', name: 'Contabilidad',       color: '#854F0B', bg: '#FAEEDA' },
-  { initials: 'SP', name: 'Recursos Humanos',   color: '#534AB7', bg: '#EEEDFE' },
-  { initials: 'FB', name: 'Auxiliar Sistemas',  color: '#185FA5', bg: '#E6F1FB' },
-  { initials: 'KH', name: 'Acabados Puebla',    color: '#A32D2D', bg: '#FCEBEB' },
-  { initials: 'IE', name: 'Logística',          color: '#0F6E56', bg: '#E1F5EE' },
-]
 
 const tasks = [
   { label: 'Estructura de datos y jerarquías', status: 'done' },
@@ -36,30 +26,8 @@ export default function OrganigramaPage() {
              backgroundSize: '40px 40px'
            }} />
 
-      {/* Floating nodes — purely decorative, CSS animated */}
-      <div className="absolute inset-0 pointer-events-none overflow-hidden"
-           aria-hidden="true">
-        {floatingNodes.map((n, i) => (
-          <div
-            key={n.initials}
-            className="absolute flex items-center gap-2 px-3 py-2 rounded-xl border border-white/10 bg-white/5 backdrop-blur-sm text-xs text-white/60 animate-float-node"
-            style={{
-              left: `${10 + (i % 4) * 22 + Math.floor(i / 4) * 8}%`,
-              top:  `${15 + (i % 3) * 22}%`,
-              animationDelay: `${i * 0.9}s`,
-              animationDuration: `${5 + (i % 3)}s`,
-            }}
-          >
-            <span
-              className="w-7 h-7 rounded-full flex items-center justify-center text-[10px] font-medium flex-shrink-0"
-              style={{ background: n.bg, color: n.color }}
-            >
-              {n.initials}
-            </span>
-            {n.name}
-          </div>
-        ))}
-      </div>
+      {/* Floating nodes — animated, positioned at edges */}
+      <FloatingNodes />
 
       {/* Main content */}
       <div className="relative z-10 flex flex-col items-center text-center max-w-md w-full">
