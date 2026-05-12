@@ -1,7 +1,6 @@
 'use client';
 
 import { useEffect, useRef, useState, useMemo, useCallback } from 'react';
-import * as d3 from 'd3';
 import { createRoot } from 'react-dom/client';
 import { ZoomIn, ZoomOut, Maximize2 } from 'lucide-react';
 import { OrgChartNode } from './org-chart-node';
@@ -13,11 +12,6 @@ const NODE_WIDTH = 220;
 const NODE_HEIGHT = 88;
 const HORIZONTAL_GAP = 40;
 const VERTICAL_GAP = 80;
-
-interface HierarchyNode extends d3.HierarchyNode<Employee> {
-  x: number;
-  y: number;
-}
 
 interface OrgChartProps {
   initialCompany?: string;
@@ -57,7 +51,7 @@ export function OrgChart({ initialCompany }: OrgChartProps) {
     return employees.filter((emp) => emp.company === selectedCompany);
   }, [employees, selectedCompany, companies]);
 
-  // Build hierarchy
+  // Build hierarchy (plain data structure, no D3 dependency)
   const hierarchyRoot = useMemo(() => {
     if (filteredEmployees.length === 0) return null;
 
@@ -109,22 +103,50 @@ export function OrgChart({ initialCompany }: OrgChartProps) {
       };
     };
 
-    const tree = buildTree(rootEmployee);
-    return d3.hierarchy(tree);
+    return buildTree(rootEmployee);
   }, [filteredEmployees]);
 
-  // Layout calculation
+  // Layout calculation (without D3)
   const layoutData = useMemo(() => {
     if (!hierarchyRoot) return { nodes: [], links: [] };
 
-    const treeLayout = d3
-      .tree<Employee>()
-      .nodeSize([NODE_WIDTH + HORIZONTAL_GAP, NODE_HEIGHT + VERTICAL_GAP]);
+    // Simple tree layout calculation
+    const nodes: any[] = [];
+    const links: any[] = [];
+    const visited = new Set<string>();
 
-    const root = treeLayout(hierarchyRoot);
-    const nodes = root.descendants() as HierarchyNode[];
-    const links = root.links();
+    const traverse = (
+      emp: any,
+      x: number,
+      y: number,
+      parentX?: number,
+      parentY?: number
+    ) => {
+      if (visited.has(emp.id)) return;
+      visited.add(emp.id);
 
+      nodes.push({ ...emp, x, y });
+
+      if (parentX !== undefined && parentY !== undefined) {
+        links.push({
+          source: { x: parentX, y: parentY },
+          target: { x, y },
+        });
+      }
+
+      const children = emp.children || [];
+      const childCount = children.length;
+      const childSpacing = (NODE_WIDTH + HORIZONTAL_GAP) * 2;
+      const startX = x - ((childCount - 1) * childSpacing) / 2;
+
+      children.forEach((child: any, i: number) => {
+        const childX = startX + i * childSpacing;
+        const childY = y + NODE_HEIGHT + VERTICAL_GAP;
+        traverse(child, childX, childY, x, y);
+      });
+    };
+
+    traverse(hierarchyRoot, 0, 0);
     return { nodes, links };
   }, [hierarchyRoot, layout]);
 
@@ -132,136 +154,105 @@ export function OrgChart({ initialCompany }: OrgChartProps) {
   useEffect(() => {
     if (!svgRef.current) return;
 
-    const svg = d3.select(svgRef.current);
-    const zoom = d3
-      .zoom<SVGSVGElement, unknown>()
-      .on('zoom', (event) => {
-        d3.select(gRef.current).attr('transform', event.transform);
-      });
+    (async () => {
+      const d3 = await import('d3');
+      const svg = d3.select(svgRef.current);
+      const zoom = d3
+        .zoom<SVGSVGElement, unknown>()
+        .on('zoom', (event) => {
+          if (gRef.current) {
+            d3.select(gRef.current).attr('transform', event.transform);
+          }
+        });
 
-    zoomRef.current = zoom;
-    svg.call(zoom);
+      zoomRef.current = zoom;
+      svg.call(zoom as any);
+    })();
   }, []);
 
-  // Render D3
+  // Render visualization
   useEffect(() => {
     if (!svgRef.current || !gRef.current || !layoutData.nodes.length) return;
 
-    const svg = d3.select(svgRef.current);
-    const g = d3.select(gRef.current);
-    const { nodes, links } = layoutData;
+    (async () => {
+      const d3 = await import('d3');
+      const svg = d3.select(svgRef.current);
+      const g = d3.select(gRef.current);
+      const { nodes, links } = layoutData;
 
-    // Clear previous
-    g.selectAll('*').remove();
+      // Clear previous
+      g.selectAll('*').remove();
 
-    // Draw links
-    const linkGen =
-      layout === 'horizontal'
-        ? d3
-            .linkHorizontal<any, HierarchyNode>()
-            .x((d) => d.y)
-            .y((d) => d.x)
-        : d3
-            .linkVertical<any, HierarchyNode>()
-            .x((d) => d.x)
-            .y((d) => d.y);
+      // Draw links using SVG paths manually (simpler than d3.link generators)
+      links.forEach((link: any) => {
+        const x1 = link.source.x;
+        const y1 = link.source.y;
+        const x2 = link.target.x;
+        const y2 = link.target.y;
+        const midY = (y1 + y2) / 2;
 
-    g.selectAll('path.link')
-      .data(links)
-      .join('path')
-      .attr('class', 'link')
-      .attr('d', linkGen as any)
-      .attr('stroke', 'var(--node-link)')
-      .attr('stroke-width', 1.5)
-      .attr('fill', 'none');
-
-    // Draw nodes
-    const nodeGroups = g
-      .selectAll('g.node')
-      .data(nodes, (d: any) => d.data.id)
-      .join((enter) => {
-        const g = enter.append('g').attr('class', 'node');
-        g.append('foreignObject')
-          .attr('width', NODE_WIDTH)
-          .attr('height', NODE_HEIGHT)
-          .attr('x', -NODE_WIDTH / 2)
-          .attr('y', -NODE_HEIGHT / 2);
-        return g;
+        const pathData = `M ${x1} ${y1} C ${x1} ${midY}, ${x2} ${midY}, ${x2} ${y2}`;
+        g.append('path')
+          .attr('d', pathData)
+          .attr('stroke', 'var(--node-link)')
+          .attr('stroke-width', 1.5)
+          .attr('fill', 'none');
       });
 
-    nodeGroups.attr('transform', (d) =>
-      layout === 'horizontal' ? `translate(${d.y},${d.x})` : `translate(${d.x},${d.y})`
-    );
+      // Draw nodes
+      const nodeGroups = g
+        .selectAll('g.node')
+        .data(nodes, (d: any) => d.id)
+        .join((enter) => {
+          const grp = enter.append('g').attr('class', 'node');
+          grp.append('foreignObject')
+            .attr('width', NODE_WIDTH)
+            .attr('height', NODE_HEIGHT)
+            .attr('x', -NODE_WIDTH / 2)
+            .attr('y', -NODE_HEIGHT / 2);
+          return grp;
+        });
 
-    // Render React components in foreignObject
-    nodeGroups.select('foreignObject').each((d, i, nodes) => {
-      const node = d as HierarchyNode;
-      const company = companies.find((c) => c.id === node.data.company);
-      if (!company) return;
+      nodeGroups.attr('transform', (d: any) => `translate(${d.x},${d.y})`);
 
-      const container = nodes[i] as any;
-      container.innerHTML = '';
+      // Render React components in foreignObject
+      nodeGroups.select('foreignObject').each((d: any, i: number, nodes: any) => {
+        const company = companies.find((c) => c.id === d.company);
+        if (!company) return;
 
-      const div = document.createElement('div');
-      div.className = 'flex items-center justify-center';
-      div.style.width = NODE_WIDTH + 'px';
-      div.style.height = NODE_HEIGHT + 'px';
-      container.appendChild(div);
+        const container = nodes[i] as HTMLElement;
+        container.innerHTML = '';
 
-      const root = createRoot(div);
-      root.render(
-        <OrgChartNode
-          employee={node.data}
-          company={company}
-          isHovered={hoveredNodeId === node.data.id}
-          onHover={setHoveredNodeId}
-        />
-      );
-    });
+        const div = document.createElement('div');
+        div.className = 'flex items-center justify-center';
+        div.style.width = NODE_WIDTH + 'px';
+        div.style.height = NODE_HEIGHT + 'px';
+        container.appendChild(div);
 
-    // Auto-fit to view
-    const bounds = g.node()?.getBBox();
-    if (bounds && svgRef.current) {
-      const fullWidth = svgRef.current.clientWidth;
-      const fullHeight = svgRef.current.clientHeight;
-      const midX = bounds.x + bounds.width / 2;
-      const midY = bounds.y + bounds.height / 2;
-      const scale = Math.min(
-        (fullWidth - 80) / bounds.width,
-        (fullHeight - 80) / bounds.height,
-        2
-      );
-
-      svg
-        .transition()
-        .duration(750)
-        .call(
-          zoomRef.current!.transform as any,
-          d3.zoomIdentity
-            .translate(fullWidth / 2, fullHeight / 2)
-            .scale(scale)
-            .translate(-midX, -midY)
+        const root = createRoot(div);
+        root.render(
+          <OrgChartNode
+            employee={d}
+            company={company}
+            isHovered={hoveredNodeId === d.id}
+            onHover={setHoveredNodeId}
+          />
         );
-    }
-  }, [layoutData, layout, companies, hoveredNodeId]);
+      });
 
-  const handleZoom = useCallback((direction: 'in' | 'out' | 'fit') => {
-    if (!svgRef.current || !zoomRef.current) return;
-
-    const svg = d3.select(svgRef.current);
-
-    if (direction === 'fit') {
-      const bounds = gRef.current?.getBBox();
-      if (bounds) {
+      // Auto-fit to view
+      const bounds = g.node()?.getBBox();
+      if (bounds && svgRef.current && zoomRef.current) {
         const fullWidth = svgRef.current.clientWidth;
         const fullHeight = svgRef.current.clientHeight;
         const midX = bounds.x + bounds.width / 2;
         const midY = bounds.y + bounds.height / 2;
-        const newScale = Math.min(
+        const scale = Math.min(
           (fullWidth - 80) / bounds.width,
           (fullHeight - 80) / bounds.height,
           2
         );
+
         svg
           .transition()
           .duration(750)
@@ -269,17 +260,51 @@ export function OrgChart({ initialCompany }: OrgChartProps) {
             zoomRef.current.transform as any,
             d3.zoomIdentity
               .translate(fullWidth / 2, fullHeight / 2)
-              .scale(newScale)
+              .scale(scale)
               .translate(-midX, -midY)
           );
       }
-    } else {
-      const factor = direction === 'in' ? 1.3 : 0.77;
-      svg
-        .transition()
-        .duration(300)
-        .call(zoomRef.current.scaleBy as any, factor);
-    }
+    })();
+  }, [layoutData, companies, hoveredNodeId]);
+
+  const handleZoom = useCallback((direction: 'in' | 'out' | 'fit') => {
+    if (!svgRef.current || !zoomRef.current) return;
+
+    (async () => {
+      const d3 = await import('d3');
+      const svg = d3.select(svgRef.current);
+
+      if (direction === 'fit') {
+        const bounds = gRef.current?.getBBox();
+        if (bounds) {
+          const fullWidth = svgRef.current!.clientWidth;
+          const fullHeight = svgRef.current!.clientHeight;
+          const midX = bounds.x + bounds.width / 2;
+          const midY = bounds.y + bounds.height / 2;
+          const newScale = Math.min(
+            (fullWidth - 80) / bounds.width,
+            (fullHeight - 80) / bounds.height,
+            2
+          );
+          svg
+            .transition()
+            .duration(750)
+            .call(
+              zoomRef.current!.transform as any,
+              d3.zoomIdentity
+                .translate(fullWidth / 2, fullHeight / 2)
+                .scale(newScale)
+                .translate(-midX, -midY)
+            );
+        }
+      } else {
+        const factor = direction === 'in' ? 1.3 : 0.77;
+        svg
+          .transition()
+          .duration(300)
+          .call(zoomRef.current!.scaleBy as any, factor);
+      }
+    })();
   }, []);
 
   if (isLoading) {
