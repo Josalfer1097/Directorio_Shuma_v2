@@ -918,6 +918,19 @@
       "location": "Acabados Puebla",
       "reportsTo": "emp046",
       "avatar": null
+    },
+    {
+      "id": "emp071",
+      "name": "Sala de Juntas",
+      "department": "",
+      "position": "Sala de Juntas",
+      "phone": "55 55498999",
+      "extension": "239",
+      "email": "",
+      "company": "comercializadora",
+      "location": "División",
+      "reportsTo": "emp001",
+      "avatar": null
     }
   ]
 }
