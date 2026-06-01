@@ -10,7 +10,7 @@ const tabs = [
   { href: "/", label: "Inicio", icon: Home },
   { href: "/directorio", label: "Directorio", icon: Users },
   { href: "/organigrama", label: "Organigrama", icon: GitBranch },
-  { href: "/buscar", label: "Buscar", icon: Search },
+  { href: "/directorio?focus=search", label: "Buscar", icon: Search },
 ];
 
 export function MobileBottomTabBar() {
@@ -38,13 +38,19 @@ export function MobileBottomTabBar() {
         />
 
         {tabs.map((tab) => {
-          const isActive = pathname === tab.href || (tab.href !== "/" && pathname.startsWith(tab.href));
+          // Check if this is the search tab (special case)
+          const isSearchTab = tab.href.includes("focus=search");
+          // For regular tabs, check pathname match; for search tab, never highlight as active (it's a shortcut)
+          const isActive = isSearchTab 
+            ? false 
+            : pathname === tab.href || (tab.href !== "/" && pathname.startsWith(tab.href.split("?")[0]));
           const Icon = tab.icon;
 
           return (
             <Link
               key={tab.href}
               href={tab.href}
+              prefetch={false}
               className="flex flex-col items-center justify-center flex-1 h-14 relative touch-target group z-10"
             >
               <motion.div

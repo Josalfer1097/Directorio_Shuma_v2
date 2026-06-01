@@ -31,10 +31,20 @@ export function Navbar() {
   
   const employeeCount = useMemo(() => getEmployees().length, []);
 
-  // Check if currently on directory with quick+solo mode
-  const isQuickSoloActive = pathname === "/directorio" && typeof window !== "undefined" && 
-    localStorage.getItem("directorio-viewMode") === "extensions" &&
-    localStorage.getItem("directorio-quick-subMode") === "solo-extensiones";
+  // Safely check quick+solo mode only after mount to avoid hydration mismatch
+  const [isQuickSoloActive, setIsQuickSoloActive] = useState(false);
+  
+  useEffect(() => {
+    const checkQuickSoloMode = () => {
+      const isActive = pathname === "/directorio" && 
+        localStorage.getItem("directorio-viewMode") === "extensions" &&
+        localStorage.getItem("directorio-quick-subMode") === "solo-extensiones";
+      setIsQuickSoloActive(isActive);
+    };
+    
+    checkQuickSoloMode();
+    // Re-check when pathname changes
+  }, [pathname]);
 
   // Navigate to extensions quick view
   const handlePhoneClick = useCallback(() => {
