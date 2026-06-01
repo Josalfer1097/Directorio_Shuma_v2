@@ -712,6 +712,19 @@
       "avatar": null
     },
     {
+      "id": "emp049",
+      "name": "Jorge Luis Ramirez Flores",
+      "department": "Ventas",
+      "position": "Agente de Ventas",
+      "phone": "25 22847272",
+      "extension": "117",
+      "email": "-",
+      "company": "acabados",
+      "location": "Acabados Puebla",
+      "reportsTo": "emp046",
+      "avatar": null
+    },
+    {
       "id": "emp051",
       "name": "Claudia Ariadna Cordova",
       "department": "Crédito y Cobranza",
@@ -738,19 +751,6 @@
       "avatar": null
     },
     {
-      "id": "emp053",
-      "name": "Anaí Navarro Suarez",
-      "department": "Administración",
-      "position": "Caja",
-      "phone": "30 22847272",
-      "extension": "106",
-      "email": "acabados.suc@shuma.com.mx",
-      "company": "acabados",
-      "location": "Acabados Puebla",
-      "reportsTo": "emp046",
-      "avatar": null
-    },
-    {
       "id": "emp054",
       "name": "Efren Guzmán Mora",
       "department": "Ventas",
@@ -765,12 +765,12 @@
     },
     {
       "id": "emp055",
-      "name": "Verónica Ceron Aguirre",
+      "name": "Jose Alan Arturo Vargas Mendoza",
       "department": "Almacén",
       "position": "Auxiliar Almacén",
       "phone": "32 22847272",
       "extension": "115",
-      "email": "veronica.ceron@shuma.mx",
+      "email": "-",
       "company": "acabados",
       "location": "Acabados Puebla",
       "reportsTo": "emp046",
