@@ -90,7 +90,6 @@ function DirectoryContent() {
   // Start with safe server-compatible defaults to avoid hydration mismatch
   const [isMobile, setIsMobile] = useState(false);
   const [viewMode, setViewMode] = useState<ViewMode>("grid");
-  const [isHydrated, setIsHydrated] = useState(false);
 
   // Hydrate client-only state after mount
   useEffect(() => {
@@ -106,8 +105,6 @@ function DirectoryContent() {
         setViewMode(saved as ViewMode);
       }
     }
-    
-    setIsHydrated(true);
   }, []);
 
   // Detect viewport changes and auto-switch views
@@ -177,6 +174,7 @@ function DirectoryContent() {
       }, 100);
       return () => clearTimeout(timer);
     }
+    return undefined;
   }, [focusSearch]);
 
   // Company theme immersion - single company filter triggers theme change
