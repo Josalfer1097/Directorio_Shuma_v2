@@ -131,21 +131,14 @@ export default function HomePage() {
               </div>
             </motion.div>
 
-            {/* Smart Search Bar */}
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.3, duration: 0.8 }}
-              className="mt-8 mb-6"
-            >
-              <SmartSearchBar />
-            </motion.div>
+            {/* Smart Search Bar — renders immediately without delay */}
+            <SmartSearchBar />
 
             <motion.div 
               initial={{ opacity: 0, scale: 0.95 }}
               animate={{ opacity: 1, scale: 1 }}
-              transition={{ delay: 0.4, duration: 0.8 }}
-              className="flex flex-col sm:flex-row items-center justify-center gap-4"
+              transition={{ delay: 0.2, duration: 0.6 }}
+              className="flex flex-col sm:flex-row items-center justify-center gap-4 mt-6 mb-6"
             >
               <Link href="/directorio" className="w-full sm:w-auto">
                 <button 
