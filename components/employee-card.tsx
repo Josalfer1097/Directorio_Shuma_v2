@@ -207,7 +207,7 @@ export function EmployeeCard({
                 </h3>
                 {!hideCompanyBadge && (
                   <span
-                    className="text-xs font-medium px-2 py-0.5 rounded-full shrink-0"
+                    className="font-neuropol text-xs font-medium px-2 py-0.5 rounded-full shrink-0 tracking-wide"
                     style={{
                       backgroundColor: companyConfig.highlight ? companyConfig.secondary : `${companyConfig.primary}15`,
                       border: companyConfig.highlight ? `1px solid ${companyConfig.primary}` : 'none',
@@ -448,7 +448,7 @@ export function EmployeeCard({
               )}
               {!hideCompanyBadge && (
                 <span
-                  className="inline-block font-medium rounded-full"
+                  className="inline-block font-neuropol font-medium rounded-full tracking-wide"
                   style={{
                     fontSize: 'var(--font-xs)',
                     padding: 'calc(3px * var(--font-scale, 1)) calc(10px * var(--font-scale, 1))',

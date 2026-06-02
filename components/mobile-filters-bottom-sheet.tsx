@@ -117,28 +117,19 @@ export function MobileFiltersBottomSheet({
                 onClose();
               }
             }}
-            className="fixed bottom-0 left-0 right-0 z-50 md:hidden shadow-2xl safe-bottom"
+            className="fixed bottom-0 left-0 right-0 z-50 md:hidden shadow-2xl safe-bottom bg-card border border-border"
             style={{ 
               height: "70vh", 
               maxHeight: "70vh",
               borderRadius: "20px 20px 0 0",
-              background: "#0F1114",
               WebkitBackdropFilter: "blur(20px)",
               backdropFilter: "blur(20px)",
-              border: "1px solid rgba(255,255,255,0.08)",
               borderBottom: "none",
             }}
           >
             {/* Drag handle */}
             <div className="flex justify-center pt-3 pb-2">
-              <div 
-                className="rounded-full"
-                style={{ 
-                  width: "32px", 
-                  height: "4px", 
-                  background: "rgba(255,255,255,0.18)" 
-                }} 
-              />
+              <div className="rounded-full bg-foreground/20" style={{ width: "32px", height: "4px" }} />
             </div>
             
             {/* Header */}

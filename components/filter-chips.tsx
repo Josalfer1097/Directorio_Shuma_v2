@@ -53,7 +53,7 @@ export function FilterChips({
             aria-label={`Remover filtro de empresa: ${getCompanyName(companyId)}`}
           >
             <span aria-hidden="true">🏢</span>
-            <span>{getCompanyName(companyId)}</span>
+            <span className="font-neuropol tracking-wide">{getCompanyName(companyId)}</span>
             <X className="w-3.5 h-3.5 opacity-60 group-hover:opacity-100 transition-opacity" />
           </motion.button>
         ))}
