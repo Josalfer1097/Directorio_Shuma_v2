@@ -71,10 +71,8 @@ const getCardVariants = (isMobile: boolean) => ({
 // Loading fallback for Suspense boundaries around heavy view components
 function ViewLoadingFallback() {
   return (
-    <div className="flex flex-col gap-3">
-      {[...Array(6)].map((_, i) => (
-        <Skeleton key={i} className="h-16 rounded-lg" />
-      ))}
+    <div className="w-full">
+      <EmployeeSkeletonGroup view="grid" count={12} />
     </div>
   );
 }

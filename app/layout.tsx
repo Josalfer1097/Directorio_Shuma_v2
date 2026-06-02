@@ -86,7 +86,7 @@ export default function RootLayout({
               <AmbientGlows />
               <ParticleBackground />
               <div className="dot-grid-overlay" />
-              <div className="pb-7 relative z-[1]">
+              <div className="pb-7 md:pb-7 relative z-[1]" style={{ paddingBottom: 'calc(28px + max(env(safe-area-inset-bottom), 8px))' }}>
                 {children}
               </div>
               <RgbSignature />
