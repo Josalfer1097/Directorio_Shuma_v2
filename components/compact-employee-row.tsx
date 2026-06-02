@@ -51,10 +51,11 @@ export function CompactEmployeeRow({
       initial={{ opacity: 0, x: -10 }}
       animate={{ opacity: 1, x: 0 }}
       transition={{ delay: index * 0.03 }}
-      whileHover={{ backgroundColor: "#161625", x: 2 }}
+      whileHover={{ backgroundColor: "var(--bg-elevated)", x: 2 }}
       className={cn(
-        "group h-[52px] w-full flex items-center gap-4 px-4 border-b border-[--border-subtle] transition-all relative overflow-hidden",
-        index % 2 === 0 ? "bg-[#0F0F1A]" : "bg-[#111120]"
+        "group h-[52px] w-full flex items-center gap-4 px-4 border-b border-border-subtle transition-all relative overflow-hidden",
+        "bg-background/50 dark:bg-white/[0.015] hover:bg-background/70 dark:hover:bg-white/[0.04]",
+        index % 2 === 0 ? "" : "bg-background/70 dark:bg-white/[0.025]"
       )}
     >
       {/* Left accent bar */}
@@ -65,7 +66,7 @@ export function CompactEmployeeRow({
 
       {/* Monogram avatar */}
       <div
-        className="w-8 h-8 rounded-full flex items-center justify-center text-[10px] font-bold text-white shrink-0 shadow-lg"
+        className="w-8 h-8 rounded-full flex items-center justify-center text-[10px] font-bold text-foreground dark:text-white shrink-0 shadow-lg"
         style={{ 
           background: monogramGradient,
           border: isFerrecapital ? "1.5px solid #CC0000" : "none"

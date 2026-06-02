@@ -786,7 +786,7 @@ export function ExtensionDirectory({
   const columnHeaders = ["Ext.", "Nombre", "Puesto", "Departamento", "Sucursal"];
 
   return (
-    <div className="w-full" style={{ background: "#0A0C0F" }}>
+    <div className="w-full bg-background dark:bg-[#0A0C0F]">
       {/* Header Bar */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 px-4 py-3 border-b border-border-subtle print-hidden">
         <span

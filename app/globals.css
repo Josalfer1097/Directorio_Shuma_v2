@@ -459,9 +459,17 @@
   backdrop-filter: blur(20px) saturate(180%);
 }
 
+.light .glass {
+  background: rgba(244, 244, 248, 0.88);
+}
+
 @supports (backdrop-filter: blur(20px)) or (-webkit-backdrop-filter: blur(20px)) {
   .glass {
     background: rgba(8, 8, 16, 0.88);
+  }
+  
+  .light .glass {
+    background: rgba(244, 244, 248, 0.88);
   }
 }
 
@@ -472,9 +480,18 @@
   border: 1px solid rgba(255, 255, 255, 0.05);
 }
 
+.light .glass-light {
+  background: rgba(255, 255, 255, 0.90);
+  border: 1px solid rgba(0, 0, 0, 0.08);
+}
+
 @supports (backdrop-filter: blur(12px)) or (-webkit-backdrop-filter: blur(12px)) {
   .glass-light {
     background: rgba(255, 255, 255, 0.03);
+  }
+  
+  .light .glass-light {
+    background: rgba(255, 255, 255, 0.92);
   }
 }
 
@@ -491,6 +508,10 @@
   backdrop-filter: blur(20px) saturate(180%);
   -webkit-backdrop-filter: blur(20px) saturate(180%);
   border-bottom: 1px solid var(--border-subtle);
+}
+
+.light .header-sticky {
+  background: rgba(244, 244, 248, 0.88);
 }
 
 @media (max-width: 640px) {
@@ -1087,7 +1108,7 @@
 
 /* ═══════════════════════════════════════════════════════════════════
    TOUCH & INTERACTION POLISH
-   ═════════════════════════════════════════════════════��═════════════ */
+   ═════════════════════���═══════════════════════════════��═════════════ */
 
 /* All tap targets minimum 44x44px */
 .touch-target {
