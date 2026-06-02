@@ -1,7 +1,7 @@
 "use client";
 
 import { use, useState, Component, ReactNode } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion } from "framer-motion";
 import { notFound, useRouter } from "next/navigation";
 import { toast } from "sonner";
 import {
@@ -1060,10 +1060,8 @@ export default function EmployeeDetailPage({ params }: Props) {
   const resolvedParams = use(params);
   
   return (
-    <AnimatePresence mode="wait">
-      <EmployeeDetailErrorBoundary fallback={<ErrorFallback />}>
-        <EmployeeDetailContent id={resolvedParams.id} />
-      </EmployeeDetailErrorBoundary>
-    </AnimatePresence>
+    <EmployeeDetailErrorBoundary fallback={<ErrorFallback />}>
+      <EmployeeDetailContent id={resolvedParams.id} />
+    </EmployeeDetailErrorBoundary>
   );
 }

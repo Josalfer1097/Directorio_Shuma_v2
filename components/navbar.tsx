@@ -155,7 +155,7 @@ export function Navbar() {
               style={{
                 fontFamily: 'Neuropol, var(--font-orbitron), monospace',
                 fontWeight: 900,
-                fontSize: 'clamp(1.35rem, 5vw, 1.6rem)',
+                fontSize: 'clamp(1rem, 4vw, 1.6rem)',
                 lineHeight: 1,
                 background: 'linear-gradient(90deg, #00C9A7, #845EC2, #00C2FF, #00C9A7)',
                 backgroundSize: '200% auto',
@@ -163,7 +163,9 @@ export function Navbar() {
                 WebkitTextFillColor: 'transparent',
                 backgroundClip: 'text',
                 animation: 'shimmerText 4s linear infinite',
-                letterSpacing: '0.1em',
+                letterSpacing: '0.08em',
+                overflow: 'visible',
+                minWidth: '0',
               }}
             >
               SHUMA
