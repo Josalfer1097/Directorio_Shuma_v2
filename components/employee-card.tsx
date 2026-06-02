@@ -347,8 +347,8 @@ export function EmployeeCard({
               width: '28px',
               height: '28px',
               borderRadius: '50%',
-              background: isEmployeeFavorite ? 'rgba(245,196,0,0.15)' : 'rgba(0,0,0,0.3)',
-              border: isEmployeeFavorite ? '1px solid rgba(245,196,0,0.4)' : '1px solid rgba(0,0,0,0.1) dark:rgba(255,255,255,0.1)',
+              background: isEmployeeFavorite ? 'rgba(245,196,0,0.15)' : 'rgba(0,0,0,0.30)',
+              border: isEmployeeFavorite ? '1px solid rgba(245,196,0,0.4)' : '1px solid rgba(255,255,255,0.15)',
               transform: favoriteAnimating ? 'scale(1.3)' : 'scale(1)',
             }}
           >
@@ -357,7 +357,7 @@ export function EmployeeCard({
               style={{
                 width: '14px',
                 height: '14px',
-                color: isEmployeeFavorite ? '#F5C400' : 'rgba(0,0,0,0.4) dark:rgba(255,255,255,0.20)',
+                color: isEmployeeFavorite ? '#F5C400' : 'rgba(255,255,255,0.65)',
                 filter: isEmployeeFavorite ? 'drop-shadow(0 0 4px rgba(245,196,0,0.6))' : 'none',
               }}
             />
@@ -522,12 +522,10 @@ export function EmployeeCard({
                 <span>{formatPhone(employee.phone)}</span>
               </button>
               <span 
-                className="shrink-0 text-[10px] font-medium"
+                className="shrink-0 text-[10px] font-medium text-gray-600 dark:text-white/60 bg-black/[0.06] dark:bg-white/[0.06] border border-black/[0.10] dark:border-white/[0.10]"
                 style={{
                   padding: '2px 6px',
                   borderRadius: '4px',
-                  background: 'rgba(0,0,0,0.03) dark:rgba(255,255,255,0.06)',
-                  border: '1px solid rgba(0,0,0,0.1) dark:rgba(255,255,255,0.09)',
                 }}
               >
                 Ext. {employee.extension}
