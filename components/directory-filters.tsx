@@ -153,22 +153,16 @@ export function DirectoryFilters({
         <div>
           <button
             onClick={() => onFavoritesToggle(!showFavoritesOnly)}
-            className="w-full flex items-center justify-between gap-2 px-3 py-2.5 rounded-lg transition-all duration-[180ms] border"
-            style={{
-              background: showFavoritesOnly ? 'rgba(245,196,0,0.12)' : 'rgba(0,0,0,0.03) dark:rgba(255,255,255,0.03)',
-              borderColor: showFavoritesOnly ? 'rgba(245,196,0,0.30)' : 'rgba(0,0,0,0.1) dark:rgba(255,255,255,0.08)',
-              color: showFavoritesOnly ? '#F5C400' : 'rgba(0,0,0,0.6) dark:rgba(255,255,255,0.7)',
-            }}
+            className={`w-full flex items-center justify-between gap-2 px-3 py-2.5 rounded-lg transition-all duration-[180ms] border
+              ${showFavoritesOnly
+                ? "bg-[#F5C400]/10 border-[#F5C400]/30 text-[#F5C400]"
+                : "bg-gray-100 dark:bg-white/[0.04] border-gray-300 dark:border-white/[0.10] text-gray-700 dark:text-white/75 hover:bg-gray-200 dark:hover:bg-white/[0.07]"
+              }`}
           >
             <span className="flex items-center gap-2 text-sm font-medium">
               <Star className={`w-4 h-4 ${showFavoritesOnly ? 'fill-[#F5C400]' : ''}`} />
               Mis Contactos
-              <span 
-                className="px-1.5 py-0.5 text-xs rounded text-gray-600 dark:text-white/40"
-                style={{
-                  background: 'rgba(0,0,0,0.05) dark:rgba(255,255,255,0.08)',
-                }}
-              >
+              <span className="px-1.5 py-0.5 text-xs rounded bg-black/[0.08] dark:bg-white/[0.10] text-gray-600 dark:text-white/60">
                 {favorites.length}
               </span>
             </span>
@@ -303,25 +297,13 @@ export function DirectoryFilters({
               </label>
               <button
                 onClick={() => onDeptViewOpen(dept)}
-                className="flex items-center gap-1 transition-all shrink-0 text-scale-xs border rounded-md"
-                style={{
-                  color: "rgba(0,0,0,0.5) dark:rgba(255,255,255,0.35)",
-                  background: "rgba(0,0,0,0.03) dark:rgba(255,255,255,0.04)",
-                  borderColor: "rgba(0,0,0,0.1) dark:rgba(255,255,255,0.08)",
-                  padding: "3px 8px",
-                  borderRadius: "6px",
-                }}
-                onMouseEnter={(e) => {
-                  e.currentTarget.style.color = "#00C9A7";
-                  e.currentTarget.style.borderColor = "rgba(0,201,167,0.35)";
-                  e.currentTarget.style.background = "rgba(0,201,167,0.08)";
-                }}
-                onMouseLeave={(e) => {
-                  const isDark = document.documentElement.classList.contains('dark');
-                  e.currentTarget.style.color = isDark ? "rgba(255,255,255,0.35)" : "rgba(0,0,0,0.5)";
-                  e.currentTarget.style.borderColor = isDark ? "rgba(255,255,255,0.08)" : "rgba(0,0,0,0.1)";
-                  e.currentTarget.style.background = isDark ? "rgba(255,255,255,0.04)" : "rgba(0,0,0,0.03)";
-                }}
+                className="dept-ver-btn flex items-center gap-1 shrink-0 text-scale-xs border rounded-md transition-colors duration-150
+                  text-gray-600 dark:text-white/70
+                  bg-gray-100 dark:bg-white/[0.06]
+                  border-gray-300 dark:border-white/[0.12]
+                  hover:text-[#00C9A7] hover:border-[#00C9A7]/40 hover:bg-[#00C9A7]/[0.08]
+                  focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[#00C9A7]"
+                style={{ padding: "3px 8px", borderRadius: "6px" }}
                 title={`Ver departamento ${dept}`}
               >
                 <span>Ver</span>

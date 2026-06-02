@@ -18,6 +18,7 @@ import {
   getCompanyById,
 } from "@/lib/data";
 import { MobileFiltersBottomSheet } from "@/components/mobile-filters-bottom-sheet";
+import { EmployeeSkeletonGroup } from "@/components/employee-card-skeleton";
 import { ExtensionDirectory } from "@/components/extension-directory";
 import { FilterChips } from "@/components/filter-chips";
 import { AgendaView } from "@/components/agenda-view";
@@ -70,10 +71,8 @@ const getCardVariants = (isMobile: boolean) => ({
 // Loading fallback for Suspense boundaries around heavy view components
 function ViewLoadingFallback() {
   return (
-    <div className="flex flex-col gap-3">
-      {[...Array(6)].map((_, i) => (
-        <Skeleton key={i} className="h-16 rounded-lg" />
-      ))}
+    <div className="w-full">
+      <EmployeeSkeletonGroup view="grid" count={12} />
     </div>
   );
 }
@@ -318,10 +317,10 @@ function DirectoryContent() {
                 transition={{ duration: 0.25, ease: premiumEase }}
                 className="mb-8"
             >
-              <h1 className="text-3xl font-bold text-foreground mb-2">
+              <h1 className="type-page-title text-foreground mb-2">
                 Directorio de Empleados
               </h1>
-              <p className="text-muted-foreground">
+              <p className="type-subtitle text-muted-foreground">
                 Encuentra y contacta a los colaboradores de Grupo Shuma
               </p>
             </motion.div>
