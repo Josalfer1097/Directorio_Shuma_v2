@@ -67,32 +67,45 @@ const getCardVariants = (isMobile: boolean) => ({
   },
 });
 
+// Loading fallback for Suspense boundaries around heavy view components
+function ViewLoadingFallback() {
+  return (
+    <div className="flex flex-col gap-3">
+      {[...Array(6)].map((_, i) => (
+        <Skeleton key={i} className="h-16 rounded-lg" />
+      ))}
+    </div>
+  );
+}
+
 function DirectoryContent() {
   const searchParams = useSearchParams();
   const initialQuery = searchParams.get("q") || "";
   const initialCompany = searchParams.get("empresa") || "";
+  const focusSearch = searchParams.get("focus") === "search";
 
   const [searchQuery, setSearchQuery] = useState(initialQuery);
   const deferredSearchQuery = useDeferredValue(searchQuery);
-  const [isMobile, setIsMobile] = useState(() => {
-    if (typeof window !== "undefined") {
-      return window.innerWidth < 768;
-    }
-    return false;
-  });
-  const [viewMode, setViewMode] = useState<ViewMode>(() => {
-    if (typeof window !== "undefined") {
-      // On mobile, default to agenda view
-      if (window.innerWidth < 768) {
-        return "agenda";
-      }
+  
+  // Start with safe server-compatible defaults to avoid hydration mismatch
+  const [isMobile, setIsMobile] = useState(false);
+  const [viewMode, setViewMode] = useState<ViewMode>("grid");
+
+  // Hydrate client-only state after mount
+  useEffect(() => {
+    const mobile = window.innerWidth < 768;
+    setIsMobile(mobile);
+    
+    // Set initial view mode based on device and localStorage
+    if (mobile) {
+      setViewMode("agenda");
+    } else {
       const saved = safeGetItem("directorio-viewMode");
       if (saved === "grid" || saved === "list" || saved === "extensions" || saved === "agenda") {
-        return saved as ViewMode;
+        setViewMode(saved as ViewMode);
       }
     }
-    return "grid";
-  });
+  }, []);
 
   // Detect viewport changes and auto-switch views
   useEffect(() => {
@@ -150,6 +163,19 @@ function DirectoryContent() {
   const searchInputRef = useRef<HTMLInputElement>(null);
   const { favorites } = useFavorites();
   const { setActiveTheme } = useCompanyTheme();
+
+  // Focus search input when navigating from /buscar or with focus=search param
+  useEffect(() => {
+    if (focusSearch && searchInputRef.current) {
+      // Small delay to ensure DOM is ready
+      const timer = setTimeout(() => {
+        searchInputRef.current?.focus();
+        searchInputRef.current?.scrollIntoView({ behavior: "smooth", block: "center" });
+      }, 100);
+      return () => clearTimeout(timer);
+    }
+    return undefined;
+  }, [focusSearch]);
 
   // Company theme immersion - single company filter triggers theme change
   useEffect(() => {
@@ -396,23 +422,27 @@ function DirectoryContent() {
 
                 {/* Extensions View - Full width table */}
                 {viewMode === "extensions" ? (
-                  <ExtensionDirectory
-                    selectedCompanies={selectedCompanies}
-                    selectedDepartment={selectedDepartment}
-                    selectedLocations={selectedLocations}
-                    searchQuery={searchQuery}
-                  />
+                  <Suspense fallback={<ViewLoadingFallback />}>
+                    <ExtensionDirectory
+                      selectedCompanies={selectedCompanies}
+                      selectedDepartment={selectedDepartment}
+                      selectedLocations={selectedLocations}
+                      searchQuery={searchQuery}
+                    />
+                  </Suspense>
                 ) : viewMode === "agenda" ? (
                   <>
                     {/* Results count for agenda view */}
                     <p className="text-sm text-muted-foreground mb-4" role="status" aria-live="polite" aria-atomic="true">
                       Mostrando {filteredEmployees.length} empleados
                     </p>
-                    <AgendaView
-                      employees={filteredEmployees}
-                      companies={companies}
-                      selectedCompanies={selectedCompanies}
-                    />
+                    <Suspense fallback={<ViewLoadingFallback />}>
+                      <AgendaView
+                        employees={filteredEmployees}
+                        companies={companies}
+                        selectedCompanies={selectedCompanies}
+                      />
+                    </Suspense>
                   </>
                 ) : (
                   <>

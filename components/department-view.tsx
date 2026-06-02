@@ -216,11 +216,9 @@ export function DepartmentView({ department, onClose }: DepartmentViewProps) {
 
             {/* Header */}
             <header
-              className="sticky top-0 z-10 flex items-center justify-between px-4 md:px-6"
+              className="sticky top-0 z-10 flex items-center justify-between px-4 md:px-6 bg-background dark:bg-[#0C0E11] border-b border-border-subtle dark:border-b dark:border-white/7"
               style={{
                 height: "64px",
-                background: "#0C0E11",
-                borderBottom: "1px solid rgba(255,255,255,0.07)",
               }}
             >
               {/* Back button */}
@@ -239,11 +237,10 @@ export function DepartmentView({ department, onClose }: DepartmentViewProps) {
 
               {/* Department name */}
               <h1
-                className="absolute left-1/2 -translate-x-1/2 font-neuropol uppercase truncate max-w-[50%] text-scale-xl"
+                className="absolute left-1/2 -translate-x-1/2 font-neuropol uppercase truncate max-w-[50%] text-scale-xl text-foreground dark:text-white"
                 style={{
                   fontFamily: "var(--font-neuropol), var(--font-orbitron), 'Orbitron', monospace",
                   letterSpacing: "0.05em",
-                  color: "white",
                 }}
               >
                 {department}
@@ -251,12 +248,10 @@ export function DepartmentView({ department, onClose }: DepartmentViewProps) {
 
               {/* Employee count */}
               <div
-                className="flex items-center gap-1.5 text-scale-xs"
+                className="flex items-center gap-1.5 text-scale-xs bg-white/7 dark:bg-white/7 text-muted-foreground dark:text-white/70"
                 style={{
-                  background: "rgba(255,255,255,0.07)",
                   borderRadius: "20px",
                   padding: "4px 12px",
-                  color: "rgba(255,255,255,0.7)",
                 }}
               >
                 <Users className="w-3.5 h-3.5" />
@@ -269,10 +264,9 @@ export function DepartmentView({ department, onClose }: DepartmentViewProps) {
               {departmentEmployees.length === 0 ? (
                 <div className="flex flex-col items-center justify-center h-full gap-4">
                   <Users 
-                    className="w-12 h-12"
-                    style={{ color: "rgba(255,255,255,0.15)" }}
+                    className="w-12 h-12 text-white/15 dark:text-white/15"
                   />
-                  <p className="text-scale-base" style={{ color: "rgba(255,255,255,0.30)" }}>
+                  <p className="text-scale-base text-white/30 dark:text-white/30">
                     No hay colaboradores en este departamento
                   </p>
                 </div>
@@ -281,14 +275,13 @@ export function DepartmentView({ department, onClose }: DepartmentViewProps) {
                   {/* Manager Section */}
                   {managers.length > 0 && (
                     <section
+                      className="bg-white/1.5 dark:bg-white/1.5 border-b border-border-subtle dark:border-white/6"
                       style={{
                         padding: "24px",
-                        background: "rgba(255,255,255,0.015)",
-                        borderBottom: "1px solid rgba(255,255,255,0.06)",
                       }}
                     >
                       <p
-                        className="mb-3 text-scale-xs"
+                        className="mb-3 text-scale-xs text-foreground dark:text-white"
                         style={{
                           letterSpacing: "0.18em",
                           color: getCompanyConfig(managers[0].company).primary,
@@ -334,19 +327,16 @@ export function DepartmentView({ department, onClose }: DepartmentViewProps) {
                   {/* Divider */}
                   {managers.length > 0 && teamMembers.length > 0 && (
                     <div 
-                      className="relative flex items-center justify-center"
+                      className="relative flex items-center justify-center border-t border-border-subtle dark:border-white/6"
                       style={{ 
-                        borderTop: "1px solid rgba(255,255,255,0.06)",
                         margin: "0 24px",
                       }}
                     >
                       <span
-                        className="text-scale-xs"
+                        className="text-scale-xs text-foreground/25 dark:text-white/25 bg-background dark:bg-[#0C0E11]"
                         style={{
                           position: "absolute",
                           letterSpacing: "0.15em",
-                          color: "rgba(255,255,255,0.25)",
-                          background: "#0C0E11",
                           padding: "0 16px",
                           textTransform: "uppercase",
                         }}

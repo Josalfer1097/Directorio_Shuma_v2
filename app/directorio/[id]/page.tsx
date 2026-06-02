@@ -640,16 +640,22 @@ function EmployeeDetailContent({ id }: { id: string }) {
         initial="hidden"
         animate="visible"
         exit="exit"
-        transition={{ type: "spring", damping: 30, stiffness: 400, duration: 0.2 }}
+        transition={{ 
+          type: "spring", 
+          damping: 28, 
+          stiffness: 320,
+          mass: 0.8,
+        }}
         drag="y"
         dragConstraints={{ top: 0 }}
-        dragElastic={0.2}
+        dragElastic={0.15}
         onDragEnd={(_, info) => {
-          if (info.offset.y > 100) handleClose();
+          if (info.offset.y > 80 || info.velocity.y > 500) handleClose();
         }}
-        className="relative md:hidden w-full overflow-hidden z-10"
+        className="relative md:hidden w-full z-10 flex flex-col"
         style={{
           ...companyVars,
+          maxHeight: 'calc(100dvh - 40px)',
           borderRadius: '20px 20px 0 0',
           background: '#0C0E11',
           border: '1px solid rgba(255,255,255,0.07)',
@@ -659,12 +665,12 @@ function EmployeeDetailContent({ id }: { id: string }) {
       >
         {/* Top border accent */}
         <div 
-          className="h-[3px] w-full" 
+          className="h-[3px] w-full shrink-0" 
           style={{ backgroundColor: config.primary }} 
         />
 
         {/* Drag handle */}
-        <div className="flex justify-center pt-2.5">
+        <div className="flex justify-center pt-2 pb-1 shrink-0">
           <div 
             className="rounded-full"
             style={{ 
@@ -678,19 +684,19 @@ function EmployeeDetailContent({ id }: { id: string }) {
         {/* Close button */}
         <button
           onClick={handleClose}
-          className="absolute top-4 right-4 w-[30px] h-[30px] rounded-full flex items-center justify-center z-10"
+          className="absolute top-3 right-3 w-[28px] h-[28px] rounded-full flex items-center justify-center z-10"
           style={{
-            background: 'rgba(0,0,0,0.3)',
+            background: 'rgba(0,0,0,0.4)',
             border: '1px solid rgba(255,255,255,0.12)',
-            color: 'rgba(255,255,255,0.5)',
+            color: 'rgba(255,255,255,0.6)',
           }}
         >
-          <X className="w-[13px] h-[13px]" />
+          <X className="w-[12px] h-[12px]" />
         </button>
 
-        {/* Header Band */}
+        {/* Compact Header Band - Fixed */}
         <div 
-          className="relative overflow-hidden"
+          className="relative overflow-hidden shrink-0"
           style={{
             background: `linear-gradient(135deg, ${config.secondary} 0%, color-mix(in srgb, ${config.primary} 40%, #0C0E11) 100%)`,
           }}
@@ -702,9 +708,9 @@ function EmployeeDetailContent({ id }: { id: string }) {
               right: '-10px',
               top: '-10px',
               fontFamily: "var(--font-neuropol), var(--font-orbitron), 'Orbitron', 'Courier New', monospace",
-              fontSize: '120px',
+              fontSize: '80px',
               fontWeight: 900,
-              opacity: 0.08,
+              opacity: 0.06,
               color: config.primary,
               lineHeight: 1,
               zIndex: 0,
@@ -713,289 +719,310 @@ function EmployeeDetailContent({ id }: { id: string }) {
             {config.initial}
           </div>
 
-          {/* Header Content */}
-          <div className="relative z-[1] px-6 pt-4 pb-5 flex flex-col items-center text-center">
-            {/* Avatar */}
+          {/* Compact Header Content - Horizontal Layout */}
+          <div className="relative z-[1] px-4 py-3 flex items-center gap-3">
+            {/* Avatar - Smaller */}
             <div 
-              className="w-16 h-16 rounded-full flex items-center justify-center"
+              className="w-12 h-12 rounded-full flex items-center justify-center shrink-0"
               style={{ 
                 background: `linear-gradient(135deg, ${config.secondary}, ${config.primary})`,
-                border: `2.5px solid ${config.primary}`,
-                boxShadow: `0 0 24px ${config.glow}`,
+                border: `2px solid ${config.primary}`,
+                boxShadow: `0 0 16px ${config.glow}`,
               }}
             >
               <span 
                 className="text-white font-bold"
                 style={{ 
                   fontFamily: "var(--font-neuropol), var(--font-orbitron), 'Orbitron', 'Courier New', monospace",
-                  fontSize: 'var(--font-xl)',
+                  fontSize: 'var(--font-base)',
                 }}
               >
                 {getInitials(employee.name)}
               </span>
             </div>
 
-            {/* Name */}
-            <h2 
-              className="text-white font-bold mt-3"
-              style={{ 
-                fontFamily: "'DM Sans', sans-serif",
-                fontSize: 'var(--font-lg)',
-                fontWeight: 700,
-              }}
-            >
-              {employee.name}
-            </h2>
-
-            {/* Position */}
-            <p 
-              className="italic mt-1"
-              style={{ 
-                color: config.primary,
-                fontSize: 'var(--font-sm)',
-                fontFamily: "'DM Sans', sans-serif",
-              }}
-            >
-              {employee.position}
-            </p>
-
-            {/* Company badge */}
-            <span 
-              className="mt-2"
-              style={{
-                background: `color-mix(in srgb, ${config.primary} 18%, transparent)`,
-                border: `1px solid color-mix(in srgb, ${config.primary} 45%, transparent)`,
-                color: config.highlight,
-                fontSize: 'var(--font-xs)',
-                fontFamily: "var(--font-neuropol), var(--font-orbitron), 'Orbitron', 'Courier New', monospace",
-                textTransform: 'uppercase',
-                letterSpacing: '0.1em',
-                padding: '3px 10px',
-                borderRadius: '20px',
-              }}
-            >
-              {company?.shortName || company?.name}
-            </span>
+            {/* Name & Info */}
+            <div className="flex-1 min-w-0">
+              <h2 
+                className="text-white font-bold truncate"
+                style={{ 
+                  fontFamily: "'DM Sans', sans-serif",
+                  fontSize: 'var(--font-base)',
+                  fontWeight: 700,
+                  lineHeight: 1.2,
+                }}
+              >
+                {employee.name}
+              </h2>
+              <p 
+                className="italic truncate"
+                style={{ 
+                  color: config.highlight || config.primary,
+                  fontSize: 'var(--font-sm)',
+                  fontFamily: "'DM Sans', sans-serif",
+                  lineHeight: 1.3,
+                }}
+              >
+                {employee.position}
+              </p>
+              {/* Company badge inline */}
+              <span 
+                className="inline-block mt-1"
+                style={{
+                  background: `color-mix(in srgb, ${config.primary} 18%, transparent)`,
+                  border: `1px solid color-mix(in srgb, ${config.primary} 45%, transparent)`,
+                  color: config.highlight,
+                  fontSize: '10px',
+                  fontFamily: "var(--font-neuropol), var(--font-orbitron), 'Orbitron', 'Courier New', monospace",
+                  textTransform: 'uppercase',
+                  letterSpacing: '0.08em',
+                  padding: '2px 8px',
+                  borderRadius: '12px',
+                }}
+              >
+                {company?.shortName || company?.name}
+              </span>
+            </div>
           </div>
         </div>
 
-        {/* Body Section - Info Grid */}
-        <div className="px-6 py-5">
-          <div className="grid grid-cols-2 gap-x-4 gap-y-3">
-            {/* Departamento */}
-            <div className="pb-2" style={{ borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
-              <p 
-                className="mb-0.5"
-                style={{ 
-                  fontSize: 'var(--font-xs)', 
-                  color: 'rgba(255,255,255,0.27)', 
-                  textTransform: 'uppercase',
-                  letterSpacing: '0.1em',
-                }}
-              >
-                Departamento
-              </p>
-              <p style={{ fontSize: 'var(--font-sm)', color: '#FFFFFF', fontWeight: 500 }}>
-                {employee.department || "—"}
-              </p>
-            </div>
-
-            {/* Empresa */}
-            <div className="pb-2" style={{ borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
-              <p 
-                className="mb-0.5"
-                style={{ 
-                  fontSize: 'var(--font-xs)', 
-                  color: 'rgba(255,255,255,0.27)', 
-                  textTransform: 'uppercase',
-                  letterSpacing: '0.1em',
-                }}
-              >
-                Empresa
-              </p>
-              <p style={{ fontSize: 'var(--font-sm)', color: '#FFFFFF', fontWeight: 500 }}>
-                {company?.shortName || "—"}
-              </p>
-            </div>
-
-            {/* Telefono */}
-            <div className="pb-2" style={{ borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
-              <p 
-                className="mb-0.5"
-                style={{ 
-                  fontSize: 'var(--font-xs)', 
-                  color: 'rgba(255,255,255,0.27)', 
-                  textTransform: 'uppercase',
-                  letterSpacing: '0.1em',
-                }}
-              >
-                Telefono
-              </p>
-              <p style={{ fontSize: 'var(--font-sm)', color: '#FFFFFF', fontWeight: 500 }}>
-                {employee.phone || "—"}
-              </p>
-            </div>
-
-            {/* Extension */}
-            <div className="pb-2" style={{ borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
-              <p 
-                className="mb-0.5"
-                style={{ 
-                  fontSize: 'var(--font-xs)', 
-                  color: 'rgba(255,255,255,0.27)', 
-                  textTransform: 'uppercase',
-                  letterSpacing: '0.1em',
-                }}
-              >
-                Extension
-              </p>
-              {employee.extension && employee.extension !== "—" ? (
-                <p style={{ fontSize: 'var(--font-sm)', color: '#FFFFFF', fontWeight: 500 }}>
-                  {employee.extension}
-                </p>
-              ) : (
-                <span 
+        {/* Scrollable Content Area */}
+        <div className="flex-1 overflow-y-auto overscroll-contain">
+          {/* Body Section - Compact Info Grid */}
+          <div className="px-4 py-3">
+            <div className="grid grid-cols-2 gap-x-3 gap-y-2">
+              {/* Departamento */}
+              <div className="pb-1.5" style={{ borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
+                <p 
                   style={{ 
-                    fontSize: 'var(--font-xs)', 
-                    color: 'rgba(255,255,255,0.3)',
+                    fontSize: '10px', 
+                    color: 'rgba(255,255,255,0.27)', 
+                    textTransform: 'uppercase',
+                    letterSpacing: '0.08em',
+                    marginBottom: '2px',
                   }}
                 >
-                  Sin ext.
-                </span>
-              )}
-            </div>
+                  Departamento
+                </p>
+                <p style={{ fontSize: 'var(--font-sm)', color: '#FFFFFF', fontWeight: 500, lineHeight: 1.2 }}>
+                  {employee.department || "—"}
+                </p>
+              </div>
 
-            {/* Email - spans both columns */}
-            <div className="col-span-2 pb-2" style={{ borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
-              <p 
-                className="mb-0.5"
-                style={{ 
-                  fontSize: 'var(--font-xs)', 
-                  color: 'rgba(255,255,255,0.27)', 
-                  textTransform: 'uppercase',
-                  letterSpacing: '0.1em',
-                }}
-              >
-                Email
-              </p>
-              <p style={{ fontSize: 'var(--font-sm)', color: '#FFFFFF', fontWeight: 500, wordBreak: 'break-all' }}>
-                {employee.email || "—"}
-              </p>
+              {/* Empresa */}
+              <div className="pb-1.5" style={{ borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
+                <p 
+                  style={{ 
+                    fontSize: '10px', 
+                    color: 'rgba(255,255,255,0.27)', 
+                    textTransform: 'uppercase',
+                    letterSpacing: '0.08em',
+                    marginBottom: '2px',
+                  }}
+                >
+                  Empresa
+                </p>
+                <p style={{ fontSize: 'var(--font-sm)', color: '#FFFFFF', fontWeight: 500, lineHeight: 1.2 }}>
+                  {company?.shortName || "—"}
+                </p>
+              </div>
+
+              {/* Telefono */}
+              <div className="pb-1.5" style={{ borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
+                <p 
+                  style={{ 
+                    fontSize: '10px', 
+                    color: 'rgba(255,255,255,0.27)', 
+                    textTransform: 'uppercase',
+                    letterSpacing: '0.08em',
+                    marginBottom: '2px',
+                  }}
+                >
+                  Telefono
+                </p>
+                <p style={{ fontSize: 'var(--font-sm)', color: '#FFFFFF', fontWeight: 500, lineHeight: 1.2 }}>
+                  {employee.phone || "—"}
+                </p>
+              </div>
+
+              {/* Extension */}
+              <div className="pb-1.5" style={{ borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
+                <p 
+                  style={{ 
+                    fontSize: '10px', 
+                    color: 'rgba(255,255,255,0.27)', 
+                    textTransform: 'uppercase',
+                    letterSpacing: '0.08em',
+                    marginBottom: '2px',
+                  }}
+                >
+                  Extension
+                </p>
+                {employee.extension && employee.extension !== "—" ? (
+                  <p style={{ fontSize: 'var(--font-sm)', color: '#FFFFFF', fontWeight: 500, lineHeight: 1.2 }}>
+                    {employee.extension}
+                  </p>
+                ) : (
+                  <span style={{ fontSize: '11px', color: 'rgba(255,255,255,0.3)' }}>
+                    Sin ext.
+                  </span>
+                )}
+              </div>
+
+              {/* Email - spans both columns */}
+              <div className="col-span-2 pb-1.5" style={{ borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
+                <p 
+                  style={{ 
+                    fontSize: '10px', 
+                    color: 'rgba(255,255,255,0.27)', 
+                    textTransform: 'uppercase',
+                    letterSpacing: '0.08em',
+                    marginBottom: '2px',
+                  }}
+                >
+                  Email
+                </p>
+                <p style={{ fontSize: 'var(--font-sm)', color: '#FFFFFF', fontWeight: 500, wordBreak: 'break-all', lineHeight: 1.2 }}>
+                  {employee.email || "—"}
+                </p>
+              </div>
+
+              {/* Sucursal - spans both columns */}
+              {employee.location && (
+                <div className="col-span-2 pb-1.5" style={{ borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
+                  <p 
+                    style={{ 
+                      fontSize: '10px', 
+                      color: 'rgba(255,255,255,0.27)', 
+                      textTransform: 'uppercase',
+                      letterSpacing: '0.08em',
+                      marginBottom: '2px',
+                    }}
+                  >
+                    Sucursal
+                  </p>
+                  <span 
+                    className="inline-flex items-center gap-1"
+                    style={{
+                      background: 'rgba(255,255,255,0.05)',
+                      border: '1px solid rgba(255,255,255,0.10)',
+                      borderRadius: '12px',
+                      padding: '2px 8px',
+                      fontSize: 'var(--font-xs)',
+                      color: 'white',
+                    }}
+                  >
+                    <MapPin className="w-2.5 h-2.5" style={{ color: config.primary }} />
+                    {employee.location}
+                  </span>
+                </div>
+              )}
             </div>
           </div>
         </div>
 
-        {/* Action Row - Stacked for mobile */}
+        {/* Action Row - Compact 2-column grid - Fixed at bottom */}
         <div 
-          className="px-6 py-4 flex flex-col gap-2"
+          className="px-4 py-3 shrink-0"
           style={{
             background: 'rgba(255,255,255,0.015)',
             borderTop: '1px solid rgba(255,255,255,0.06)',
-            paddingBottom: '24px',
+            paddingBottom: 'max(16px, env(safe-area-inset-bottom))',
           }}
         >
-          {/* Copy Email */}
-          <button
-            onClick={() => employee.email && copyToClipboard(employee.email, 'email')}
-            className="w-full rounded-[10px] flex items-center justify-center gap-1.5 transition-all duration-[180ms]"
-            style={{
-              height: '44px',
-              background: copiedField === 'email' ? config.primary : 'rgba(255,255,255,0.04)',
-              border: `1px solid ${copiedField === 'email' ? config.primary : 'rgba(255,255,255,0.08)'}`,
-              color: copiedField === 'email' ? 'white' : 'rgba(255,255,255,0.44)',
-              fontSize: 'var(--font-sm)',
-            }}
-          >
-            {copiedField === 'email' ? (
-              <>
-                <Check className="w-4 h-4" />
-                <span>Copiado</span>
-              </>
-            ) : (
-              <>
-                <Copy className="w-4 h-4" />
-                <span>Copiar email</span>
-              </>
-            )}
-          </button>
-
-          {/* Teams */}
-          <button
-            onClick={openTeamsChat}
-            className="w-full rounded-[10px] flex items-center justify-center gap-1.5 transition-all duration-[180ms]"
-            style={{
-              height: '44px',
-              background: 'rgba(255,255,255,0.04)',
-              border: '1px solid rgba(255,255,255,0.08)',
-              color: 'rgba(255,255,255,0.44)',
-              fontSize: 'var(--font-sm)',
-            }}
-          >
-            <MessageSquare className="w-4 h-4" />
-            <span>Abrir en Teams</span>
-          </button>
-
-          {/* Copy Phone */}
-          <button
-            onClick={() => employee.phone && copyToClipboard(employee.phone, 'phone')}
-            className="w-full rounded-[10px] flex items-center justify-center gap-1.5 transition-all duration-[180ms]"
-            style={{
-              height: '44px',
-              background: copiedField === 'phone' ? config.primary : 'rgba(255,255,255,0.04)',
-              border: `1px solid ${copiedField === 'phone' ? config.primary : 'rgba(255,255,255,0.08)'}`,
-              color: copiedField === 'phone' ? 'white' : 'rgba(255,255,255,0.44)',
-              fontSize: 'var(--font-sm)',
-            }}
-          >
-            {copiedField === 'phone' ? (
-              <>
-                <Check className="w-4 h-4" />
-                <span>Copiado</span>
-              </>
-            ) : (
-              <>
-                <Phone className="w-4 h-4" />
-                <span>Copiar telefono</span>
-              </>
-            )}
-          </button>
-
-          {/* Favorite + Copy All row */}
-          <div className="flex gap-2">
+          <div className="grid grid-cols-2 gap-2">
+            {/* Copy Email */}
             <button
-              onClick={handleToggleFavorite}
-              className="flex-1 rounded-[10px] flex items-center justify-center gap-1.5 transition-all duration-[180ms]"
+              onClick={() => employee.email && copyToClipboard(employee.email, 'email')}
+              className="rounded-lg flex items-center justify-center gap-1.5 transition-all duration-150 active:scale-[0.98]"
               style={{
-                height: '44px',
-                background: isEmployeeFavorite ? 'rgba(245,196,0,0.15)' : 'rgba(255,255,255,0.04)',
-                border: isEmployeeFavorite ? '1px solid rgba(245,196,0,0.4)' : '1px solid rgba(255,255,255,0.08)',
-                color: isEmployeeFavorite ? '#F5C400' : 'rgba(255,255,255,0.44)',
-                fontSize: 'var(--font-sm)',
+                height: '38px',
+                background: copiedField === 'email' ? config.primary : 'rgba(255,255,255,0.04)',
+                border: `1px solid ${copiedField === 'email' ? config.primary : 'rgba(255,255,255,0.08)'}`,
+                color: copiedField === 'email' ? 'white' : 'rgba(255,255,255,0.5)',
+                fontSize: '12px',
               }}
             >
-              <Star className={`w-4 h-4 ${isEmployeeFavorite ? 'fill-[#F5C400]' : ''}`} />
+              {copiedField === 'email' ? (
+                <Check className="w-3.5 h-3.5" />
+              ) : (
+                <Copy className="w-3.5 h-3.5" />
+              )}
+              <span>{copiedField === 'email' ? 'Copiado' : 'Email'}</span>
+            </button>
+
+            {/* Teams */}
+            <button
+              onClick={openTeamsChat}
+              className="rounded-lg flex items-center justify-center gap-1.5 transition-all duration-150 active:scale-[0.98]"
+              style={{
+                height: '38px',
+                background: 'rgba(255,255,255,0.04)',
+                border: '1px solid rgba(255,255,255,0.08)',
+                color: 'rgba(255,255,255,0.5)',
+                fontSize: '12px',
+              }}
+            >
+              <MessageSquare className="w-3.5 h-3.5" />
+              <span>Teams</span>
+            </button>
+
+            {/* Copy Phone */}
+            <button
+              onClick={() => employee.phone && copyToClipboard(employee.phone, 'phone')}
+              className="rounded-lg flex items-center justify-center gap-1.5 transition-all duration-150 active:scale-[0.98]"
+              style={{
+                height: '38px',
+                background: copiedField === 'phone' ? config.primary : 'rgba(255,255,255,0.04)',
+                border: `1px solid ${copiedField === 'phone' ? config.primary : 'rgba(255,255,255,0.08)'}`,
+                color: copiedField === 'phone' ? 'white' : 'rgba(255,255,255,0.5)',
+                fontSize: '12px',
+              }}
+            >
+              {copiedField === 'phone' ? (
+                <Check className="w-3.5 h-3.5" />
+              ) : (
+                <Phone className="w-3.5 h-3.5" />
+              )}
+              <span>{copiedField === 'phone' ? 'Copiado' : 'Telefono'}</span>
+            </button>
+
+            {/* Favorite */}
+            <button
+              onClick={handleToggleFavorite}
+              className="rounded-lg flex items-center justify-center gap-1.5 transition-all duration-150 active:scale-[0.98]"
+              style={{
+                height: '38px',
+                background: isEmployeeFavorite ? 'rgba(245,196,0,0.15)' : 'rgba(255,255,255,0.04)',
+                border: isEmployeeFavorite ? '1px solid rgba(245,196,0,0.4)' : '1px solid rgba(255,255,255,0.08)',
+                color: isEmployeeFavorite ? '#F5C400' : 'rgba(255,255,255,0.5)',
+                fontSize: '12px',
+              }}
+            >
+              <Star className={`w-3.5 h-3.5 ${isEmployeeFavorite ? 'fill-[#F5C400]' : ''}`} />
               <span>{isEmployeeFavorite ? 'Guardado' : 'Favorito'}</span>
             </button>
 
+            {/* Copy All - Full width */}
             <button
               onClick={copyAllInfo}
-              className="flex-1 rounded-[10px] flex items-center justify-center gap-1.5 transition-all duration-[180ms]"
+              className="col-span-2 rounded-lg flex items-center justify-center gap-1.5 transition-all duration-150 active:scale-[0.98]"
               style={{
-                height: '44px',
+                height: '38px',
                 background: copyAllState === 'copied' ? '#00C9A7' : 'rgba(255,255,255,0.04)',
                 border: copyAllState === 'copied' ? '1px solid #00C9A7' : '1px solid rgba(255,255,255,0.08)',
-                color: copyAllState === 'copied' ? 'white' : 'rgba(255,255,255,0.44)',
-                fontSize: 'var(--font-sm)',
+                color: copyAllState === 'copied' ? 'white' : 'rgba(255,255,255,0.5)',
+                fontSize: '12px',
               }}
             >
               {copyAllState === 'copied' ? (
                 <>
-                  <Check className="w-4 h-4" />
+                  <Check className="w-3.5 h-3.5" />
                   <span>Copiado</span>
                 </>
               ) : (
                 <>
-                  <ClipboardList className="w-4 h-4" />
+                  <ClipboardList className="w-3.5 h-3.5" />
                   <span>Copiar todo</span>
                 </>
               )}
