@@ -121,7 +121,7 @@ export function AgendaView({
                 } : undefined}
               >
                 <Link
-                  href={`/empleado/${employee.id}`}
+                  href={`/directorio/${employee.id}`}
                   className={cn(
                     "w-full flex items-center gap-3 px-3 py-3 text-left",
                     "border-b border-border/30 last:border-b-0",
