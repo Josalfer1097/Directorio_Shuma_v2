@@ -11,6 +11,7 @@ import { getEmployees } from "@/lib/data";
 import { FontScaleControl } from "./font-scale-control";
 import { ThemeToggle } from "./theme-toggle";
 import { MundialToggle } from "./mundial/mundial-toggle";
+import { EagleIcon } from "./mundial/eagle-icon";
 import { useMundialTheme } from "@/lib/MundialThemeContext";
 
 export function Navbar() {
@@ -21,7 +22,7 @@ export function Navbar() {
   const [viewMode, setViewMode] = useState<ViewMode>("grid");
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [phoneTooltipVisible, setPhoneTooltipVisible] = useState(false);
-  const { mundialActive } = useMundialTheme();
+  const { mundialActive, openTracker } = useMundialTheme();
 
   const longPressTimer = useRef<NodeJS.Timeout | null>(null);
 
@@ -229,21 +230,38 @@ export function Navbar() {
             <span className="px-1.5 py-0.5 rounded-full text-[9px] bg-muted border border-border-subtle text-muted-foreground">
               {employeeCount}
             </span>
-            {/* Modo Mundial badge — only visible when active */}
-            <span
-              className="mundial-only items-center gap-1 px-2 py-0.5 rounded-full text-[9px] font-dm-sans font-semibold normal-case tracking-normal whitespace-nowrap"
+            {pathname === "/directorio" && (
+              <span className="absolute -bottom-1.5 left-0 right-0 h-0.5 bg-gradient-to-r from-[#C9A84C] to-[#E0C060] rounded-full" />
+            )}
+          </Link>
+
+          {/* Modo Mundial: "¡Vamos México!" badge with vertical tricolor +
+              eagle accent — opens the match tracker (easter egg) */}
+          <div className="hidden md:block">
+            <button
+              type="button"
+              onClick={openTracker}
+              className="mundial-only items-center gap-1.5 px-2 py-1 rounded-full text-[9px] font-dm-sans font-semibold tracking-normal whitespace-nowrap transition-transform hover:scale-105 active:scale-95"
               style={{
                 background: "rgba(31,168,92,0.12)",
                 border: "1px solid rgba(31,168,92,0.35)",
                 color: "#1FA85C",
               }}
+              aria-label="Ver partidos de México en el Mundial 2026"
             >
-              {"\u{1F1F2}\u{1F1FD}"} Rumbo al Mundial 2026
-            </span>
-            {pathname === "/directorio" && (
-              <span className="absolute -bottom-1.5 left-0 right-0 h-0.5 bg-gradient-to-r from-[#C9A84C] to-[#E0C060] rounded-full" />
-            )}
-          </Link>
+              {/* Vertical green-white-red stripes (Mexican flag order) */}
+              <span
+                className="flex h-2.5 w-3.5 overflow-hidden rounded-[2px] shrink-0"
+                aria-hidden="true"
+              >
+                <span className="flex-1" style={{ background: "#1FA85C" }} />
+                <span className="flex-1" style={{ background: "#F4F4F4" }} />
+                <span className="flex-1" style={{ background: "#CE1126" }} />
+              </span>
+              <EagleIcon size={12} strokeWidth={1.8} className="shrink-0" />
+              ¡Vamos México!
+            </button>
+          </div>
 
           {/* Font Scale Control */}
           <FontScaleControl />

@@ -7,6 +7,7 @@ import { FontScaleProvider } from '@/lib/FontScaleContext'
 import { CompanyThemeProvider } from '@/lib/CompanyThemeContext'
 import { MundialThemeProvider } from '@/lib/MundialThemeContext'
 import { PitchPattern } from '@/components/mundial/pitch-pattern'
+import { MundialMatchTracker } from '@/components/mundial/match-tracker'
 import { RgbSignature } from '@/components/rgb-signature'
 import { Toaster } from 'sonner'
 import { ScrollToTop } from '@/components/scroll-to-top'
@@ -93,6 +94,7 @@ export default function RootLayout({
                 <div className="pb-7 md:pb-7 relative z-[1]" style={{ paddingBottom: 'calc(28px + max(env(safe-area-inset-bottom), 8px))' }}>
                   {children}
                 </div>
+                <MundialMatchTracker />
                 <RgbSignature />
                 <ScrollToTop />
                 <Toaster position="bottom-right" richColors />

@@ -1603,34 +1603,6 @@ button, a, [role="button"], .clickable {
   opacity: 0.85;
 }
 
-/* ── CTA "Ver Directorio": keep brand fill, add a thin tricolor
-   (green–white–red) underline accent below the label ──────────────── */
-.theme-mundial .mundial-cta {
-  position: relative;
-}
-
-.theme-mundial .mundial-cta::after {
-  content: '';
-  position: absolute;
-  bottom: 9px;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 44%;
-  height: 2.5px;
-  border-radius: 999px;
-  background: linear-gradient(
-    90deg,
-    var(--mundial-green) 0%,
-    var(--mundial-green) 33.3%,
-    var(--mundial-white) 33.3%,
-    var(--mundial-white) 66.6%,
-    var(--mundial-red) 66.6%,
-    var(--mundial-red) 100%
-  );
-  opacity: 0.9;
-  pointer-events: none;
-}
-
 /* ── Shuma logo: ball-roll bounce on hover ─────────────────────────── */
 @keyframes mundialBallRoll {
   0%   { transform: translateY(0) rotate(0deg); }

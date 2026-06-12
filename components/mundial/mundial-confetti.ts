@@ -20,15 +20,22 @@ interface Particle {
   rotationSpeed: number;
 }
 
-export function fireMundialConfetti(): void {
+export function fireMundialConfetti(options?: {
+  /** Skip the once-per-session guard (used by the match tracker on wins). */
+  force?: boolean;
+  /** Smaller, subtler burst. */
+  subtle?: boolean;
+}): void {
   if (typeof window === "undefined") return;
 
-  // Only once per session
-  try {
-    if (sessionStorage.getItem(SESSION_KEY) === "true") return;
-    sessionStorage.setItem(SESSION_KEY, "true");
-  } catch {
-    return;
+  // Only once per session (unless forced)
+  if (!options?.force) {
+    try {
+      if (sessionStorage.getItem(SESSION_KEY) === "true") return;
+      sessionStorage.setItem(SESSION_KEY, "true");
+    } catch {
+      return;
+    }
   }
 
   // Respect reduced motion
@@ -52,9 +59,10 @@ export function fireMundialConfetti(): void {
   const cx = window.innerWidth / 2;
   const cy = window.innerHeight * 0.45;
 
-  const particles: Particle[] = Array.from({ length: PARTICLE_COUNT }, () => {
+  const count = options?.subtle ? Math.round(PARTICLE_COUNT / 2) : PARTICLE_COUNT;
+  const particles: Particle[] = Array.from({ length: count }, () => {
     const angle = Math.random() * Math.PI * 2;
-    const speed = 4 + Math.random() * 9;
+    const speed = options?.subtle ? 3 + Math.random() * 6 : 4 + Math.random() * 9;
     return {
       x: cx,
       y: cy,

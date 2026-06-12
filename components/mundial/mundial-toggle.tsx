@@ -6,7 +6,7 @@ import { useMundialTheme } from "@/lib/MundialThemeContext";
 import { SoccerBallIcon } from "./soccer-ball-icon";
 
 export function MundialToggle() {
-  const { mundialActive, toggleMundial } = useMundialTheme();
+  const { mundialActive, toggleMundial, hasUnseenMatches } = useMundialTheme();
   const [mounted, setMounted] = useState(false);
 
   // Prevent hydration mismatch (same pattern as ThemeToggle)
@@ -36,9 +36,11 @@ export function MundialToggle() {
       >
         <SoccerBallIcon className="w-5 h-5 transition-transform group-hover:scale-110" />
       </motion.div>
-      {mundialActive && (
+      {/* "New match update" indicator — pulses while there's an entry in
+          mundial-mexico.ts the user hasn't viewed in the match tracker */}
+      {mundialActive && hasUnseenMatches && (
         <span
-          className="absolute -top-0.5 -right-0.5 w-2 h-2 rounded-full"
+          className="absolute -top-0.5 -right-0.5 w-2 h-2 rounded-full motion-safe:animate-pulse"
           style={{
             background: "linear-gradient(135deg, #1FA85C, #CE1126)",
             boxShadow: "0 0 6px rgba(31,168,92,0.6)",
