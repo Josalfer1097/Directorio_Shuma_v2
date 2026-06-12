@@ -17,6 +17,7 @@ import { AdminProvider } from "@/components/admin/admin-context";
 import { SoccerBallIcon } from "@/components/mundial/soccer-ball-icon";
 import { MundialCountdown } from "@/components/mundial/mundial-countdown";
 import { fireMundialConfetti } from "@/components/mundial/mundial-confetti";
+import { MundialOnboardingTooltip } from "@/components/mundial/mundial-onboarding-tooltip";
 import { useMundialTheme } from "@/lib/MundialThemeContext";
 
 export default function HomePage() {
@@ -138,17 +139,21 @@ export default function HomePage() {
 
             {/* Smart Search Bar — renders immediately without delay */}
             <div className="relative">
-              {/* Modo Mundial: decorative line-art soccer ball — also a secondary
+              {/* Mundial 2026: decorative line-art soccer ball — also a secondary
                   entry point that opens the match tracker banner */}
-              <button
-                type="button"
-                onClick={openTracker}
-                className="mundial-only absolute -top-14 right-2 sm:-top-16 sm:right-4 md:right-8 select-none opacity-30 hover:opacity-70 focus-visible:opacity-70 transition-opacity"
-                style={{ color: "#1FA85C", transform: "rotate(12deg)" }}
-                aria-label="Ver partidos de México en el Mundial 2026"
-              >
-                <SoccerBallIcon size={44} strokeWidth={1.1} />
-              </button>
+              <div className="mundial-only absolute -top-14 right-2 sm:-top-16 sm:right-4 md:right-8">
+                <button
+                  type="button"
+                  onClick={openTracker}
+                  className="select-none opacity-30 hover:opacity-70 focus-visible:opacity-70 transition-opacity"
+                  style={{ color: "#1FA85C", transform: "rotate(12deg)" }}
+                  aria-label="Ver partidos de México en el Mundial 2026"
+                >
+                  <SoccerBallIcon size={44} strokeWidth={1.1} />
+                </button>
+                {/* Onboarding tooltip (mobile entry point) */}
+                <MundialOnboardingTooltip placement="hero" />
+              </div>
               <SmartSearchBar />
             </div>
 

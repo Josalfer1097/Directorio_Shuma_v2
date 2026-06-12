@@ -10,7 +10,7 @@ import { cn } from "@/lib/utils";
 import { getEmployees } from "@/lib/data";
 import { FontScaleControl } from "./font-scale-control";
 import { ThemeToggle } from "./theme-toggle";
-import { MundialToggle } from "./mundial/mundial-toggle";
+import { MundialBallButton } from "./mundial/mundial-ball-button";
 import { EagleIcon } from "./mundial/eagle-icon";
 import { useMundialTheme } from "@/lib/MundialThemeContext";
 
@@ -342,8 +342,8 @@ export function Navbar() {
           {/* Theme Toggle */}
           <ThemeToggle />
 
-          {/* Modo Mundial Toggle */}
-          <MundialToggle />
+          {/* Mundial 2026: soccer ball — opens the match tracker */}
+          <MundialBallButton />
 
           {/* View Toggle - Hidden on mobile (agenda is default there) */}
           <button

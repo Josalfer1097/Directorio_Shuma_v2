@@ -172,11 +172,21 @@ export function MundialMatchTracker() {
               border: "1px solid var(--border-subtle)",
             }}
           >
-            {/* Tricolor top accent (vertical stripes, Mexican flag order) */}
-            <div className="flex h-1" aria-hidden="true">
+            {/* Tricolor top accent (vertical stripes, Mexican flag order) with
+                a small brown/gold emblem dot centered in the white section */}
+            <div className="relative flex h-1" aria-hidden="true">
               <span className="flex-1" style={{ background: GREEN }} />
               <span className="flex-1" style={{ background: "#F4F4F4" }} />
               <span className="flex-1" style={{ background: RED }} />
+              <span
+                className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 rounded-full"
+                style={{
+                  width: "9px",
+                  height: "9px",
+                  background: "radial-gradient(circle at 35% 35%, #D4A574, #8B5E34)",
+                  boxShadow: "0 0 0 1.5px var(--bg-surface)",
+                }}
+              />
             </div>
 
             {/* Header */}
