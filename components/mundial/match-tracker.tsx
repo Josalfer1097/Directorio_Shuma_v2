@@ -32,8 +32,17 @@ function formatDate(iso: string): string {
   return d.toLocaleDateString("es-MX", { day: "numeric", month: "long", year: "numeric" });
 }
 
-function MatchRow({ match }: { match: MatchResult }) {
+/** Whole days from today until the given ISO date (local midnights). */
+function daysUntil(iso: string): number {
+  const target = new Date(`${iso}T00:00:00`);
+  const now = new Date();
+  const todayMidnight = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+  return Math.round((target.getTime() - todayMidnight.getTime()) / 86_400_000);
+}
+
+function MatchRow({ match, isNextUpcoming }: { match: MatchResult; isNextUpcoming?: boolean }) {
   const outcome = getOutcome(match);
+  const remaining = isNextUpcoming ? daysUntil(match.date) : null;
 
   return (
     <div
@@ -54,22 +63,29 @@ function MatchRow({ match }: { match: MatchResult }) {
             <span className="font-semibold">{OUTCOME_STYLES[outcome].label}</span>
           </span>
         ) : (
-          <span
-            className="px-2 py-0.5 rounded-full text-[10px] font-semibold"
-            style={{
-              background: "rgba(31,168,92,0.10)",
-              border: "1px solid rgba(31,168,92,0.30)",
-              color: GREEN,
-            }}
-          >
-            Próximo
+          <span className="flex items-center gap-1.5 shrink-0">
+            {remaining !== null && remaining > 0 && (
+              <span className="text-[10px] font-medium whitespace-nowrap" style={{ color: "var(--muted-foreground)" }}>
+                {remaining === 1 ? "Falta 1 día" : `Faltan ${remaining} días`}
+              </span>
+            )}
+            <span
+              className="px-2 py-0.5 rounded-full text-[10px] font-semibold"
+              style={{
+                background: "rgba(31,168,92,0.10)",
+                border: "1px solid rgba(31,168,92,0.30)",
+                color: GREEN,
+              }}
+            >
+              Próximo
+            </span>
           </span>
         )}
       </div>
 
       <div className="flex items-center justify-between gap-2">
         <span className="text-sm font-semibold" style={{ color: "var(--foreground)" }}>
-          México vs {match.opponent}
+          México vs {match.flag ? `${match.flag} ` : ""}{match.opponent}
         </span>
         {match.status === "played" && match.result && (
           <span className="text-sm font-bold tabular-nums" style={{ color: "var(--foreground)" }}>
@@ -89,6 +105,7 @@ function MatchRow({ match }: { match: MatchResult }) {
         <span className="flex items-center gap-1">
           <Calendar className="w-3 h-3" />
           {formatDate(match.date)}
+          {match.time ? ` · ${match.time} hrs` : ""}
         </span>
         {match.venue && (
           <span className="flex items-center gap-1">
@@ -185,9 +202,19 @@ export function MundialMatchTracker() {
 
             {/* Matches */}
             <div className="flex flex-col gap-2 px-4 pb-4 max-h-[60vh] overflow-y-auto">
-              {mexicoMatches.map((match) => (
-                <MatchRow key={`${match.round}-${match.date}`} match={match} />
-              ))}
+              {(() => {
+                // First upcoming match chronologically gets the countdown
+                const nextUpcoming = mexicoMatches
+                  .filter((m) => m.status === "upcoming")
+                  .sort((a, b) => a.date.localeCompare(b.date))[0];
+                return mexicoMatches.map((match) => (
+                  <MatchRow
+                    key={`${match.round}-${match.date}`}
+                    match={match}
+                    isNextUpcoming={match === nextUpcoming}
+                  />
+                ));
+              })()}
             </div>
           </div>
         </motion.div>

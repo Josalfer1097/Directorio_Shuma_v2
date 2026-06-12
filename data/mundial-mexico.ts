@@ -6,7 +6,11 @@
 export interface MatchResult {
   round: string;
   opponent: string;
+  /** Opponent's flag emoji, shown next to the name in match cards */
+  flag?: string;
   date: string; // ISO date
+  /** Local kickoff time, 24h format e.g. "19:00" */
+  time?: string;
   status: "played" | "upcoming";
   result?: { mexico: number; opponent: number; scorers?: string[] };
   venue?: string;
@@ -16,6 +20,7 @@ export const mexicoMatches: MatchResult[] = [
   {
     round: "Fase de Grupos - Jornada 1",
     opponent: "Sudáfrica",
+    flag: "\u{1F1FF}\u{1F1E6}",
     date: "2026-06-11",
     status: "played",
     result: {
@@ -27,15 +32,19 @@ export const mexicoMatches: MatchResult[] = [
   },
   {
     round: "Fase de Grupos - Jornada 2",
-    opponent: "Por definir",
+    opponent: "Corea del Sur",
+    flag: "\u{1F1F0}\u{1F1F7}",
     date: "2026-06-18",
+    time: "19:00",
     status: "upcoming",
-    venue: "Estadio Akron, Guadalajara",
+    venue: "Estadio Guadalajara (Akron)",
   },
   {
     round: "Fase de Grupos - Jornada 3",
-    opponent: "Por definir",
+    opponent: "Chequia",
+    flag: "\u{1F1E8}\u{1F1FF}",
     date: "2026-06-24",
+    time: "19:00",
     status: "upcoming",
     venue: "Estadio Ciudad de México",
   },
@@ -47,6 +56,6 @@ export const mexicoMatches: MatchResult[] = [
  */
 export function getMatchesSignature(): string {
   return mexicoMatches
-    .map((m) => `${m.date}:${m.status}:${m.result ? `${m.result.mexico}-${m.result.opponent}` : "x"}`)
+    .map((m) => `${m.date}:${m.opponent}:${m.status}:${m.result ? `${m.result.mexico}-${m.result.opponent}` : "x"}`)
     .join("|");
 }
