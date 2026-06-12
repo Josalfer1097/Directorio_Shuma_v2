@@ -11,7 +11,6 @@ import { getEmployees } from "@/lib/data";
 import { FontScaleControl } from "./font-scale-control";
 import { ThemeToggle } from "./theme-toggle";
 import { MundialBallButton } from "./mundial/mundial-ball-button";
-import { EagleIcon } from "./mundial/eagle-icon";
 import { useMundialTheme } from "@/lib/MundialThemeContext";
 
 export function Navbar() {
@@ -249,7 +248,25 @@ export function Navbar() {
               }}
               aria-label="Ver partidos de México en el Mundial 2026"
             >
-              <EagleIcon size={12} strokeWidth={1.8} className="shrink-0" />
+              {/* Vertical green-white-red stripes (Mexican flag order) with a
+                  small brown/gold emblem dot in the white stripe so it doesn't
+                  read as the Italian flag at this size */}
+              <span
+                className="relative flex h-2.5 w-3.5 overflow-hidden rounded-[2px] shrink-0"
+                aria-hidden="true"
+              >
+                <span className="flex-1" style={{ background: "#1FA85C" }} />
+                <span className="flex-1" style={{ background: "#F4F4F4" }} />
+                <span className="flex-1" style={{ background: "#CE1126" }} />
+                <span
+                  className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 rounded-full"
+                  style={{
+                    width: "3.5px",
+                    height: "3.5px",
+                    background: "radial-gradient(circle at 35% 35%, #D4A574, #8B5E34)",
+                  }}
+                />
+              </span>
               ¡Vamos México!
             </button>
           </div>
