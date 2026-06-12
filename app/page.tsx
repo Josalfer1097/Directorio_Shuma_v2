@@ -138,13 +138,14 @@ export default function HomePage() {
 
             {/* Smart Search Bar — renders immediately without delay */}
             <div className="relative">
-              {/* Modo Mundial: decorative original soccer ball near the search bar */}
+              {/* Modo Mundial: decorative line-art soccer ball, tucked into the
+                  corner away from the search bar (low opacity, no interaction) */}
               <span
-                className="mundial-only absolute -top-7 right-[8%] sm:right-[18%] md:right-[24%] pointer-events-none select-none"
-                style={{ color: "#1FA85C", opacity: 0.55 }}
+                className="mundial-only absolute -top-14 right-2 sm:-top-16 sm:right-4 md:right-8 pointer-events-none select-none"
+                style={{ color: "#1FA85C", opacity: 0.28, transform: "rotate(12deg)" }}
                 aria-hidden="true"
               >
-                <SoccerBallIcon size={26} />
+                <SoccerBallIcon size={44} strokeWidth={1.1} />
               </span>
               <SmartSearchBar />
             </div>

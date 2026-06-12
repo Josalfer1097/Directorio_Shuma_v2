@@ -225,6 +225,11 @@
   --color-border: var(--border);
   --color-input: var(--input);
   --color-ring: var(--ring);
+
+  /* Map existing design tokens so utilities like bg-text-primary,
+     text-bg-base, and text-text-primary resolve in Tailwind v4 */
+  --color-text-primary: var(--text-primary);
+  --color-bg-base: var(--bg-base);
   
   --radius-sm: calc(var(--radius) - 4px);
   --radius-md: calc(var(--radius) - 2px);
@@ -499,7 +504,7 @@
   right: -200px;
 }
 
-/* ════════════════════════════════�����══════════════════════════════════
+/* ════════════════════════════════���������══════════════════════════════════
    GLASSMORPHISM
    ═══════════════════════════════════════════════════════════════════ */
 
@@ -1598,14 +1603,32 @@ button, a, [role="button"], .clickable {
   opacity: 0.85;
 }
 
-/* ── CTA "Ver Directorio" subtle green-to-red gradient ─────────────── */
+/* ── CTA "Ver Directorio": keep brand fill, add a thin tricolor
+   (green–white–red) underline accent below the label ──────────────── */
 .theme-mundial .mundial-cta {
-  background: linear-gradient(120deg, #157A44 0%, #1FA85C 42%, #B0121F 100%) !important;
-  color: #ffffff !important;
+  position: relative;
 }
 
-.theme-mundial .mundial-cta:hover {
-  filter: brightness(1.08);
+.theme-mundial .mundial-cta::after {
+  content: '';
+  position: absolute;
+  bottom: 9px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 44%;
+  height: 2.5px;
+  border-radius: 999px;
+  background: linear-gradient(
+    90deg,
+    var(--mundial-green) 0%,
+    var(--mundial-green) 33.3%,
+    var(--mundial-white) 33.3%,
+    var(--mundial-white) 66.6%,
+    var(--mundial-red) 66.6%,
+    var(--mundial-red) 100%
+  );
+  opacity: 0.9;
+  pointer-events: none;
 }
 
 /* ── Shuma logo: ball-roll bounce on hover ─────────────────────────── */
@@ -1622,4 +1645,4 @@ button, a, [role="button"], .clickable {
     transition: none;
   }
 }
-/* end Modo Mundial */
+/* end of Modo Mundial theme layer */
