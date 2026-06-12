@@ -225,6 +225,11 @@
   --color-border: var(--border);
   --color-input: var(--input);
   --color-ring: var(--ring);
+
+  /* Map existing design tokens so utilities like bg-text-primary,
+     text-bg-base, and text-text-primary resolve in Tailwind v4 */
+  --color-text-primary: var(--text-primary);
+  --color-bg-base: var(--bg-base);
   
   --radius-sm: calc(var(--radius) - 4px);
   --radius-md: calc(var(--radius) - 2px);
@@ -499,7 +504,7 @@
   right: -200px;
 }
 
-/* ═══════════════════════════════════════════════════════════════════
+/* ════════════════════════════════���������══════════════════════════════════
    GLASSMORPHISM
    ═══════════════════════════════════════════════════════════════════ */
 
@@ -1491,3 +1496,125 @@ button, a, [role="button"], .clickable {
 .animate-spin-slow {
   animation: spin-slow 3s linear infinite;
 }
+
+/* ═══════════════════════════════════════════════════════════════════
+   MODO MUNDIAL 2026 — Optional seasonal theme layer
+   Activated by adding .theme-mundial to the <html> element.
+   Purely aesthetic: layers on top of dark/light without replacing
+   brand identity. Company colors are never touched.
+   ═══════════════════════════════════════════════════════════════════ */
+
+:root {
+  /* Favorite star defaults (gold) — overridden by Modo Mundial */
+  --fav-color: #F5C400;
+  --fav-bg: rgba(245, 196, 0, 0.15);
+  --fav-border: rgba(245, 196, 0, 0.4);
+  --fav-glow: rgba(245, 196, 0, 0.6);
+}
+
+.theme-mundial {
+  /* Mexico-inspired (generic) palette — NOT official team colors/logos */
+  --mundial-green: #1FA85C;
+  --mundial-red: #CE1126;
+  --mundial-white: #FFFFFF;
+
+  /* Favorite star turns green when Modo Mundial is active */
+  --fav-color: #1FA85C;
+  --fav-bg: rgba(31, 168, 92, 0.15);
+  --fav-border: rgba(31, 168, 92, 0.45);
+  --fav-glow: rgba(31, 168, 92, 0.6);
+}
+
+/* Elements that only render visually when Modo Mundial is active */
+.mundial-only {
+  display: none;
+}
+
+.theme-mundial .mundial-only {
+  display: inline-flex;
+}
+
+/* ── Football pitch line pattern (background layer) ─────────────────
+   Thin lines suggesting a field: vertical stripes + center circle.
+   Very low opacity, same spirit as the dotted particle background. */
+.mundial-pitch {
+  display: none;
+}
+
+.theme-mundial .mundial-pitch {
+  display: block;
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  opacity: 0.045;
+  background-image:
+    /* Center circle */
+    radial-gradient(circle at 50% 45%, transparent 118px, var(--mundial-white, #fff) 119px, var(--mundial-white, #fff) 121px, transparent 122px),
+    /* Center spot */
+    radial-gradient(circle at 50% 45%, var(--mundial-white, #fff) 3px, transparent 4px),
+    /* Halfway line */
+    linear-gradient(to bottom, transparent calc(45% - 1px), var(--mundial-white, #fff) calc(45% - 1px), var(--mundial-white, #fff) calc(45% + 1px), transparent calc(45% + 1px)),
+    /* Mowing stripes */
+    repeating-linear-gradient(
+      90deg,
+      transparent 0px,
+      transparent 119px,
+      rgba(31, 168, 92, 0.9) 119px,
+      rgba(31, 168, 92, 0.9) 120px
+    );
+}
+
+.light.theme-mundial .mundial-pitch {
+  opacity: 0.05;
+  background-image:
+    radial-gradient(circle at 50% 45%, transparent 118px, #1FA85C 119px, #1FA85C 121px, transparent 122px),
+    radial-gradient(circle at 50% 45%, #1FA85C 3px, transparent 4px),
+    linear-gradient(to bottom, transparent calc(45% - 1px), #1FA85C calc(45% - 1px), #1FA85C calc(45% + 1px), transparent calc(45% + 1px)),
+    repeating-linear-gradient(
+      90deg,
+      transparent 0px,
+      transparent 119px,
+      rgba(31, 168, 92, 0.9) 119px,
+      rgba(31, 168, 92, 0.9) 120px
+    );
+}
+
+/* ── Tricolor gradient border on employee cards (hover/focus) ──────── */
+.theme-mundial .employee-card::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  padding: 1.5px;
+  background: linear-gradient(120deg, var(--mundial-green), var(--mundial-white), var(--mundial-red));
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  mask-composite: exclude;
+  opacity: 0;
+  transition: opacity 220ms ease;
+  pointer-events: none;
+  z-index: 5;
+}
+
+.theme-mundial .employee-card:hover::after,
+.theme-mundial .employee-card:focus-within::after {
+  opacity: 0.85;
+}
+
+/* ── Shuma logo: ball-roll bounce on hover ─────────────────────────── */
+@keyframes mundialBallRoll {
+  0%   { transform: translateY(0) rotate(0deg); }
+  30%  { transform: translateY(-5px) rotate(8deg); }
+  55%  { transform: translateY(0) rotate(-4deg); }
+  75%  { transform: translateY(-2px) rotate(3deg); }
+  100% { transform: translateY(0) rotate(0deg); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .theme-mundial .employee-card::after {
+    transition: none;
+  }
+}
+/* end of Modo Mundial theme layer */
