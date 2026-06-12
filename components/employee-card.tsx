@@ -347,18 +347,19 @@ export function EmployeeCard({
               width: '28px',
               height: '28px',
               borderRadius: '50%',
-              background: isEmployeeFavorite ? 'rgba(245,196,0,0.15)' : 'rgba(0,0,0,0.30)',
-              border: isEmployeeFavorite ? '1px solid rgba(245,196,0,0.4)' : '1px solid rgba(255,255,255,0.15)',
+              background: isEmployeeFavorite ? 'var(--fav-bg, rgba(245,196,0,0.15))' : 'rgba(0,0,0,0.30)',
+              border: isEmployeeFavorite ? '1px solid var(--fav-border, rgba(245,196,0,0.4))' : '1px solid rgba(255,255,255,0.15)',
               transform: favoriteAnimating ? 'scale(1.3)' : 'scale(1)',
             }}
           >
             <Star
-              className={`transition-all duration-[180ms] ${isEmployeeFavorite ? 'fill-[#F5C400]' : ''}`}
+              className="transition-all duration-[180ms]"
               style={{
                 width: '14px',
                 height: '14px',
-                color: isEmployeeFavorite ? '#F5C400' : 'rgba(255,255,255,0.65)',
-                filter: isEmployeeFavorite ? 'drop-shadow(0 0 4px rgba(245,196,0,0.6))' : 'none',
+                color: isEmployeeFavorite ? 'var(--fav-color, #F5C400)' : 'rgba(255,255,255,0.65)',
+                fill: isEmployeeFavorite ? 'var(--fav-color, #F5C400)' : 'none',
+                filter: isEmployeeFavorite ? 'drop-shadow(0 0 4px var(--fav-glow, rgba(245,196,0,0.6)))' : 'none',
               }}
             />
           </button>

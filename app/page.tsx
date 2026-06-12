@@ -14,8 +14,13 @@ import { AdminTrigger } from "@/components/admin/admin-trigger";
 import { AdminToolbar } from "@/components/admin/admin-toolbar";
 import { PinModal } from "@/components/admin/pin-modal";
 import { AdminProvider } from "@/components/admin/admin-context";
+import { SoccerBallIcon } from "@/components/mundial/soccer-ball-icon";
+import { MundialCountdown } from "@/components/mundial/mundial-countdown";
+import { fireMundialConfetti } from "@/components/mundial/mundial-confetti";
+import { useMundialTheme } from "@/lib/MundialThemeContext";
 
 export default function HomePage() {
+  const { mundialActive } = useMundialTheme();
   const employees = getEmployees();
   const companies = getCompanies().filter(c => !c.disabled);
   const departments = getDepartments();
@@ -132,7 +137,20 @@ export default function HomePage() {
             </motion.div>
 
             {/* Smart Search Bar — renders immediately without delay */}
-            <SmartSearchBar />
+            <div className="relative">
+              {/* Modo Mundial: decorative original soccer ball near the search bar */}
+              <span
+                className="mundial-only absolute -top-7 right-[8%] sm:right-[18%] md:right-[24%] pointer-events-none select-none"
+                style={{ color: "#1FA85C", opacity: 0.55 }}
+                aria-hidden="true"
+              >
+                <SoccerBallIcon size={26} />
+              </span>
+              <SmartSearchBar />
+            </div>
+
+            {/* Modo Mundial: countdown to the World Cup 2026 opening match (auto-hides after the date) */}
+            <MundialCountdown />
 
             <motion.div 
               initial={{ opacity: 0, scale: 0.95 }}
@@ -140,9 +158,15 @@ export default function HomePage() {
               transition={{ delay: 0.2, duration: 0.6 }}
               className="flex flex-col sm:flex-row items-center justify-center gap-4 mt-6 mb-6"
             >
-              <Link href="/directorio" className="w-full sm:w-auto">
+              <Link
+                href="/directorio"
+                className="w-full sm:w-auto"
+                onClick={() => {
+                  if (mundialActive) fireMundialConfetti();
+                }}
+              >
                 <button 
-                  className="w-full group flex items-center justify-center gap-3 px-8 py-4 rounded-full bg-text-primary text-bg-base tracking-widest transition-all hover:scale-105 active:scale-95 text-scale-base"
+                  className="mundial-cta w-full group flex items-center justify-center gap-3 px-8 py-4 rounded-full bg-text-primary text-bg-base tracking-widest transition-all hover:scale-105 active:scale-95 text-scale-base"
                   style={{ fontFamily: "var(--font-neuropol), var(--font-orbitron), 'Orbitron', 'Courier New', monospace" }}
                 >
                   Ver Directorio
