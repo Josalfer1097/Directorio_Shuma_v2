@@ -51,28 +51,33 @@ export function MundialThemeProvider({ children }: { children: ReactNode }) {
   const [tooltipVisible, setTooltipVisible] = useState(false);
 
   useEffect(() => {
-    if (!isMundialThemeActive()) return;
+    let timer: ReturnType<typeof setTimeout> | undefined;
 
-    const rootClass = getActiveSeasonalThemeClass();
-    if (rootClass) document.documentElement.classList.add(rootClass);
-    setMundialActive(true);
+    if (isMundialThemeActive()) {
+      const rootClass = getActiveSeasonalThemeClass();
+      if (rootClass) document.documentElement.classList.add(rootClass);
+      setMundialActive(true);
 
-    try {
-      // Clean up the legacy toggle key from the removed Modo Mundial switch
-      localStorage.removeItem(LEGACY_TOGGLE_KEY);
+      try {
+        // Clean up the legacy toggle key from the removed Modo Mundial switch
+        localStorage.removeItem(LEGACY_TOGGLE_KEY);
 
-      // Unseen match detection: compare data signature with last-seen value
-      const seen = localStorage.getItem(SEEN_KEY);
-      setHasUnseenMatches(seen !== getMatchesSignature());
+        // Unseen match detection: compare data signature with last-seen value
+        const seen = localStorage.getItem(SEEN_KEY);
+        setHasUnseenMatches(seen !== getMatchesSignature());
 
-      // Onboarding tooltip: show once per user, after a short delay
-      if (localStorage.getItem(TOOLTIP_SEEN_KEY) !== "true") {
-        const timer = setTimeout(() => setTooltipVisible(true), TOOLTIP_DELAY_MS);
-        return () => clearTimeout(timer);
+        // Onboarding tooltip: show once per user, after a short delay
+        if (localStorage.getItem(TOOLTIP_SEEN_KEY) !== "true") {
+          timer = setTimeout(() => setTooltipVisible(true), TOOLTIP_DELAY_MS);
+        }
+      } catch {
+        // localStorage unavailable — theme still applies, skip persistence
       }
-    } catch {
-      // localStorage unavailable — theme still applies, skip persistence
     }
+
+    return () => {
+      if (timer !== undefined) clearTimeout(timer);
+    };
   }, []);
 
   const dismissTooltip = useCallback(() => {
