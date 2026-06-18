@@ -8,7 +8,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import type { ViewMode } from "@/types";
 import { cn } from "@/lib/utils";
 import { getEmployees } from "@/lib/data";
-import { FontScaleControl } from "./font-scale-control";
+import FontScaleButton from '@/components/ui/FontScaleButton';
 import { ThemeToggle } from "./theme-toggle";
 import { MundialBallButton } from "./mundial/mundial-ball-button";
 import { EagleIcon } from "./mundial/eagle-icon";
@@ -274,7 +274,7 @@ export function Navbar() {
           </div>
 
           {/* Font Scale Control */}
-          <FontScaleControl />
+          <FontScaleButton />
 
           {/* Quick Extensions Button */}
           <div className="relative">

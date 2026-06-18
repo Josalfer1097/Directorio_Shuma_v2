@@ -73,6 +73,7 @@ export function MundialThemeProvider({ children }: { children: ReactNode }) {
     } catch {
       // localStorage unavailable — theme still applies, skip persistence
     }
+    return undefined;
   }, []);
 
   const dismissTooltip = useCallback(() => {

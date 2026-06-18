@@ -6,6 +6,7 @@ import { ZoomIn, ZoomOut, Maximize2 } from 'lucide-react';
 import { OrgChartNode } from './org-chart-node';
 import type { Employee, Company } from '@/types';
 import { cn } from '@/lib/utils';
+
 import { getEmployees, getCompanies } from '@/lib/data';
 
 const NODE_WIDTH = 220;
@@ -20,7 +21,7 @@ interface OrgChartProps {
 export function OrgChart({ initialCompany }: OrgChartProps) {
   const svgRef = useRef<SVGSVGElement>(null);
   const gRef = useRef<SVGGElement>(null);
-  const zoomRef = useRef<d3.ZoomBehavior<SVGSVGElement, unknown> | null>(null);
+  const zoomRef = useRef<any | null>(null);
 
   const [employees, setEmployees] = useState<Employee[]>([]);
   const [companies, setCompanies] = useState<Company[]>([]);
@@ -158,8 +159,8 @@ export function OrgChart({ initialCompany }: OrgChartProps) {
       const d3 = await import('d3');
       const svg = d3.select(svgRef.current);
       const zoom = d3
-        .zoom<SVGSVGElement, unknown>()
-        .on('zoom', (event) => {
+        .zoom()
+        .on('zoom', (event: any) => {
           if (gRef.current) {
             d3.select(gRef.current).attr('transform', event.transform);
           }
@@ -203,7 +204,7 @@ export function OrgChart({ initialCompany }: OrgChartProps) {
       const nodeGroups = g
         .selectAll('g.node')
         .data(nodes, (d: any) => d.id)
-        .join((enter) => {
+        .join((enter: any) => {
           const grp = enter.append('g').attr('class', 'node');
           grp.append('foreignObject')
             .attr('width', NODE_WIDTH)
