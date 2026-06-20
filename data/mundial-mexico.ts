@@ -35,8 +35,12 @@ export const mexicoMatches: MatchResult[] = [
     opponent: "Corea del Sur",
     flag: "\u{1F1F0}\u{1F1F7}",
     date: "2026-06-18",
-    time: "19:00",
-    status: "upcoming",
+    status: "played",
+    result: {
+      mexico: 1,
+      opponent: 0,
+      scorers: ["Luis Romo"],
+    },
     venue: "Estadio Guadalajara (Akron)",
   },
   {
