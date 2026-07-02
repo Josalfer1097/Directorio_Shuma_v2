@@ -56,6 +56,27 @@ export const mexicoMatches: MatchResult[] = [
     },
     venue: "Estadio Ciudad de México",
   },
+  {
+    round: "Dieciseisavos de Final",
+    opponent: "Ecuador",
+    flag: "\u{1F1EA}\u{1F1E8}",
+    date: "2026-06-30",
+    status: "played",
+    result: {
+      mexico: 2,
+      opponent: 0,
+      scorers: ["Julián Quiñones", "Raúl Jiménez"],
+    },
+    venue: "Estadio Ciudad de México",
+  },
+  {
+    round: "Octavos de Final",
+    opponent: "Inglaterra",
+    flag: "\u{1F1EC}\u{1F1E7}",
+    date: "2026-07-05",
+    status: "upcoming",
+    venue: "Estadio Ciudad de México",
+  },
 ];
 
 /**

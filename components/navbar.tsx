@@ -235,7 +235,7 @@ export function Navbar() {
             )}
           </Link>
 
-          {/* Modo Mundial: "¡Vamos México!" badge with vertical tricolor +
+          {/* Modo Mundial: "¿Y si sí?" badge with vertical tricolor +
               eagle accent — opens the match tracker (easter egg) */}
           <div className="hidden md:block">
             <button
@@ -247,7 +247,7 @@ export function Navbar() {
                 border: "1px solid rgba(31,168,92,0.35)",
                 color: "#1FA85C",
               }}
-              aria-label="Ver partidos de México en el Mundial 2026"
+              aria-label="¿Y si sí? Ver partidos de México en el Mundial 2026"
             >
               {/* Vertical green-white-red stripes (Mexican flag order) with a
                   small brown/gold emblem dot in the white stripe so it doesn't
@@ -269,7 +269,7 @@ export function Navbar() {
                 />
               </span>
               <EagleIcon size={12} strokeWidth={1.8} className="shrink-0" />
-              ¡Vamos México!
+              {'¿Y si sí?'}
             </button>
           </div>
 
