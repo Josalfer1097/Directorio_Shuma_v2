@@ -14,7 +14,7 @@
 
 export type SeasonalThemeId = "mundial-2026";
 
-export const ACTIVE_SEASONAL_THEME: SeasonalThemeId | null = "mundial-2026";
+export const ACTIVE_SEASONAL_THEME: SeasonalThemeId | null = null;
 
 /** Maps each seasonal theme id to the class applied on <html>. */
 export const SEASONAL_THEME_CLASSES: Record<SeasonalThemeId, string> = {
