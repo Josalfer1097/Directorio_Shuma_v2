@@ -1,5 +1,16 @@
 [
   {
+    "version": "0.2.0",
+    "date": "2026-07-06",
+    "changes": [
+      "Modo Soccer desactivado (México eliminado del Mundial 2026): removidos efectos de cancha, marcadores y componentes relacionados",
+      "Búsqueda: datos memoizados con useMemo para evitar congelamiento, debounce ajustado a 300 ms, manejo de errores con try/catch",
+      "Dropdown de búsqueda: fondo sólido rgba(10,12,16,0.92) + blur 16px para mejor legibilidad, iconos con color por tipo de resultado",
+      "Tarjeta detalle móvil: añadido min-h-0 al área scrollable para que overflow-y-auto funcione correctamente",
+      "Tarjeta detalle: blur del backdrop reducido de 20px a 12px, will-change:transform en ambos modales para mejor rendimiento"
+    ]
+  },
+  {
     "version": "0.1.1",
     "date": "2026-07-02",
     "changes": [

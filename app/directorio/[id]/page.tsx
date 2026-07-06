@@ -187,7 +187,7 @@ function EmployeeDetailContent({ id }: { id: string }) {
         transition={{ duration: 0.13 }}
         onClick={handleClose}
         className="absolute inset-0 bg-black/60"
-        style={{ backdropFilter: 'blur(20px)' }}
+        style={{ backdropFilter: 'blur(12px)', WebkitBackdropFilter: 'blur(12px)' }}
       />
 
       {/* Desktop Modal */}
@@ -205,6 +205,7 @@ function EmployeeDetailContent({ id }: { id: string }) {
           background: '#0C0E11',
           border: '1px solid rgba(255,255,255,0.07)',
           boxShadow: `0 32px 80px rgba(0,0,0,0.7), 0 0 0 1px ${config.primary}33`,
+          willChange: 'transform',
         }}
       >
         {/* Top border accent */}
@@ -661,6 +662,7 @@ function EmployeeDetailContent({ id }: { id: string }) {
           border: '1px solid rgba(255,255,255,0.07)',
           borderBottom: 'none',
           boxShadow: `0 -32px 80px rgba(0,0,0,0.7)`,
+          willChange: 'transform',
         }}
       >
         {/* Top border accent */}
@@ -787,7 +789,7 @@ function EmployeeDetailContent({ id }: { id: string }) {
         </div>
 
         {/* Scrollable Content Area */}
-        <div className="flex-1 overflow-y-auto overscroll-contain">
+        <div className="flex-1 min-h-0 overflow-y-auto overscroll-contain">
           {/* Body Section - Compact Info Grid */}
           <div className="px-4 py-3">
             <div className="grid grid-cols-2 gap-x-3 gap-y-2">
