@@ -68,8 +68,9 @@ function CarouselCard({ employee, scale }: { employee: Employee; scale: number }
         flexShrink: 0,
         borderRadius: 18,
         border: `1px solid ${colors.primary}26`,
-        background: "rgba(15,15,26,0.88)",
-        backdropFilter: "blur(10px)",
+        // Solid background instead of backdrop-filter: many cards each running
+        // a live backdrop blur is expensive on low-power reception screens.
+        background: "#12121e",
         boxShadow: `0 0 0 1px ${colors.primary}14, 0 18px 50px rgba(0,0,0,0.45), 0 0 44px ${colors.glow}`,
         padding: 20,
         transform: `scale(${scale})`,
@@ -135,6 +136,9 @@ function CarouselCard({ employee, scale }: { employee: Employee; scale: number }
 }
 
 // ── Infinite conveyor row ───────────────────────────────────────────
+// Pure CSS animation (quioscoScroll). Pausing is instant and free via
+// animation-play-state — no per-frame JS, so it never competes with the
+// search overlay entrance or a dark overlay on top of it.
 function ConveyorRow({
   employees,
   direction,
@@ -142,6 +146,7 @@ function ConveyorRow({
   scale,
   opacity,
   tilt,
+  paused,
 }: {
   employees: Employee[];
   direction: "left" | "right";
@@ -149,6 +154,7 @@ function ConveyorRow({
   scale: number;
   opacity: number;
   tilt: number;
+  paused: boolean;
 }) {
   const duration = employees.length * durationPerCard;
   // Duplicate the set so translating by exactly -50% loops seamlessly
@@ -167,15 +173,22 @@ function ConveyorRow({
         transformStyle: "preserve-3d",
       }}
     >
-      <motion.div
-        style={{ display: "flex", gap: 20, width: "max-content", willChange: "transform" }}
-        animate={{ x: direction === "left" ? ["0%", "-50%"] : ["-50%", "0%"] }}
-        transition={{ duration, repeat: Infinity, ease: "linear" }}
+      <div
+        style={{
+          display: "flex",
+          gap: 20,
+          width: "max-content",
+          willChange: "transform",
+          animation: `quioscoScroll ${duration}s linear infinite`,
+          // "right" direction = reverse so it travels the opposite way
+          animationDirection: direction === "right" ? "reverse" : "normal",
+          animationPlayState: paused ? "paused" : "running",
+        }}
       >
         {doubled.map((emp, i) => (
           <CarouselCard key={`${emp.id}-${i}`} employee={emp} scale={scale} />
         ))}
-      </motion.div>
+      </div>
     </div>
   );
 }
@@ -434,21 +447,33 @@ export default function QuioscoPage() {
         </span>
       </div>
 
-      {/* Continuous conveyor carousel */}
+      {/* Continuous conveyor carousel.
+          When search is active the rows are truly PAUSED (animation-play-state)
+          — not blurred while still moving — which is what caused the jank. */}
       <div
         className="absolute inset-0 flex flex-col justify-center gap-8 z-[1]"
         style={{
           perspective: "1400px",
-          filter: searchActive ? "blur(14px) brightness(0.4)" : "none",
-          transition: "filter 500ms ease",
           pointerEvents: "none",
         }}
         aria-hidden={searchActive}
       >
         {rows.map((rowEmps, i) => (
-          <ConveyorRow key={i} employees={rowEmps} {...rowConfigs[i]} />
+          <ConveyorRow key={i} employees={rowEmps} {...rowConfigs[i]} paused={searchActive} />
         ))}
       </div>
+
+      {/* Single cheap dimming overlay above the (now paused) carousel.
+          Far cheaper than animating filter: blur() on many moving cards. */}
+      <div
+        className="absolute inset-0 z-[2] pointer-events-none"
+        style={{
+          background: "rgba(6,6,14,0.78)",
+          opacity: searchActive ? 1 : 0,
+          transition: "opacity 320ms ease",
+        }}
+        aria-hidden="true"
+      />
 
       {/* Idle hint (only when search hidden) */}
       <AnimatePresence>
@@ -484,7 +509,6 @@ export default function QuioscoPage() {
             exit={{ opacity: 0 }}
             transition={{ duration: 0.3 }}
             className="absolute inset-0 z-20 flex flex-col items-center"
-            style={{ backdropFilter: "blur(2px)" }}
           >
             {/* Search bar — slides down from top */}
             <motion.div

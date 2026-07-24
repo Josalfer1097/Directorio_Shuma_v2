@@ -1,5 +1,16 @@
 [
   {
+    "version": "0.3.1",
+    "date": "2026-07-24",
+    "changes": [
+      "FIX CRITICO DE PERFORMANCE (modo quiosco): eliminado el parpadeo/jank severo al activar el buscador — antes se aplicaba filter: blur(14px) sobre las tarjetas del carrusel MIENTRAS seguian moviendose en loop infinito, obligando al navegador a re-rasterizar contenido borroso en movimiento en cada frame",
+      "CAMBIO: El carrusel ahora usa animacion CSS pura (@keyframes quioscoScroll) en lugar de Framer Motion con repeat: Infinity; al abrir el buscador se pausa de verdad e instantaneamente via animation-play-state: paused (costo cero de JS por frame), no solo se atenua por encima",
+      "CAMBIO: Reemplazado el blur animado por un unico overlay oscuro semitransparente (rgba(6,6,14,0.78)) por encima del carrusel ya detenido — mismo efecto visual de 'fondo atenuado' a una fraccion del costo",
+      "CAMBIO: Quitado backdrop-filter: blur() individual de cada tarjeta del carrusel (habia decenas activas a la vez) y del overlay del buscador; se usa fondo solido, mucho mas barato en pantallas de recepcion de baja potencia encendidas todo el dia",
+      "RESULTADO: transicion carrusel -> buscador fluida y estable, sin parpadeo, incluso con CPU throttling"
+    ]
+  },
+  {
     "version": "0.3.0",
     "date": "2026-07-24",
     "changes": [

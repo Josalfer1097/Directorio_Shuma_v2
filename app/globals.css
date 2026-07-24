@@ -1090,7 +1090,7 @@
 
 /* ═════��══════════════════════���══════════════════════════════════════
    REACT FLOW OVERRIDES
-   ═══════════════════════════════════════════════════════════════════ */
+   ════════════════════════════════════════════���══════════════════════ */
 
 .react-flow__background {
   background: var(--bg-base) !important;
@@ -1396,7 +1396,7 @@ button, a, [role="button"], .clickable {
 
 /* ═══════════════════════════════════════════════════════════════════
    ANIMATED AVATAR MONOGRAM
-   ═══════════════════════════════════════════════════════════════════ */
+   ════════════════════════════════════���══════════════════════════════ */
 
 @property --avatar-angle {
   syntax: '<angle>';
@@ -1434,6 +1434,15 @@ button, a, [role="button"], .clickable {
 @keyframes quioscoWash {
   0%   { transform: translate3d(-2%, -1%, 0) scale(1.05); opacity: 0.85 }
   100% { transform: translate3d(2%, 1%, 0) scale(1.15); opacity: 1 }
+}
+
+/* Kiosk mode: continuous conveyor scroll.
+   The card set is duplicated, so translating by -50% loops seamlessly.
+   Pure CSS so it can be paused instantly (animation-play-state) with zero
+   per-frame JS cost — critical for an all-day reception display. */
+@keyframes quioscoScroll {
+  from { transform: translateX(0); }
+  to   { transform: translateX(-50%); }
 }
 
 /* ═══════════════════════════════════════════════════════════════════
