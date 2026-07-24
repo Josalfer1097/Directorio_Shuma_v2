@@ -1,5 +1,15 @@
 [
   {
+    "version": "0.3.2",
+    "date": "2026-07-24",
+    "changes": [
+      "FIX DE HIDRATACION: eliminado el error 'Hydration failed / <tbody> cannot be a child of <tbody>' en la vista de Extensiones del directorio — la tabla envolvia el map de grupos de empresa en un <tbody> exterior y cada grupo renderizaba su propio <tbody> anidado, HTML invalido que el navegador reparaba moviendo nodos y provocaba un desajuste de hidratacion que se propagaba hasta el layout (div vs Suspense)",
+      "CAMBIO: cada grupo de empresa ahora es un <tbody> hijo directo de <table> (HTML valido: una tabla admite multiples <tbody>); se quito el <tbody> exterior redundante",
+      "FIX: los fragmentos por ubicacion dentro del map usaban <> sin key (advertencia 'unique key prop'); ahora usan <Fragment key=...> con Fragment importado de react",
+      "Verificado en navegador (sesion limpia): /directorio vista Extensiones y / sin errores de hidratacion, anidamiento ni keys en consola"
+    ]
+  },
+  {
     "version": "0.3.1",
     "date": "2026-07-24",
     "changes": [

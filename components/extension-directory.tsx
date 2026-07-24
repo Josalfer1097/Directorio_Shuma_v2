@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo, useCallback, memo, useRef, useEffect } from "react";
+import { useState, useMemo, useCallback, memo, useRef, useEffect, Fragment } from "react";
 import { useRouter } from "next/navigation";
 import { Printer, Download, MapPin, Search, X, ClipboardList, Phone, RotateCcw } from "lucide-react";
 import { getEmployees, getCompanies } from "@/lib/data";
@@ -1027,50 +1027,47 @@ export function ExtensionDirectory({
                 })}
               </tr>
             </thead>
-            <tbody>
-              {groupedEmployees.map((group) => {
-                const companyConfig = getCompanyConfig(group.company);
-                const employeeCount = group.locations.reduce((a, l) => a + l.employees.length, 0);
-                let rowIndex = 0;
+            {groupedEmployees.map((group) => {
+              const companyConfig = getCompanyConfig(group.company);
+              const employeeCount = group.locations.reduce((a, l) => a + l.employees.length, 0);
+              let rowIndex = 0;
 
-                return (
-                  <tbody
-                    key={group.company}
-                    className="print-no-break"
-                  >
-                    <CompanyHeader
-                      companyName={group.companyName}
-                      companyConfig={companyConfig}
-                      employeeCount={employeeCount}
-                    />
-                    {group.locations.map((locationGroup, locIdx) => (
-                      <>
-                        {/* Show location sub-header only if multiple locations exist and location is defined */}
-                        {group.locations.length > 1 && locationGroup.location && locIdx > 0 && (
-                          <LocationSubHeader
-                            key={`loc-${locationGroup.location}`}
-                            location={locationGroup.location}
+              return (
+                <tbody
+                  key={group.company}
+                  className="print-no-break"
+                >
+                  <CompanyHeader
+                    companyName={group.companyName}
+                    companyConfig={companyConfig}
+                    employeeCount={employeeCount}
+                  />
+                  {group.locations.map((locationGroup, locIdx) => (
+                    <Fragment key={locationGroup.location ?? `loc-${locIdx}`}>
+                      {/* Show location sub-header only if multiple locations exist and location is defined */}
+                      {group.locations.length > 1 && locationGroup.location && locIdx > 0 && (
+                        <LocationSubHeader
+                          location={locationGroup.location}
+                        />
+                      )}
+                      {locationGroup.employees.map((employee) => {
+                        const isOdd = rowIndex % 2 === 1;
+                        rowIndex++;
+                        return (
+                          <ExtensionRow
+                            key={employee.id}
+                            employee={employee}
+                            companyConfig={companyConfig}
+                            onClick={() => handleRowClick(employee.id)}
+                            isOdd={isOdd}
                           />
-                        )}
-                        {locationGroup.employees.map((employee) => {
-                          const isOdd = rowIndex % 2 === 1;
-                          rowIndex++;
-                          return (
-                            <ExtensionRow
-                              key={employee.id}
-                              employee={employee}
-                              companyConfig={companyConfig}
-                              onClick={() => handleRowClick(employee.id)}
-                              isOdd={isOdd}
-                            />
-                          );
-                        })}
-                      </>
-                    ))}
-                  </tbody>
-                );
-              })}
-            </tbody>
+                        );
+                      })}
+                    </Fragment>
+                  ))}
+                </tbody>
+              );
+            })}
           </table>
         </div>
       )}
