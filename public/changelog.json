@@ -1,5 +1,15 @@
 [
   {
+    "version": "0.2.2",
+    "date": "2026-07-24",
+    "changes": [
+      "FIX (accesibilidad): Resultados de busqueda ahora son legibles en tema claro desde el primer render — el fondo, texto secundario, etiquetas de grupo y gradiente de scroll usaban valores rgba fijos pensados solo para dark mode",
+      "FIX: Reemplazados todos los colores hardcodeados del dropdown (rgba(10,10,20,0.96), #C0C0D8, #8888AA, gradiente) por tokens CSS --search-dropdown-bg, --search-dropdown-border, --search-result-secondary, --search-group-label, --search-fade-stop definidos en :root (dark) y .light",
+      "FIX: En light mode el dropdown usa fondo blanco semitransparente con texto oscuro; en dark mode mantiene el overlay oscuro anterior. El estado sin hover es completamente legible en ambos temas.",
+      "FIX: Contraste del texto secundario (subsidiaria, puesto, telefono, correo) cumple WCAG AA en ambos temas: #C0C0D8 sobre fondo oscuro (~7:1), #444455 sobre fondo blanco (~8:1)"
+    ]
+  },
+  {
     "version": "0.2.1",
     "date": "2026-07-24",
     "changes": [

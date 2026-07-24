@@ -106,6 +106,13 @@
   --node-text: #F2F0EC;
   --node-text-muted: #64647A;
   --node-border: rgba(255, 255, 255, 0.12);
+
+  /* Search dropdown tokens (dark) */
+  --search-dropdown-bg: rgba(10, 10, 20, 0.96);
+  --search-dropdown-border: rgba(255, 255, 255, 0.08);
+  --search-result-secondary: #C0C0D8;
+  --search-group-label: #8888AA;
+  --search-fade-stop: rgba(10, 10, 20, 0.95);
 }
 
 /* ═══════════════════════════════════════════════════════════════════
@@ -179,6 +186,13 @@
   --node-text: #0a0a0f;
   --node-text-muted: #555566;
   --node-border: rgba(0, 0, 0, 0.10);
+
+  /* Search dropdown tokens (light) */
+  --search-dropdown-bg: rgba(255, 255, 255, 0.97);
+  --search-dropdown-border: rgba(0, 0, 0, 0.10);
+  --search-result-secondary: #444455;
+  --search-group-label: #777788;
+  --search-fade-stop: rgba(255, 255, 255, 0.96);
   
   color-scheme: light;
 }

@@ -59,7 +59,7 @@ function ScrollFadeContainer({ children }: { children: React.ReactNode }) {
           className="pointer-events-none absolute bottom-0 left-0 right-0 h-10 rounded-b-xl"
           style={{
             background:
-              "linear-gradient(to bottom, transparent 0%, rgba(10,10,20,0.92) 100%)",
+              "linear-gradient(to bottom, transparent 0%, var(--search-fade-stop) 100%)",
           }}
         />
       )}
@@ -445,8 +445,11 @@ export function SmartSearchBar() {
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -8 }}
             transition={{ duration: 0.15, ease: "easeOut" }}
-            className="absolute top-full left-0 right-0 mt-2 z-50 backdrop-blur-lg border border-border-subtle rounded-xl shadow-2xl overflow-hidden"
-            style={{ background: "rgba(10,10,20,0.96)" }}
+            className="absolute top-full left-0 right-0 mt-2 z-50 backdrop-blur-lg rounded-xl shadow-2xl overflow-hidden"
+            style={{
+              background: "var(--search-dropdown-bg)",
+              border: "1px solid var(--search-dropdown-border)",
+            }}
           >
           {/* Scroll fade wrapper — keeps rounded corners intact */}
           <ScrollFadeContainer>
@@ -465,7 +468,7 @@ export function SmartSearchBar() {
                       {groupIndex > 0 && (
                         <div className="my-1 mx-2 border-t border-border-subtle" />
                       )}
-                      <div className="px-3 py-1.5 text-scale-xs font-semibold uppercase tracking-wider" style={{ color: "#8888AA" }}>
+                      <div className="px-3 py-1.5 text-scale-xs font-semibold uppercase tracking-wider" style={{ color: "var(--search-group-label)" }}>
                         {groupLabels[type]}
                       </div>
                       {items.map((result, index) => {
@@ -508,21 +511,21 @@ export function SmartSearchBar() {
                                 {result.label}
                               </div>
                               {result.secondary && (
-                                <div className="text-scale-sm truncate" style={{ color: "#C0C0D8" }}>
+                                <div className="text-scale-sm truncate" style={{ color: "var(--search-result-secondary)" }}>
                                   {result.secondary}
                                 </div>
                               )}
                               {hasContactInfo && (
-                                <div className="mt-1.5 flex items-center gap-4 text-scale-sm" style={{ color: "#C0C0D8" }}>
+                                <div className="mt-1.5 flex items-center gap-4 text-scale-sm" style={{ color: "var(--search-result-secondary)" }}>
                                   {result.data?.extension && (
                                     <div className="flex items-center gap-1.5">
-                                      <Phone className="w-3.5 h-3.5 flex-shrink-0" style={{ color: "#C0C0D8" }} />
+                                      <Phone className="w-3.5 h-3.5 flex-shrink-0" style={{ color: "var(--search-result-secondary)" }} />
                                       <span>Ext. {result.data.extension}</span>
                                     </div>
                                   )}
                                   {result.data?.email && (
                                     <div className="flex items-center gap-1.5 truncate">
-                                      <Mail className="w-3.5 h-3.5 flex-shrink-0" style={{ color: "#C0C0D8" }} />
+                                      <Mail className="w-3.5 h-3.5 flex-shrink-0" style={{ color: "var(--search-result-secondary)" }} />
                                       <span className="truncate">{result.data.email}</span>
                                     </div>
                                   )}
