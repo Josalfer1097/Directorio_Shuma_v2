@@ -1,21 +1,30 @@
 'use client';
 
-import { useState, useRef, useEffect } from 'react';
-import { useFontScale } from '@/lib/FontScaleContext'; // ajustar path si es diferente
+import { useState, useRef, useEffect, useCallback } from 'react';
+import { useFontScale } from '@/lib/FontScaleContext';
 
-const SCALE_OPTIONS = [
-  { label: 'Normal',      value: 1     as const, desc: 'Tamaño predeterminado' },
-  { label: 'Grande',      value: 1.15  as const, desc: 'Un poco más grande' },
-  { label: 'Más grande',  value: 1.3   as const, desc: 'Para mejor lectura' },
-  { label: 'Accesible',   value: 1.5   as const, desc: 'Alto contraste visual' },
+type FontScale = 1 | 1.15 | 1.3 | 1.5;
+
+const SCALE_OPTIONS: { label: string; value: FontScale; desc: string }[] = [
+  { label: 'Normal',      value: 1,    desc: 'Tamaño predeterminado' },
+  { label: 'Grande',      value: 1.15, desc: 'Un poco más grande' },
+  { label: 'Más grande',  value: 1.3,  desc: 'Para mejor lectura' },
+  { label: 'Accesible',   value: 1.5,  desc: 'Alto contraste visual' },
 ];
+
+/** Apply --font-scale to :root without touching localStorage (preview only). */
+function applyPreview(value: number) {
+  document.documentElement.style.setProperty('--font-scale', String(value));
+}
 
 export default function FontScaleButton() {
   const { scale, setScale } = useFontScale();
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
   const [isMobile, setIsMobile] = useState(false);
-  
+  // Debounce timer for hover preview
+  const previewTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+
   useEffect(() => {
     const check = () => setIsMobile(window.innerWidth < 768);
     check();
@@ -23,23 +32,59 @@ export default function FontScaleButton() {
     return () => window.removeEventListener('resize', check);
   }, []);
 
-  // Cerrar al click fuera
+  // Cerrar al click fuera — also restore committed scale on outside-click dismiss
   useEffect(() => {
     const handler = (e: MouseEvent) => {
       if (ref.current && !ref.current.contains(e.target as Node)) {
+        applyPreview(scale); // restore in case a hover preview was mid-flight
         setOpen(false);
       }
     };
     if (open && !isMobile) document.addEventListener('mousedown', handler);
     return () => document.removeEventListener('mousedown', handler);
-  }, [open, isMobile]);
+  }, [open, isMobile, scale]);
 
   // Cerrar con Escape
   useEffect(() => {
-    const handler = (e: KeyboardEvent) => { if (e.key === 'Escape') setOpen(false); };
+    const handler = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        applyPreview(scale); // restore committed scale
+        setOpen(false);
+      }
+    };
     document.addEventListener('keydown', handler);
     return () => document.removeEventListener('keydown', handler);
-  }, []);
+  }, [scale]);
+
+  // When panel closes (open → false), always restore the committed scale
+  const prevOpen = useRef(open);
+  useEffect(() => {
+    if (prevOpen.current && !open) {
+      applyPreview(scale);
+    }
+    prevOpen.current = open;
+  }, [open, scale]);
+
+  /** Hover: preview scale after 50 ms debounce (desktop only). */
+  const handleOptionMouseEnter = useCallback((value: FontScale) => {
+    if (isMobile) return;
+    if (previewTimer.current) clearTimeout(previewTimer.current);
+    previewTimer.current = setTimeout(() => applyPreview(value), 50);
+  }, [isMobile]);
+
+  /** Mouse leave option: cancel pending preview and restore committed scale. */
+  const handleOptionMouseLeave = useCallback(() => {
+    if (isMobile) return;
+    if (previewTimer.current) clearTimeout(previewTimer.current);
+    applyPreview(scale);
+  }, [isMobile, scale]);
+
+  /** Click: commit (saves to localStorage + React state) via context setScale. */
+  const handleOptionClick = useCallback((value: FontScale) => {
+    if (previewTimer.current) clearTimeout(previewTimer.current);
+    setScale(value);
+    if (isMobile) setOpen(false);
+  }, [setScale, isMobile]);
 
   const isActive = scale !== 1;
 
@@ -103,7 +148,15 @@ export default function FontScaleButton() {
               return (
                 <button
                   key={opt.value}
-                  onClick={() => setScale(opt.value)}
+                  onClick={() => handleOptionClick(opt.value)}
+                  onMouseEnter={e => {
+                    handleOptionMouseEnter(opt.value);
+                    if (!active) { e.currentTarget.style.background = 'var(--bg-base)'; e.currentTarget.style.color = '#fff'; }
+                  }}
+                  onMouseLeave={e => {
+                    handleOptionMouseLeave();
+                    if (!active) { e.currentTarget.style.background = 'var(--bg-elevated)'; e.currentTarget.style.color = 'var(--muted-foreground)'; }
+                  }}
                   style={{
                     height: 40, borderRadius: 10,
                     background: active ? 'rgba(0,201,167,0.15)' : 'var(--bg-elevated)',
@@ -114,8 +167,6 @@ export default function FontScaleButton() {
                     padding: '0 10px', transition: 'all 0.15s',
                     fontFamily: 'DM Sans, sans-serif',
                   }}
-                  onMouseEnter={e => { if (!active) { e.currentTarget.style.background = 'var(--bg-base)'; e.currentTarget.style.color = '#fff'; }}}
-                  onMouseLeave={e => { if (!active) { e.currentTarget.style.background = 'var(--bg-elevated)'; e.currentTarget.style.color = 'var(--muted-foreground)'; }}}
                 >
                   <span className="text-scale-sm">{opt.label}</span>
                   {active && <span style={{ color: '#00C9A7', fontSize: 12 }}>✓</span>}
@@ -136,7 +187,7 @@ export default function FontScaleButton() {
           {/* Restablecer */}
           {scale !== 1 && (
             <button
-              onClick={() => setScale(1)}
+              onClick={() => handleOptionClick(1)}
               className="text-scale-xs"
               style={{
                 background: 'none', border: 'none', cursor: 'pointer',
@@ -192,7 +243,7 @@ export default function FontScaleButton() {
                 return (
                   <button
                     key={opt.value}
-                    onClick={() => { setScale(opt.value); setOpen(false); }}
+                    onClick={() => handleOptionClick(opt.value)}
                     style={{
                       height: 52, borderRadius: 12, width: '100%',
                       background: active ? 'rgba(0,201,167,0.15)' : 'var(--bg-elevated)',
@@ -215,7 +266,7 @@ export default function FontScaleButton() {
 
             {scale !== 1 && (
               <button
-                onClick={() => { setScale(1); setOpen(false); }}
+                onClick={() => handleOptionClick(1)}
                 className="text-scale-sm"
                 style={{ width: '100%', background: 'none', border: 'none', cursor: 'pointer', color: 'var(--muted-foreground)', fontFamily: 'DM Sans, sans-serif', padding: '8px 0' }}
               >

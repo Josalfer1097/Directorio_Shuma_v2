@@ -1,5 +1,18 @@
 [
   {
+    "version": "0.2.1",
+    "date": "2026-07-24",
+    "changes": [
+      "FIX: Resultados de busqueda ahora respetan el tamaño de texto accesible — todas las clases fijas (text-sm, text-xs) reemplazadas por text-scale-* para que nombre, subsidiaria, puesto y datos de contacto escalen junto con el toggle 'Aa'",
+      "FIX: Icono/avatar de cada resultado de busqueda escala proporcionalmente con el factor de fuente sin romper el layout",
+      "FIX: Contraste del texto secundario en resultados subido a #C0C0D8 (~7:1 sobre fondo oscuro, pasa WCAG AA/AAA); iconos de telefono y correo actualizados al mismo valor",
+      "FIX: Contenedor de resultados separado en capa externa (chrome visual: border-radius, backdrop-blur, sombra) y capa interna de scroll (max-h: 60vh/420px, overflow-y: auto, scroll tactil fluido) — ya no se recortan bordes ni sombras",
+      "FIX: Indicador de scroll suave — gradiente de fade en la parte inferior del dropdown cuando hay mas resultados ocultos; desaparece al llegar al final",
+      "NUEVA FUNCION: Preview en vivo del tamaño de texto — al pasar el cursor sobre una opcion del menu 'Aa' se aplica ese tamaño temporalmente a toda la pagina (debounce 50ms); al salir sin hacer clic se restaura el tamaño anterior; al hacer clic se confirma y persiste en localStorage",
+      "NUEVA FUNCION: En movil, el tap aplica el tamaño directamente sin preview (degradacion segura sin hover)"
+    ]
+  },
+  {
     "version": "0.2.0",
     "date": "2026-07-24",
     "changes": [
