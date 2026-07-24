@@ -1,5 +1,20 @@
 [
   {
+    "version": "0.3.0",
+    "date": "2026-07-24",
+    "changes": [
+      "REDISEÑO COMPLETO del modo quiosco (/quiosco) — ahora es un protector de pantalla profesional para pantallas de recepcion en lugar de un slideshow de una tarjeta cada 9s",
+      "NUEVO: Carrusel continuo tipo cinta transportadora con 3 filas de tarjetas moviendose simultaneamente en loop infinito y sin cortes; la fila central va hacia la derecha a mayor escala/opacidad, las filas superior e inferior van hacia la izquierda mas pequeñas y con inclinacion 3D para dar profundidad (efecto cover-flow sutil)",
+      "NUEVO: Movimiento fluido basado en transform (translateX) con Framer Motion en loop lineal infinito y will-change: transform; el set de tarjetas se duplica para un bucle perfecto sin re-render por indice (adios setInterval)",
+      "NUEVO: Fondo con la red de nodos animada del hero + gradiente ambiental en movimiento lento (quioscoWash) para reforzar la sensacion de protector de pantalla premium; bordes de cada fila con fade horizontal (mask) para que las tarjetas entren y salgan suavemente",
+      "NUEVO: Buscador oculto activado por interaccion — cualquier tecla o toque/click revela un overlay de busqueda con slide-down y el carrusel se difumina y atenua detras; los caracteres imprimibles siembran la consulta automaticamente",
+      "NUEVO: Busqueda fuzzy reutilizando la logica de Fuse.js del smart-search-bar (nombre, apellidos, puesto, departamento, extension); los resultados aparecen en un grid con animacion de reveal escalonada (stagger) sin salir del modo quiosco",
+      "NUEVO: Auto-retorno al carrusel tras 18s de inactividad en el buscador, con animacion de salida simetrica",
+      "NUEVO: Comportamiento de Escape en dos pasos — primer ESC cierra el buscador y regresa al carrusel; segundo ESC (sin buscador) sale del modo quiosco a la pagina principal",
+      "PERFORMANCE: solo se animan transform/opacity/filter; will-change en las cintas; sin propiedades que disparen reflow"
+    ]
+  },
+  {
     "version": "0.2.4",
     "date": "2026-07-24",
     "changes": [

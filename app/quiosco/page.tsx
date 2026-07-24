@@ -1,21 +1,23 @@
 "use client";
 
-import { useEffect, useState, useCallback, useRef } from "react";
+import { useEffect, useState, useCallback, useRef, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Phone, Mail, MapPin, Building2, X } from "lucide-react";
+import Fuse from "fuse.js";
+import { Phone, Mail, MapPin, Search, X } from "lucide-react";
 import { getEmployees, getCompanies, getCompanyColors } from "@/lib/data";
+import type { Employee } from "@/types";
+import { HeroNetworkCanvas } from "@/components/hero-network-canvas";
 
-const ROTATION_INTERVAL_MS = 9000;
-const TRANSITION_DURATION = 0.55;
+// ── Config ──────────────────────────────────────────────────────────
+const INACTIVITY_MS = 18000; // auto-return to carousel after inactivity
+const ROW_COUNT = 3;
 
-// Company color map for monogram backgrounds
 const COMPANY_GRADIENT: Record<string, string> = {
   comercializadora: "linear-gradient(135deg, #0047AB 0%, #002D6E 100%)",
   acabados: "linear-gradient(135deg, #C0152A 0%, #8B0000 100%)",
   ferrecapital: "linear-gradient(135deg, #4A525A 0%, #1A1A1A 100%)",
   arkiramica: "linear-gradient(135deg, #F5C400 0%, #C49A00 100%)",
 };
-
 const COMPANY_TEXT_COLOR: Record<string, string> = {
   comercializadora: "#fff",
   acabados: "#fff",
@@ -23,14 +25,16 @@ const COMPANY_TEXT_COLOR: Record<string, string> = {
   arkiramica: "#0a0a0f",
 };
 
-function Monogram({ name, company, size = 120 }: { name: string; company: string; size?: number }) {
-  const initials = name
+function initialsOf(name: string): string {
+  return name
     .split(" ")
     .filter(Boolean)
     .slice(0, 2)
     .map((w) => w[0].toUpperCase())
     .join("");
+}
 
+function Monogram({ name, company, size }: { name: string; company: string; size: number }) {
   return (
     <div
       style={{
@@ -41,128 +45,370 @@ function Monogram({ name, company, size = 120 }: { name: string; company: string
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
-        fontSize: size * 0.33,
+        fontSize: size * 0.34,
         fontWeight: 700,
         color: COMPANY_TEXT_COLOR[company] ?? "#fff",
         fontFamily: "var(--font-neuropol), var(--font-orbitron), monospace",
         flexShrink: 0,
-        boxShadow: "0 8px 40px rgba(0,0,0,0.5)",
+        boxShadow: "0 6px 24px rgba(0,0,0,0.45)",
       }}
     >
-      {initials}
+      {initialsOf(name)}
     </div>
   );
 }
 
-// Flip + blur transition variants
-const cardVariants = {
-  enter: {
-    rotateY: 25,
-    opacity: 0,
-    filter: "blur(8px)",
-    scale: 0.96,
-  },
-  center: {
-    rotateY: 0,
-    opacity: 1,
-    filter: "blur(0px)",
-    scale: 1,
-    transition: {
-      duration: TRANSITION_DURATION,
-      ease: [0.22, 1, 0.36, 1],
-    },
-  },
-  exit: {
-    rotateY: -25,
-    opacity: 0,
-    filter: "blur(8px)",
-    scale: 0.96,
-    transition: {
-      duration: TRANSITION_DURATION * 0.8,
-      ease: [0.64, 0, 0.78, 0],
-    },
-  },
-};
+// ── Compact carousel card ───────────────────────────────────────────
+function CarouselCard({ employee, scale }: { employee: Employee; scale: number }) {
+  const colors = getCompanyColors(employee.company);
+  return (
+    <div
+      style={{
+        width: 300,
+        flexShrink: 0,
+        borderRadius: 18,
+        border: `1px solid ${colors.primary}26`,
+        background: "rgba(15,15,26,0.88)",
+        backdropFilter: "blur(10px)",
+        boxShadow: `0 0 0 1px ${colors.primary}14, 0 18px 50px rgba(0,0,0,0.45), 0 0 44px ${colors.glow}`,
+        padding: 20,
+        transform: `scale(${scale})`,
+        transformOrigin: "center",
+      }}
+    >
+      {/* accent bar */}
+      <div
+        style={{
+          height: 3,
+          borderRadius: 3,
+          marginBottom: 16,
+          background: `linear-gradient(90deg, ${colors.primary}, ${colors.accent ?? colors.secondary})`,
+        }}
+      />
+      <div className="flex items-center gap-4 mb-4">
+        <Monogram name={employee.name} company={employee.company} size={58} />
+        <div className="min-w-0 flex-1">
+          <div
+            style={{
+              fontSize: "1rem",
+              fontWeight: 700,
+              color: "#F2F0EC",
+              lineHeight: 1.2,
+              fontFamily: "var(--font-neuropol), var(--font-orbitron), monospace",
+              whiteSpace: "nowrap",
+              overflow: "hidden",
+              textOverflow: "ellipsis",
+            }}
+          >
+            {employee.name}
+          </div>
+          <div
+            style={{
+              fontSize: "0.8rem",
+              color: colors.accent ?? colors.primary,
+              fontWeight: 600,
+              whiteSpace: "nowrap",
+              overflow: "hidden",
+              textOverflow: "ellipsis",
+            }}
+          >
+            {employee.position}
+          </div>
+        </div>
+      </div>
+      <div className="flex items-center gap-4" style={{ color: "#8888B0", fontSize: "0.75rem" }}>
+        {employee.extension && (
+          <span className="flex items-center gap-1.5">
+            <Phone size={13} style={{ color: colors.primary }} />
+            Ext. {employee.extension}
+          </span>
+        )}
+        {employee.location && (
+          <span className="flex items-center gap-1.5 min-w-0">
+            <MapPin size={13} style={{ color: colors.primary, flexShrink: 0 }} />
+            <span className="truncate">{employee.location}</span>
+          </span>
+        )}
+      </div>
+    </div>
+  );
+}
 
-// Light scan "reveal" overlay that sweeps across the entering card
-const scanVariants = {
-  enter: { x: "-110%", opacity: 0.0 },
-  animate: {
-    x: "110%",
-    opacity: [0, 0.18, 0.18, 0],
-    transition: { duration: TRANSITION_DURATION + 0.1, ease: "linear" },
-  },
-};
-
-export default function QuioscoPage() {
-  const allEmployees = getEmployees().filter((e) => {
-    const companies = getCompanies();
-    const company = companies.find((c) => c.id === e.company);
-    return company && !company.disabled;
-  });
-  const companies = getCompanies();
-
-  const [index, setIndex] = useState(0);
-  const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
-
-  const advance = useCallback(() => {
-    setIndex((prev) => (prev + 1) % allEmployees.length);
-  }, [allEmployees.length]);
-
-  // Auto-rotation
-  useEffect(() => {
-    intervalRef.current = setInterval(advance, ROTATION_INTERVAL_MS);
-    return () => {
-      if (intervalRef.current) clearInterval(intervalRef.current);
-    };
-  }, [advance]);
-
-  // Escape key exits kiosk mode
-  useEffect(() => {
-    const handleKey = (e: KeyboardEvent) => {
-      if (e.key === "Escape") {
-        window.location.href = "/";
-      }
-    };
-    window.addEventListener("keydown", handleKey);
-    return () => window.removeEventListener("keydown", handleKey);
-  }, []);
-
-  const employee = allEmployees[index];
-  const company = companies.find((c) => c.id === employee?.company);
-  const colors = getCompanyColors(employee?.company ?? "");
-
-  if (!employee) return null;
+// ── Infinite conveyor row ───────────────────────────────────────────
+function ConveyorRow({
+  employees,
+  direction,
+  durationPerCard,
+  scale,
+  opacity,
+  tilt,
+}: {
+  employees: Employee[];
+  direction: "left" | "right";
+  durationPerCard: number;
+  scale: number;
+  opacity: number;
+  tilt: number;
+}) {
+  const duration = employees.length * durationPerCard;
+  // Duplicate the set so translating by exactly -50% loops seamlessly
+  const doubled = [...employees, ...employees];
 
   return (
     <div
-      className="fixed inset-0 overflow-hidden flex flex-col"
-      style={{ background: "#08080f", fontFamily: "var(--font-dm-sans, sans-serif)" }}
+      style={{
+        overflow: "hidden",
+        opacity,
+        WebkitMaskImage:
+          "linear-gradient(to right, transparent 0%, black 12%, black 88%, transparent 100%)",
+        maskImage:
+          "linear-gradient(to right, transparent 0%, black 12%, black 88%, transparent 100%)",
+        transform: `rotateX(${tilt}deg)`,
+        transformStyle: "preserve-3d",
+      }}
     >
-      {/* Background ambient glow */}
+      <motion.div
+        style={{ display: "flex", gap: 20, width: "max-content", willChange: "transform" }}
+        animate={{ x: direction === "left" ? ["0%", "-50%"] : ["-50%", "0%"] }}
+        transition={{ duration, repeat: Infinity, ease: "linear" }}
+      >
+        {doubled.map((emp, i) => (
+          <CarouselCard key={`${emp.id}-${i}`} employee={emp} scale={scale} />
+        ))}
+      </motion.div>
+    </div>
+  );
+}
+
+// ── Search result card (grid reveal) ───────────────────────────────
+function ResultCard({ employee }: { employee: Employee }) {
+  const colors = getCompanyColors(employee.company);
+  const companies = getCompanies();
+  const company = companies.find((c) => c.id === employee.company);
+  return (
+    <div
+      style={{
+        borderRadius: 16,
+        border: `1px solid ${colors.primary}30`,
+        background: "rgba(18,18,30,0.95)",
+        boxShadow: `0 0 32px ${colors.glow}`,
+        padding: 20,
+      }}
+    >
+      <div className="flex items-center gap-4 mb-4">
+        <Monogram name={employee.name} company={employee.company} size={64} />
+        <div className="min-w-0 flex-1">
+          <div
+            style={{
+              fontSize: "1.05rem",
+              fontWeight: 700,
+              color: "#F2F0EC",
+              lineHeight: 1.2,
+              fontFamily: "var(--font-neuropol), var(--font-orbitron), monospace",
+            }}
+          >
+            {employee.name}
+          </div>
+          <div style={{ fontSize: "0.85rem", color: colors.accent ?? colors.primary, fontWeight: 600 }}>
+            {employee.position}
+          </div>
+          {employee.department && (
+            <div style={{ fontSize: "0.75rem", color: "#7070A0" }}>{employee.department}</div>
+          )}
+        </div>
+      </div>
+      <div style={{ borderTop: "1px solid rgba(255,255,255,0.08)", margin: "0 0 14px" }} />
+      <div className="grid gap-2" style={{ color: "#9090B8", fontSize: "0.82rem" }}>
+        {company && (
+          <span className="flex items-center gap-2.5">
+            <span style={{ width: 8, height: 8, borderRadius: 2, background: colors.primary, flexShrink: 0 }} />
+            {company.shortName ?? company.name}
+          </span>
+        )}
+        {employee.extension && (
+          <span className="flex items-center gap-2.5">
+            <Phone size={14} style={{ color: colors.primary, flexShrink: 0 }} />
+            Ext. {employee.extension}
+          </span>
+        )}
+        {employee.location && (
+          <span className="flex items-center gap-2.5">
+            <MapPin size={14} style={{ color: colors.primary, flexShrink: 0 }} />
+            {employee.location}
+          </span>
+        )}
+        {employee.email && (
+          <span className="flex items-center gap-2.5 overflow-hidden">
+            <Mail size={14} style={{ color: colors.primary, flexShrink: 0 }} />
+            <span className="truncate">{employee.email}</span>
+          </span>
+        )}
+      </div>
+    </div>
+  );
+}
+
+// ── Page ────────────────────────────────────────────────────────────
+export default function QuioscoPage() {
+  const allEmployees = useMemo(() => {
+    const companies = getCompanies();
+    return getEmployees().filter((e) => {
+      const company = companies.find((c) => c.id === e.company);
+      return company && !company.disabled;
+    });
+  }, []);
+
+  const [searchActive, setSearchActive] = useState(false);
+  const [query, setQuery] = useState("");
+  const inputRef = useRef<HTMLInputElement>(null);
+  const inactivityTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  // Fuse index for fuzzy employee search (mirrors smart-search-bar config)
+  const fuse = useMemo(() => {
+    const searchable = allEmployees.map((emp) => ({
+      nombreCompleto: emp.name,
+      apellidos: emp.name.split(" ").slice(-2).join(" "),
+      primerNombre: emp.name.split(" ")[0],
+      puesto: emp.position,
+      departamento: emp.department || "",
+      empresa: emp.company,
+      sucursal: emp.location || "",
+      extension: emp.extension || "",
+      data: emp,
+    }));
+    return new Fuse(searchable, {
+      keys: [
+        { name: "nombreCompleto", weight: 0.3 },
+        { name: "apellidos", weight: 0.35 },
+        { name: "primerNombre", weight: 0.15 },
+        { name: "puesto", weight: 0.1 },
+        { name: "departamento", weight: 0.05 },
+        { name: "extension", weight: 0.05 },
+      ],
+      threshold: 0.3,
+      distance: 100,
+      minMatchCharLength: 1,
+      shouldSort: true,
+    });
+  }, [allEmployees]);
+
+  const results = useMemo(() => {
+    const q = query.trim();
+    if (q.length < 1) return [];
+    // numeric-only query → extension match
+    const digits = q.replace(/\D/g, "");
+    if (digits.length >= 2 && digits === q.replace(/\s/g, "")) {
+      return allEmployees.filter((e) => e.extension?.includes(digits)).slice(0, 12);
+    }
+    return fuse
+      .search(q)
+      .slice(0, 12)
+      .map((r) => r.item.data);
+  }, [query, fuse, allEmployees]);
+
+  // Split employees across rows (offset slices so rows differ)
+  const rows = useMemo(() => {
+    const perRow = Math.ceil(allEmployees.length / ROW_COUNT);
+    return Array.from({ length: ROW_COUNT }, (_, r) => {
+      const start = r * perRow;
+      const slice = allEmployees.slice(start, start + perRow);
+      // ensure each row has enough cards to fill wide screens
+      return slice.length >= 6 ? slice : [...slice, ...allEmployees].slice(0, Math.max(8, slice.length));
+    });
+  }, [allEmployees]);
+
+  const closeSearch = useCallback(() => {
+    setSearchActive(false);
+    setQuery("");
+  }, []);
+
+  const openSearch = useCallback((seed?: string) => {
+    setSearchActive(true);
+    if (seed) setQuery(seed);
+    requestAnimationFrame(() => inputRef.current?.focus());
+  }, []);
+
+  // Reset inactivity timer whenever search is active + user interacts
+  const bumpInactivity = useCallback(() => {
+    if (inactivityTimer.current) clearTimeout(inactivityTimer.current);
+    inactivityTimer.current = setTimeout(() => closeSearch(), INACTIVITY_MS);
+  }, [closeSearch]);
+
+  useEffect(() => {
+    if (searchActive) bumpInactivity();
+    return () => {
+      if (inactivityTimer.current) clearTimeout(inactivityTimer.current);
+    };
+  }, [searchActive, query, bumpInactivity]);
+
+  // Global interaction handling
+  useEffect(() => {
+    const onKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape") {
+        // First Escape closes search; a second (carousel visible) exits kiosk
+        if (searchActive) {
+          e.preventDefault();
+          closeSearch();
+        } else {
+          window.location.href = "/";
+        }
+        return;
+      }
+      if (!searchActive) {
+        // Seed the query with printable single characters
+        const isPrintable = e.key.length === 1 && !e.ctrlKey && !e.metaKey && !e.altKey;
+        openSearch(isPrintable ? e.key : undefined);
+      } else {
+        bumpInactivity();
+      }
+    };
+
+    const onPointer = () => {
+      if (!searchActive) openSearch();
+    };
+
+    window.addEventListener("keydown", onKeyDown);
+    window.addEventListener("touchstart", onPointer, { passive: true });
+    window.addEventListener("mousedown", onPointer);
+    return () => {
+      window.removeEventListener("keydown", onKeyDown);
+      window.removeEventListener("touchstart", onPointer);
+      window.removeEventListener("mousedown", onPointer);
+    };
+  }, [searchActive, openSearch, closeSearch, bumpInactivity]);
+
+  if (allEmployees.length === 0) return null;
+
+  const rowConfigs = [
+    { direction: "left" as const, durationPerCard: 4.6, scale: 0.86, opacity: 0.7, tilt: 6 },
+    { direction: "right" as const, durationPerCard: 3.9, scale: 1, opacity: 1, tilt: 0 },
+    { direction: "left" as const, durationPerCard: 4.2, scale: 0.86, opacity: 0.7, tilt: -6 },
+  ];
+
+  return (
+    <div
+      className="fixed inset-0 overflow-hidden"
+      style={{ background: "#07070e", fontFamily: "var(--font-dm-sans, sans-serif)" }}
+    >
+      {/* Animated node/network backdrop */}
+      <HeroNetworkCanvas />
+
+      {/* Slow animated gradient wash for a premium screensaver feel */}
       <div
         className="absolute inset-0 pointer-events-none"
         style={{
-          background: `radial-gradient(ellipse 70% 60% at 50% 50%, ${colors.glow} 0%, transparent 70%)`,
-          transition: "background 1.2s ease",
-        }}
-      />
-
-      {/* Subtle dot grid */}
-      <div
-        className="absolute inset-0 pointer-events-none opacity-30"
-        style={{
-          backgroundImage: "radial-gradient(circle at 1px 1px, rgba(255,255,255,0.04) 1px, transparent 0)",
-          backgroundSize: "28px 28px",
+          background:
+            "radial-gradient(ellipse 60% 50% at 20% 30%, rgba(0,201,167,0.08), transparent 60%), radial-gradient(ellipse 60% 50% at 80% 70%, rgba(0,194,255,0.07), transparent 60%)",
+          animation: "quioscoWash 18s ease-in-out infinite alternate",
         }}
       />
 
       {/* Branding header */}
-      <div className="relative z-10 flex items-center justify-between px-8 pt-6 pb-4 shrink-0">
+      <div className="relative z-10 flex items-center justify-between px-10 pt-7">
         <span
           style={{
             fontFamily: "var(--font-neuropol), var(--font-orbitron), monospace",
-            fontSize: "1.4rem",
+            fontSize: "1.5rem",
             fontWeight: 900,
             background: "linear-gradient(90deg, #00C9A7, #845EC2, #00C2FF, #00C9A7)",
             backgroundSize: "200% auto",
@@ -178,227 +424,159 @@ export default function QuioscoPage() {
         <span
           style={{
             fontFamily: "var(--font-neuropol), var(--font-orbitron), monospace",
-            fontSize: "0.65rem",
-            letterSpacing: "0.18em",
-            color: "#555570",
+            fontSize: "0.68rem",
+            letterSpacing: "0.2em",
+            color: "#55557a",
             textTransform: "uppercase",
           }}
         >
           Directorio Corporativo
         </span>
-        <a
-          href="/"
-          title="Salir del modo quiosco (también: tecla Esc)"
-          style={{
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            width: 36,
-            height: 36,
-            borderRadius: 8,
-            border: "1px solid rgba(255,255,255,0.08)",
-            background: "rgba(255,255,255,0.04)",
-            color: "#555570",
-            transition: "all 150ms",
-          }}
-          onMouseEnter={(e) => {
-            (e.currentTarget as HTMLElement).style.color = "#F2F0EC";
-            (e.currentTarget as HTMLElement).style.borderColor = "rgba(255,255,255,0.2)";
-          }}
-          onMouseLeave={(e) => {
-            (e.currentTarget as HTMLElement).style.color = "#555570";
-            (e.currentTarget as HTMLElement).style.borderColor = "rgba(255,255,255,0.08)";
-          }}
-        >
-          <X size={16} />
-        </a>
       </div>
 
-      {/* Main card area */}
-      <div className="relative z-10 flex-1 flex items-center justify-center px-8">
-        <div style={{ perspective: "1200px", width: "100%", maxWidth: 520 }}>
-          <AnimatePresence mode="wait">
-            <motion.div
-              key={employee.id}
-              variants={cardVariants}
-              initial="enter"
-              animate="center"
-              exit="exit"
-              style={{
-                transformStyle: "preserve-3d",
-                willChange: "transform, filter, opacity",
-                position: "relative",
-                overflow: "hidden",
-                borderRadius: 20,
-                border: `1px solid ${colors.primary}30`,
-                background: "rgba(15,15,26,0.92)",
-                backdropFilter: "blur(20px)",
-                boxShadow: `0 0 0 1px ${colors.primary}18, 0 32px 80px rgba(0,0,0,0.6), 0 0 80px ${colors.glow}`,
-              }}
-            >
-              {/* Light scan effect */}
-              <motion.div
-                variants={scanVariants}
-                initial="enter"
-                animate="animate"
-                style={{
-                  position: "absolute",
-                  inset: 0,
-                  background: "linear-gradient(105deg, transparent 35%, rgba(255,255,255,0.35) 50%, transparent 65%)",
-                  pointerEvents: "none",
-                  zIndex: 10,
-                }}
-              />
-
-              {/* Company accent top bar */}
-              <div
-                style={{
-                  position: "absolute",
-                  top: 0,
-                  left: 0,
-                  right: 0,
-                  height: 3,
-                  background: `linear-gradient(90deg, ${colors.primary}, ${colors.accent ?? colors.secondary})`,
-                }}
-              />
-
-              <div className="p-8 pt-10">
-                {/* Avatar + name */}
-                <div className="flex items-center gap-6 mb-8">
-                  <Monogram name={employee.name} company={employee.company} size={96} />
-                  <div className="flex-1 min-w-0">
-                    <h2
-                      style={{
-                        fontSize: "clamp(1.25rem, 4vw, 1.75rem)",
-                        fontWeight: 700,
-                        color: "#F2F0EC",
-                        lineHeight: 1.15,
-                        marginBottom: 6,
-                        fontFamily: "var(--font-neuropol), var(--font-orbitron), monospace",
-                        letterSpacing: "-0.01em",
-                      }}
-                    >
-                      {employee.name}
-                    </h2>
-                    <p
-                      style={{
-                        fontSize: "0.925rem",
-                        color: colors.accent ?? colors.primary,
-                        fontWeight: 600,
-                        letterSpacing: "0.01em",
-                        marginBottom: 4,
-                      }}
-                    >
-                      {employee.position}
-                    </p>
-                    {employee.department && (
-                      <p style={{ fontSize: "0.8rem", color: "#7070A0", letterSpacing: "0.02em" }}>
-                        {employee.department}
-                      </p>
-                    )}
-                  </div>
-                </div>
-
-                {/* Divider */}
-                <div style={{ borderTop: "1px solid rgba(255,255,255,0.07)", marginBottom: 20 }} />
-
-                {/* Contact info */}
-                <div className="grid grid-cols-2 gap-3">
-                  {company && (
-                    <div className="flex items-center gap-2.5 col-span-2" style={{ color: "#9090B8" }}>
-                      <Building2 size={15} style={{ flexShrink: 0, color: colors.primary }} />
-                      <span style={{ fontSize: "0.82rem" }}>{company.shortName ?? company.name}</span>
-                    </div>
-                  )}
-                  {employee.location && (
-                    <div className="flex items-center gap-2.5 col-span-2" style={{ color: "#9090B8" }}>
-                      <MapPin size={15} style={{ flexShrink: 0, color: colors.primary }} />
-                      <span style={{ fontSize: "0.82rem" }}>{employee.location}</span>
-                    </div>
-                  )}
-                  {employee.extension && (
-                    <div className="flex items-center gap-2.5" style={{ color: "#9090B8" }}>
-                      <Phone size={15} style={{ flexShrink: 0, color: colors.primary }} />
-                      <span style={{ fontSize: "0.82rem" }}>Ext. {employee.extension}</span>
-                    </div>
-                  )}
-                  {employee.email && (
-                    <div className="flex items-center gap-2.5 overflow-hidden" style={{ color: "#9090B8" }}>
-                      <Mail size={15} style={{ flexShrink: 0, color: colors.primary }} />
-                      <span style={{ fontSize: "0.82rem" }} className="truncate">{employee.email}</span>
-                    </div>
-                  )}
-                </div>
-              </div>
-            </motion.div>
-          </AnimatePresence>
-        </div>
-      </div>
-
-      {/* Progress dots */}
-      <div className="relative z-10 flex items-center justify-center gap-1.5 py-6 shrink-0">
-        {allEmployees.map((_, i) => (
-          <button
-            key={i}
-            onClick={() => setIndex(i)}
-            style={{
-              width: i === index ? 20 : 6,
-              height: 6,
-              borderRadius: 3,
-              background: i === index ? colors.primary : "rgba(255,255,255,0.12)",
-              border: "none",
-              padding: 0,
-              cursor: "pointer",
-              transition: "all 300ms ease",
-            }}
-            aria-label={`Ver empleado ${i + 1}`}
-          />
+      {/* Continuous conveyor carousel */}
+      <div
+        className="absolute inset-0 flex flex-col justify-center gap-8 z-[1]"
+        style={{
+          perspective: "1400px",
+          filter: searchActive ? "blur(14px) brightness(0.4)" : "none",
+          transition: "filter 500ms ease",
+          pointerEvents: "none",
+        }}
+        aria-hidden={searchActive}
+      >
+        {rows.map((rowEmps, i) => (
+          <ConveyorRow key={i} employees={rowEmps} {...rowConfigs[i]} />
         ))}
       </div>
 
-      {/* Auto-advance progress bar */}
-      <ProgressBar key={index} durationMs={ROTATION_INTERVAL_MS} color={colors.primary} onComplete={advance} />
+      {/* Idle hint (only when search hidden) */}
+      <AnimatePresence>
+        {!searchActive && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ delay: 0.6, duration: 0.8 }}
+            className="absolute bottom-16 left-1/2 -translate-x-1/2 z-10 flex items-center gap-2 px-4 py-2 rounded-full"
+            style={{
+              color: "#8a8ab0",
+              fontSize: "0.8rem",
+              letterSpacing: "0.05em",
+              background: "rgba(10,10,20,0.6)",
+              backdropFilter: "blur(6px)",
+              border: "1px solid rgba(255,255,255,0.06)",
+            }}
+          >
+            <Search size={15} />
+            Toca la pantalla o escribe para buscar
+          </motion.div>
+        )}
+      </AnimatePresence>
 
-      {/* Esc hint */}
-      <div
-        className="absolute bottom-4 left-1/2 -translate-x-1/2 z-20"
-        style={{ color: "#333355", fontSize: "0.65rem", letterSpacing: "0.1em" }}
-      >
-        Presiona ESC para salir
-      </div>
-    </div>
-  );
-}
+      {/* Search overlay */}
+      <AnimatePresence>
+        {searchActive && (
+          <motion.div
+            key="search-overlay"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.3 }}
+            className="absolute inset-0 z-20 flex flex-col items-center"
+            style={{ backdropFilter: "blur(2px)" }}
+          >
+            {/* Search bar — slides down from top */}
+            <motion.div
+              initial={{ y: -80, opacity: 0 }}
+              animate={{ y: 0, opacity: 1 }}
+              exit={{ y: -80, opacity: 0 }}
+              transition={{ type: "spring", stiffness: 320, damping: 30 }}
+              className="w-full max-w-2xl px-6 pt-10"
+            >
+              <div
+                className="flex items-center gap-3 px-5"
+                style={{
+                  height: 64,
+                  borderRadius: 16,
+                  background: "rgba(18,18,30,0.96)",
+                  border: "1px solid rgba(0,201,167,0.35)",
+                  boxShadow: "0 20px 60px rgba(0,0,0,0.6), 0 0 40px rgba(0,201,167,0.12)",
+                }}
+              >
+                <Search size={22} style={{ color: "#00C9A7", flexShrink: 0 }} />
+                <input
+                  ref={inputRef}
+                  value={query}
+                  onChange={(e) => setQuery(e.target.value)}
+                  placeholder="Buscar por nombre, puesto o extensión..."
+                  className="flex-1 bg-transparent outline-none"
+                  style={{ color: "#F2F0EC", fontSize: "1.15rem" }}
+                  autoComplete="off"
+                  spellCheck={false}
+                />
+                <button
+                  onClick={closeSearch}
+                  aria-label="Cerrar búsqueda"
+                  className="flex items-center justify-center transition-colors"
+                  style={{
+                    width: 36,
+                    height: 36,
+                    borderRadius: 8,
+                    background: "rgba(255,255,255,0.05)",
+                    border: "1px solid rgba(255,255,255,0.1)",
+                    color: "#9090b8",
+                    flexShrink: 0,
+                  }}
+                >
+                  <X size={18} />
+                </button>
+              </div>
+              <div
+                className="text-center mt-3"
+                style={{ color: "#55557a", fontSize: "0.72rem", letterSpacing: "0.05em" }}
+              >
+                ESC para volver al carrusel · ESC de nuevo para salir
+              </div>
+            </motion.div>
 
-function ProgressBar({
-  durationMs,
-  color,
-  onComplete,
-}: {
-  durationMs: number;
-  color: string;
-  onComplete: () => void;
-}) {
-  return (
-    <div
-      style={{
-        position: "absolute",
-        bottom: 0,
-        left: 0,
-        right: 0,
-        height: 2,
-        background: "rgba(255,255,255,0.06)",
-        zIndex: 20,
-        overflow: "hidden",
-      }}
-    >
-      <motion.div
-        initial={{ width: "0%" }}
-        animate={{ width: "100%" }}
-        transition={{ duration: durationMs / 1000, ease: "linear" }}
-        onAnimationComplete={onComplete}
-        style={{ height: "100%", background: color, originX: 0 }}
-      />
+            {/* Results grid — staggered reveal */}
+            <div className="flex-1 w-full overflow-y-auto px-6 pb-10 mt-6">
+              <div className="max-w-5xl mx-auto">
+                {query.trim().length >= 1 && results.length === 0 && (
+                  <motion.div
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    className="text-center py-16"
+                    style={{ color: "#7070a0", fontSize: "1rem" }}
+                  >
+                    Sin resultados para &ldquo;{query}&rdquo;
+                  </motion.div>
+                )}
+                <div
+                  className="grid gap-4"
+                  style={{ gridTemplateColumns: "repeat(auto-fill, minmax(300px, 1fr))" }}
+                >
+                  <AnimatePresence mode="popLayout">
+                    {results.map((emp, i) => (
+                      <motion.div
+                        key={emp.id}
+                        layout
+                        initial={{ opacity: 0, y: 20, scale: 0.96 }}
+                        animate={{ opacity: 1, y: 0, scale: 1 }}
+                        exit={{ opacity: 0, scale: 0.96 }}
+                        transition={{ delay: Math.min(i * 0.04, 0.4), duration: 0.28, ease: [0.22, 1, 0.36, 1] }}
+                      >
+                        <ResultCard employee={emp} />
+                      </motion.div>
+                    ))}
+                  </AnimatePresence>
+                </div>
+              </div>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }
