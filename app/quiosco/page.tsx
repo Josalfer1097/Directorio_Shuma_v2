@@ -160,34 +160,43 @@ function ConveyorRow({
   // Duplicate the set so translating by exactly -50% loops seamlessly
   const doubled = [...employees, ...employees];
 
+  // Safari/WebKit fails to composite an element that combines overflow:hidden
+  // + mask-image + a 3D transform (rotateX/preserve-3d) all at once, leaving a
+  // blank screen. We split responsibilities across nested elements and use a
+  // subtle 2D skewY for the tilt so no 3D context (perspective/preserve-3d) is
+  // ever needed. skewY factor keeps the lean gentle (~0.2deg per tilt unit).
+  const skew = tilt * 0.2;
+
   return (
-    <div
-      style={{
-        overflow: "hidden",
-        opacity,
-        WebkitMaskImage:
-          "linear-gradient(to right, transparent 0%, black 12%, black 88%, transparent 100%)",
-        maskImage:
-          "linear-gradient(to right, transparent 0%, black 12%, black 88%, transparent 100%)",
-        transform: `rotateX(${tilt}deg)`,
-        transformStyle: "preserve-3d",
-      }}
-    >
+    // Outer: tilt only (2D skew, no overflow, no mask, no 3D context)
+    <div style={{ opacity, transform: `skewY(${skew}deg)` }}>
+      {/* Middle: clipping + edge fade mask ONLY — no transform of any kind */}
       <div
         style={{
-          display: "flex",
-          gap: 20,
-          width: "max-content",
-          willChange: "transform",
-          animation: `quioscoScroll ${duration}s linear infinite`,
-          // "right" direction = reverse so it travels the opposite way
-          animationDirection: direction === "right" ? "reverse" : "normal",
-          animationPlayState: paused ? "paused" : "running",
+          overflow: "hidden",
+          WebkitMaskImage:
+            "linear-gradient(to right, transparent 0%, black 12%, black 88%, transparent 100%)",
+          maskImage:
+            "linear-gradient(to right, transparent 0%, black 12%, black 88%, transparent 100%)",
         }}
       >
-        {doubled.map((emp, i) => (
-          <CarouselCard key={`${emp.id}-${i}`} employee={emp} scale={scale} />
-        ))}
+        {/* Inner: horizontal scroll animation */}
+        <div
+          style={{
+            display: "flex",
+            gap: 20,
+            width: "max-content",
+            willChange: "transform",
+            animation: `quioscoScroll ${duration}s linear infinite`,
+            // "right" direction = reverse so it travels the opposite way
+            animationDirection: direction === "right" ? "reverse" : "normal",
+            animationPlayState: paused ? "paused" : "running",
+          }}
+        >
+          {doubled.map((emp, i) => (
+            <CarouselCard key={`${emp.id}-${i}`} employee={emp} scale={scale} />
+          ))}
+        </div>
       </div>
     </div>
   );
@@ -453,7 +462,8 @@ export default function QuioscoPage() {
       <div
         className="absolute inset-0 flex flex-col justify-center gap-8 z-[1]"
         style={{
-          perspective: "1400px",
+          // No `perspective` here anymore: rows use a 2D skew tilt, so no 3D
+          // context is needed. Avoiding it prevents WebKit compositing bugs.
           pointerEvents: "none",
         }}
         aria-hidden={searchActive}

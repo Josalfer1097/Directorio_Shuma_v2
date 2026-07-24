@@ -1,5 +1,16 @@
 [
   {
+    "version": "0.3.3",
+    "date": "2026-07-24",
+    "changes": [
+      "FIX CRITICO (Safari/macOS): el modo quiosco (/quiosco) mostraba pantalla en blanco/negro sin tarjetas en equipos Mac — bug de compositing de WebKit al combinar overflow:hidden + mask-image + transform 3D (rotateX/preserve-3d) en el MISMO elemento de cada fila del carrusel (ConveyorRow)",
+      "CAMBIO: ConveyorRow ahora separa responsabilidades en 3 elementos anidados — externo aplica solo el tilt, intermedio solo overflow:hidden + mask de bordes (sin transform), interno la animacion de scroll",
+      "CAMBIO: el tilt de las filas pasa de rotateX (3D, requeria preserve-3d + perspective) a un skewY 2D sutil, eliminando por completo la necesidad de contexto 3D que disparaba el bug de Safari",
+      "CAMBIO: removido perspective:1400px del contenedor de las filas, ya innecesario al no usar ningun hijo preserve-3d — reduce aun mas el riesgo de bugs de compositing en WebKit",
+      "El fade de bordes izquierdo/derecho (mask) y las 3 filas animadas se mantienen; compatible con Safari macOS e iOS (mismo motor WebKit)"
+    ]
+  },
+  {
     "version": "0.3.2",
     "date": "2026-07-24",
     "changes": [
