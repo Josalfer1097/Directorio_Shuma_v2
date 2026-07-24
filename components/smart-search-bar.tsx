@@ -44,7 +44,9 @@ function ScrollFadeContainer({ children }: { children: React.ReactNode }) {
   }, [checkScroll]);
 
   return (
-    <div className="relative">
+    // overflow-hidden + border-radius here clips content to rounded corners
+    // without blocking the inner div's own scroll behaviour.
+    <div className="relative overflow-hidden rounded-xl">
       <div
         ref={scrollRef}
         className="max-h-[min(60vh,420px)] overflow-y-auto overscroll-contain"
@@ -56,7 +58,7 @@ function ScrollFadeContainer({ children }: { children: React.ReactNode }) {
       {showFade && (
         <div
           aria-hidden="true"
-          className="pointer-events-none absolute bottom-0 left-0 right-0 h-10 rounded-b-xl"
+          className="pointer-events-none absolute bottom-0 left-0 right-0 h-10"
           style={{
             background:
               "linear-gradient(to bottom, transparent 0%, var(--search-fade-stop) 100%)",
@@ -445,7 +447,7 @@ export function SmartSearchBar() {
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -8 }}
             transition={{ duration: 0.15, ease: "easeOut" }}
-            className="absolute top-full left-0 right-0 mt-2 z-50 backdrop-blur-lg rounded-xl shadow-2xl overflow-hidden"
+            className="absolute top-full left-0 right-0 mt-2 z-50 backdrop-blur-lg rounded-xl shadow-2xl"
             style={{
               background: "var(--search-dropdown-bg)",
               border: "1px solid var(--search-dropdown-border)",

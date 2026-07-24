@@ -1,5 +1,14 @@
 [
   {
+    "version": "0.2.3",
+    "date": "2026-07-24",
+    "changes": [
+      "FIX: Scroll en resultados de busqueda ahora funciona correctamente — se movio overflow-hidden + border-radius al wrapper interno de ScrollFadeContainer para que el div scrollable interno pueda medir su propia altura sin ser recortado por el contenedor padre",
+      "FIX CRITICO: Vista de departamento/equipo ahora respeta el tema claro — eliminados todos los colores hardcodeados (background #0C0E11, rgba(255,255,255,0.6), bg-white/7, bg-white/1.5, dark:text-white, dark:bg-[#0C0E11], dark:border-white/6, text-white/25, text-white/15); reemplazados por tokens semanticos del sistema de temas: bg-background, text-foreground, text-muted-foreground, bg-muted, border-border-subtle",
+      "FIX: Boton Volver en vista de departamento ahora es legible en ambos temas — usaba color inline rgba(255,255,255,0.6) fijo; ahora usa clases Tailwind text-muted-foreground hover:text-foreground que siguen el tema activo"
+    ]
+  },
+  {
     "version": "0.2.2",
     "date": "2026-07-24",
     "changes": [

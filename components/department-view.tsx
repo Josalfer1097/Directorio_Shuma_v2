@@ -195,9 +195,8 @@ export function DepartmentView({ department, onClose }: DepartmentViewProps) {
               duration: 0.28, 
               ease: [0.16, 1, 0.3, 1],
             }}
-            className="fixed inset-0 z-[200] flex flex-col"
+            className="fixed inset-0 z-[200] flex flex-col bg-background"
             style={{
-              background: "#0C0E11",
               transform: swipeOffset > 0 ? `translateX(${swipeOffset}px)` : undefined,
             }}
             onTouchStart={handleTouchStart}
@@ -216,7 +215,7 @@ export function DepartmentView({ department, onClose }: DepartmentViewProps) {
 
             {/* Header */}
             <header
-              className="sticky top-0 z-10 flex items-center justify-between px-4 md:px-6 bg-background dark:bg-[#0C0E11] border-b border-border-subtle dark:border-b dark:border-white/7"
+              className="sticky top-0 z-10 flex items-center justify-between px-4 md:px-6 bg-background border-b border-border-subtle"
               style={{
                 height: "64px",
               }}
@@ -224,12 +223,7 @@ export function DepartmentView({ department, onClose }: DepartmentViewProps) {
               {/* Back button */}
               <button
                 onClick={onClose}
-                className="flex items-center gap-2 transition-colors text-scale-sm"
-                style={{ 
-                  color: "rgba(255,255,255,0.6)",
-                }}
-                onMouseEnter={(e) => e.currentTarget.style.color = "white"}
-                onMouseLeave={(e) => e.currentTarget.style.color = "rgba(255,255,255,0.6)"}
+                className="flex items-center gap-2 transition-colors text-scale-sm text-muted-foreground hover:text-foreground"
               >
                 <ArrowLeft className="w-4 h-4" />
                 <span>Volver</span>
@@ -237,7 +231,7 @@ export function DepartmentView({ department, onClose }: DepartmentViewProps) {
 
               {/* Department name */}
               <h1
-                className="absolute left-1/2 -translate-x-1/2 font-neuropol uppercase truncate max-w-[50%] text-scale-xl text-foreground dark:text-white"
+                className="absolute left-1/2 -translate-x-1/2 font-neuropol uppercase truncate max-w-[50%] text-scale-xl text-foreground"
                 style={{
                   fontFamily: "var(--font-neuropol), var(--font-orbitron), 'Orbitron', monospace",
                   letterSpacing: "0.05em",
@@ -248,7 +242,7 @@ export function DepartmentView({ department, onClose }: DepartmentViewProps) {
 
               {/* Employee count */}
               <div
-                className="flex items-center gap-1.5 text-scale-xs bg-white/7 dark:bg-white/7 text-muted-foreground dark:text-white/70"
+                className="flex items-center gap-1.5 text-scale-xs bg-muted text-muted-foreground"
                 style={{
                   borderRadius: "20px",
                   padding: "4px 12px",
@@ -263,10 +257,10 @@ export function DepartmentView({ department, onClose }: DepartmentViewProps) {
             <div className="flex-1 overflow-y-auto overscroll-contain">
               {departmentEmployees.length === 0 ? (
                 <div className="flex flex-col items-center justify-center h-full gap-4">
-                  <Users 
-                    className="w-12 h-12 text-white/15 dark:text-white/15"
+                  <Users
+                    className="w-12 h-12 text-muted-foreground/30"
                   />
-                  <p className="text-scale-base text-white/30 dark:text-white/30">
+                  <p className="text-scale-base text-muted-foreground/50">
                     No hay colaboradores en este departamento
                   </p>
                 </div>
@@ -275,7 +269,7 @@ export function DepartmentView({ department, onClose }: DepartmentViewProps) {
                   {/* Manager Section */}
                   {managers.length > 0 && (
                     <section
-                      className="bg-white/1.5 dark:bg-white/1.5 border-b border-border-subtle dark:border-white/6"
+                      className="bg-muted/20 border-b border-border-subtle"
                       style={{
                         padding: "24px",
                       }}
@@ -326,14 +320,14 @@ export function DepartmentView({ department, onClose }: DepartmentViewProps) {
 
                   {/* Divider */}
                   {managers.length > 0 && teamMembers.length > 0 && (
-                    <div 
-                      className="relative flex items-center justify-center border-t border-border-subtle dark:border-white/6"
-                      style={{ 
+                    <div
+                      className="relative flex items-center justify-center border-t border-border-subtle"
+                      style={{
                         margin: "0 24px",
                       }}
                     >
                       <span
-                        className="text-scale-xs text-foreground/25 dark:text-white/25 bg-background dark:bg-[#0C0E11]"
+                        className="text-scale-xs text-muted-foreground/50 bg-background"
                         style={{
                           position: "absolute",
                           letterSpacing: "0.15em",
