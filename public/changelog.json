@@ -1,5 +1,13 @@
 [
   {
+    "version": "0.3.5",
+    "date": "2026-07-24",
+    "changes": [
+      "MITIGATION FINAL (Safari): el bug de pantalla negra en modo quiosco es un fallo silencioso de compositing de WebKit que no lanza excepciones — el error.tsx nunca se activa. Se agrega un boton de salida de emergencia garantizado: <a href='/'> con estilos inline puros (sin Framer Motion, sin canvas, sin mask-image, sin transforms 3D, sin backdrop-filter), position:fixed top-left, zIndex:9999, renderizado como PRIMER elemento del arbol para maximizar la probabilidad de que WebKit lo pinte aunque el resto de la pagina falle",
+      "FIX MENOR: agregado WebkitBackdropFilter: blur(6px) al 'idle hint' (pill inferior 'Toca la pantalla o escribe para buscar') — Safari requiere el prefijo -webkit- explicito para esta propiedad"
+    ]
+  },
+  {
     "version": "0.3.4",
     "date": "2026-07-24",
     "changes": [

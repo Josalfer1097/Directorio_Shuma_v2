@@ -465,6 +465,37 @@ function QuioscoContent() {
       className="fixed inset-0 overflow-hidden"
       style={{ background: "#07070e", fontFamily: "var(--font-dm-sans, sans-serif)" }}
     >
+      {/* Emergency exit — rendered FIRST in the tree, before any canvas/animation/mask,
+          so WebKit paints it even if the rest of the page silently fails to composite.
+          Pure HTML + inline styles only: no Framer Motion, no backdrop-filter, no
+          mask-image, no 3D transforms, no JS required beyond standard <a> navigation. */}
+      <a
+        href="/"
+        style={{
+          position: "fixed",
+          top: 16,
+          left: 16,
+          zIndex: 9999,
+          display: "inline-flex",
+          alignItems: "center",
+          gap: 6,
+          padding: "7px 14px",
+          borderRadius: 8,
+          background: "#1a1a2e",
+          border: "1px solid #3a3a5c",
+          color: "#c8c8e8",
+          fontSize: "0.8rem",
+          fontWeight: 600,
+          letterSpacing: "0.04em",
+          textDecoration: "none",
+          cursor: "pointer",
+          userSelect: "none",
+        }}
+        aria-label="Salir del modo quiosco"
+      >
+        &#8592; Salir
+      </a>
+
       {/* Animated node/network backdrop */}
       <HeroNetworkCanvas />
 
@@ -553,6 +584,7 @@ function QuioscoContent() {
               letterSpacing: "0.05em",
               background: "rgba(10,10,20,0.6)",
               backdropFilter: "blur(6px)",
+              WebkitBackdropFilter: "blur(6px)",
               border: "1px solid rgba(255,255,255,0.06)",
             }}
           >
