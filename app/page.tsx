@@ -19,6 +19,7 @@ import { MundialCountdown } from "@/components/mundial/mundial-countdown";
 import { fireMundialConfetti } from "@/components/mundial/mundial-confetti";
 import { MundialOnboardingTooltip } from "@/components/mundial/mundial-onboarding-tooltip";
 import { useMundialTheme } from "@/lib/MundialThemeContext";
+import { HeroNetworkCanvas } from "@/components/hero-network-canvas";
 
 export default function HomePage() {
   const { mundialActive, openTracker } = useMundialTheme();
@@ -67,7 +68,9 @@ export default function HomePage() {
         <Navbar />
 
         {/* Hero Section */}
-        <section className="relative pt-32 md:pt-48 pb-20 px-4">
+        <section className="relative pt-32 md:pt-48 pb-20 px-4 overflow-hidden">
+          {/* Subtle node/network background — organizational connection motif */}
+          <HeroNetworkCanvas />
           <div className="container mx-auto text-center relative z-10">
             <motion.div
               initial={{ opacity: 0, y: 20 }}

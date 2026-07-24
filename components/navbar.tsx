@@ -13,6 +13,7 @@ import { ThemeToggle } from "./theme-toggle";
 import { MundialBallButton } from "./mundial/mundial-ball-button";
 import { EagleIcon } from "./mundial/eagle-icon";
 import { useMundialTheme } from "@/lib/MundialThemeContext";
+import { useCountUp } from "@/hooks/use-count-up";
 
 export function Navbar() {
   const pathname = usePathname();
@@ -34,6 +35,7 @@ export function Navbar() {
   const pageName = pageNames[pathname] ?? '';
   
   const employeeCount = useMemo(() => getEmployees().length, []);
+  const animatedCount = useCountUp(employeeCount, 1100);
 
   // Safely check quick+solo mode only after mount to avoid hydration mismatch
   const [isQuickSoloActive, setIsQuickSoloActive] = useState(false);
@@ -227,8 +229,8 @@ export function Navbar() {
             )}
           >
             Directorio
-            <span className="px-1.5 py-0.5 rounded-full text-[9px] bg-muted border border-border-subtle text-muted-foreground">
-              {employeeCount}
+            <span className="px-1.5 py-0.5 rounded-full text-[9px] bg-muted border border-border-subtle text-muted-foreground tabular-nums">
+              {animatedCount}
             </span>
             {pathname === "/directorio" && (
               <span className="absolute -bottom-1.5 left-0 right-0 h-0.5 bg-gradient-to-r from-[#C9A84C] to-[#E0C060] rounded-full" />

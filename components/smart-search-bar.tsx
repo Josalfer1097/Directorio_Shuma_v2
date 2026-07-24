@@ -393,7 +393,8 @@ export function SmartSearchBar() {
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -8 }}
             transition={{ duration: 0.15, ease: "easeOut" }}
-            className="absolute top-full left-0 right-0 mt-2 z-50 bg-[--bg-surface] backdrop-blur-lg border border-border-subtle rounded-xl shadow-2xl max-h-[400px] overflow-y-auto"
+            className="absolute top-full left-0 right-0 mt-2 z-50 backdrop-blur-lg border border-border-subtle rounded-xl shadow-2xl max-h-[400px] overflow-y-auto"
+            style={{ background: "rgba(10,10,20,0.96)" }}
           >
             {results.length === 0 ? (
               <div className="flex flex-col items-center justify-center py-12 px-4">
@@ -410,7 +411,7 @@ export function SmartSearchBar() {
                       {groupIndex > 0 && (
                         <div className="my-1 mx-2 border-t border-border-subtle" />
                       )}
-                      <div className="px-3 py-1.5 text-xs font-semibold text-muted-foreground uppercase tracking-wider">
+                      <div className="px-3 py-1.5 text-xs font-semibold uppercase tracking-wider" style={{ color: "#8888AA" }}>
                         {groupLabels[type]}
                       </div>
                       {items.map((result, index) => {
@@ -451,12 +452,12 @@ export function SmartSearchBar() {
                                 {result.label}
                               </div>
                               {result.secondary && (
-                                <div className="text-xs text-muted-foreground truncate">
+                                <div className="text-xs truncate" style={{ color: "#A8A8C0" }}>
                                   {result.secondary}
                                 </div>
                               )}
                               {hasContactInfo && (
-                                <div className="mt-1.5 flex items-center gap-4 text-xs text-muted-foreground">
+                                <div className="mt-1.5 flex items-center gap-4 text-xs" style={{ color: "#A8A8C0" }}>
                                   {result.data?.extension && (
                                     <div className="flex items-center gap-1.5">
                                       <Phone className="w-3.5 h-3.5 flex-shrink-0" />

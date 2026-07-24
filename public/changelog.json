@@ -1,11 +1,25 @@
 [
   {
+    "version": "0.2.0",
+    "date": "2026-07-24",
+    "changes": [
+      "FIX CRITICO: Resuelto error de hydration React #418 — toda la activacion del tema de temporada ahora ocurre exclusivamente en el cliente (useEffect), nunca en el servidor",
+      "FIX: Agregado meta tag mobile-web-app-capable junto al existente apple-mobile-web-app-capable (deprecation warning corregido)",
+      "FIX: Mejorado contraste de texto secundario en resultados de busqueda (pasa WCAG AA 4.5:1); overlay oscuro solido detras del dropdown",
+      "MEJORA: Sistema de temas de temporada por calendario — lib/seasonal-theme.ts ahora es un arreglo de temporadas con rango de fechas (Independencia de Mexico, Navidad, futuras extensibles); tema corporativo activo por defecto",
+      "MEJORA: El badge del Mundial 2026 ya no aplica (temporada vencida); aplicado tema corporativo por defecto",
+      "MEJORA: Animacion de red/nodos en el hero — canvas ligero con nodos conectados (efecto organizacional) visible detras del contenido del hero",
+      "MEJORA: Contador animado en el badge de empleados de la navbar — cuenta desde 0 hasta el total real (~1.1s, easing cubic ease-out) via requestAnimationFrame",
+      "NUEVA FUNCION: Modo Quiosco en /quiosco — rotacion automatica de tarjetas de empleados cada 9 segundos, transicion original flip-3D + blur direccional + efecto de luz cortina, barra de progreso, salida con tecla Esc o boton X"
+    ]
+  },
+  {
     "version": "0.1.1",
     "date": "2026-07-02",
     "changes": [
-      "Actualizado marcador: México 2-0 Ecuador (Dieciseisavos de Final)",
-      "Agregado próximo partido: México vs Inglaterra (Octavos de Final, 5 de julio)",
-      "Actualizada frase del badge de temporada a '¿Y si sí?'"
+      "Actualizado marcador: Mexico 2-0 Ecuador (Dieciseisavos de Final)",
+      "Agregado proximo partido: Mexico vs Inglaterra (Octavos de Final, 5 de julio)",
+      "Actualizada frase del badge de temporada a '¿Y si si?'"
     ]
   }
 ]

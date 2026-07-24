@@ -9,10 +9,7 @@ import {
   type ReactNode,
 } from "react";
 import { getMatchesSignature } from "@/data/mundial-mexico";
-import {
-  isMundialThemeActive,
-  getActiveSeasonalThemeClass,
-} from "@/lib/seasonal-theme";
+import { getActiveSeasonalTheme } from "@/lib/seasonal-theme";
 
 const SEEN_KEY = "shuma-mundial-matches-seen";
 const TOOLTIP_SEEN_KEY = "shuma-mundial-tooltip-seen";
@@ -51,28 +48,35 @@ export function MundialThemeProvider({ children }: { children: ReactNode }) {
   const [tooltipVisible, setTooltipVisible] = useState(false);
 
   useEffect(() => {
-    if (!isMundialThemeActive()) return;
+    // All seasonal theme logic runs client-side only to prevent hydration mismatches.
+    const activeTheme = getActiveSeasonalTheme();
+    const isMundial = activeTheme?.id === "mundial-2026";
 
-    const rootClass = getActiveSeasonalThemeClass();
-    if (rootClass) document.documentElement.classList.add(rootClass);
-    setMundialActive(true);
-
-    try {
-      // Clean up the legacy toggle key from the removed Modo Mundial switch
-      localStorage.removeItem(LEGACY_TOGGLE_KEY);
-
-      // Unseen match detection: compare data signature with last-seen value
-      const seen = localStorage.getItem(SEEN_KEY);
-      setHasUnseenMatches(seen !== getMatchesSignature());
-
-      // Onboarding tooltip: show once per user, after a short delay
-      if (localStorage.getItem(TOOLTIP_SEEN_KEY) !== "true") {
-        const timer = setTimeout(() => setTooltipVisible(true), TOOLTIP_DELAY_MS);
-        return () => clearTimeout(timer);
-      }
-    } catch {
-      // localStorage unavailable — theme still applies, skip persistence
+    if (activeTheme?.htmlClass) {
+      document.documentElement.classList.add(activeTheme.htmlClass);
     }
+
+    if (isMundial) {
+      setMundialActive(true);
+
+      try {
+        // Clean up the legacy toggle key from the removed Modo Mundial switch
+        localStorage.removeItem(LEGACY_TOGGLE_KEY);
+
+        // Unseen match detection: compare data signature with last-seen value
+        const seen = localStorage.getItem(SEEN_KEY);
+        setHasUnseenMatches(seen !== getMatchesSignature());
+
+        // Onboarding tooltip: show once per user, after a short delay
+        if (localStorage.getItem(TOOLTIP_SEEN_KEY) !== "true") {
+          const timer = setTimeout(() => setTooltipVisible(true), TOOLTIP_DELAY_MS);
+          return () => clearTimeout(timer);
+        }
+      } catch {
+        // localStorage unavailable — theme still applies, skip persistence
+      }
+    }
+
     return undefined;
   }, []);
 
