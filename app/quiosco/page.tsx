@@ -7,6 +7,8 @@ import { Phone, Mail, MapPin, Search, X } from "lucide-react";
 import { getEmployees, getCompanies, getCompanyColors } from "@/lib/data";
 import type { Employee } from "@/types";
 import { HeroNetworkCanvas } from "@/components/hero-network-canvas";
+import { KioskErrorBoundary } from "@/components/quiosco/kiosk-error-boundary";
+import { KioskErrorView } from "@/components/quiosco/kiosk-error-view";
 
 // ── Config ──────────────────────────────────────────────────────────
 const INACTIVITY_MS = 18000; // auto-return to carousel after inactivity
@@ -271,13 +273,35 @@ function ResultCard({ employee }: { employee: Employee }) {
 }
 
 // ── Page ────────────────────────────────────────────────────────────
+// Outer export wraps the real content in a manual error boundary so any
+// render/lifecycle failure paints a visible diagnostic instead of a black
+// screen. This is in ADDITION to app/quiosco/error.tsx.
 export default function QuioscoPage() {
+  return (
+    <KioskErrorBoundary>
+      <QuioscoContent />
+    </KioskErrorBoundary>
+  );
+}
+
+function QuioscoContent() {
+  // Visible init error state — set from the try/catch around the sensitive
+  // derivations below. Because Safari's console has been silent, we surface
+  // failures ON SCREEN, not only via console.error.
+  const [initError, setInitError] = useState<Error | null>(null);
+
   const allEmployees = useMemo(() => {
-    const companies = getCompanies();
-    return getEmployees().filter((e) => {
-      const company = companies.find((c) => c.id === e.company);
-      return company && !company.disabled;
-    });
+    try {
+      const companies = getCompanies();
+      return getEmployees().filter((e) => {
+        const company = companies.find((c) => c.id === e.company);
+        return company && !company.disabled;
+      });
+    } catch (err) {
+      console.error("[quiosco] fallo al cargar/filtrar empleados:", err);
+      setInitError(err instanceof Error ? err : new Error(String(err)));
+      return [] as Employee[];
+    }
   }, []);
 
   const [searchActive, setSearchActive] = useState(false);
@@ -287,56 +311,73 @@ export default function QuioscoPage() {
 
   // Fuse index for fuzzy employee search (mirrors smart-search-bar config)
   const fuse = useMemo(() => {
-    const searchable = allEmployees.map((emp) => ({
-      nombreCompleto: emp.name,
-      apellidos: emp.name.split(" ").slice(-2).join(" "),
-      primerNombre: emp.name.split(" ")[0],
-      puesto: emp.position,
-      departamento: emp.department || "",
-      empresa: emp.company,
-      sucursal: emp.location || "",
-      extension: emp.extension || "",
-      data: emp,
-    }));
-    return new Fuse(searchable, {
-      keys: [
-        { name: "nombreCompleto", weight: 0.3 },
-        { name: "apellidos", weight: 0.35 },
-        { name: "primerNombre", weight: 0.15 },
-        { name: "puesto", weight: 0.1 },
-        { name: "departamento", weight: 0.05 },
-        { name: "extension", weight: 0.05 },
-      ],
-      threshold: 0.3,
-      distance: 100,
-      minMatchCharLength: 1,
-      shouldSort: true,
-    });
+    try {
+      const searchable = allEmployees.map((emp) => ({
+        nombreCompleto: emp.name,
+        apellidos: emp.name.split(" ").slice(-2).join(" "),
+        primerNombre: emp.name.split(" ")[0],
+        puesto: emp.position,
+        departamento: emp.department || "",
+        empresa: emp.company,
+        sucursal: emp.location || "",
+        extension: emp.extension || "",
+        data: emp,
+      }));
+      return new Fuse(searchable, {
+        keys: [
+          { name: "nombreCompleto", weight: 0.3 },
+          { name: "apellidos", weight: 0.35 },
+          { name: "primerNombre", weight: 0.15 },
+          { name: "puesto", weight: 0.1 },
+          { name: "departamento", weight: 0.05 },
+          { name: "extension", weight: 0.05 },
+        ],
+        threshold: 0.3,
+        distance: 100,
+        minMatchCharLength: 1,
+        shouldSort: true,
+      });
+    } catch (err) {
+      console.error("[quiosco] fallo al construir el índice de Fuse.js:", err);
+      setInitError(err instanceof Error ? err : new Error(String(err)));
+      return null;
+    }
   }, [allEmployees]);
 
   const results = useMemo(() => {
-    const q = query.trim();
-    if (q.length < 1) return [];
-    // numeric-only query → extension match
-    const digits = q.replace(/\D/g, "");
-    if (digits.length >= 2 && digits === q.replace(/\s/g, "")) {
-      return allEmployees.filter((e) => e.extension?.includes(digits)).slice(0, 12);
+    try {
+      const q = query.trim();
+      if (q.length < 1 || !fuse) return [];
+      // numeric-only query → extension match
+      const digits = q.replace(/\D/g, "");
+      if (digits.length >= 2 && digits === q.replace(/\s/g, "")) {
+        return allEmployees.filter((e) => e.extension?.includes(digits)).slice(0, 12);
+      }
+      return fuse
+        .search(q)
+        .slice(0, 12)
+        .map((r) => r.item.data);
+    } catch (err) {
+      console.error("[quiosco] fallo al ejecutar la búsqueda:", err);
+      return [] as Employee[];
     }
-    return fuse
-      .search(q)
-      .slice(0, 12)
-      .map((r) => r.item.data);
   }, [query, fuse, allEmployees]);
 
   // Split employees across rows (offset slices so rows differ)
   const rows = useMemo(() => {
-    const perRow = Math.ceil(allEmployees.length / ROW_COUNT);
-    return Array.from({ length: ROW_COUNT }, (_, r) => {
-      const start = r * perRow;
-      const slice = allEmployees.slice(start, start + perRow);
-      // ensure each row has enough cards to fill wide screens
-      return slice.length >= 6 ? slice : [...slice, ...allEmployees].slice(0, Math.max(8, slice.length));
-    });
+    try {
+      const perRow = Math.ceil(allEmployees.length / ROW_COUNT);
+      return Array.from({ length: ROW_COUNT }, (_, r) => {
+        const start = r * perRow;
+        const slice = allEmployees.slice(start, start + perRow);
+        // ensure each row has enough cards to fill wide screens
+        return slice.length >= 6 ? slice : [...slice, ...allEmployees].slice(0, Math.max(8, slice.length));
+      });
+    } catch (err) {
+      console.error("[quiosco] fallo al calcular las filas del carrusel:", err);
+      setInitError(err instanceof Error ? err : new Error(String(err)));
+      return [] as Employee[][];
+    }
   }, [allEmployees]);
 
   const closeSearch = useCallback(() => {
@@ -398,6 +439,18 @@ export default function QuioscoPage() {
       window.removeEventListener("mousedown", onPointer);
     };
   }, [searchActive, openSearch, closeSearch, bumpInactivity]);
+
+  // Surface any captured init/derivation error ON SCREEN (not just console).
+  if (initError) {
+    return (
+      <KioskErrorView
+        title="Error de inicialización del modo quiosco"
+        message={initError.message}
+        stack={initError.stack ?? String(initError)}
+        onRetry={() => setInitError(null)}
+      />
+    );
+  }
 
   if (allEmployees.length === 0) return null;
 

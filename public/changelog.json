@@ -1,5 +1,17 @@
 [
   {
+    "version": "0.3.4",
+    "date": "2026-07-24",
+    "changes": [
+      "DIAGNOSTICO (Safari/macOS): el modo quiosco (/quiosco) sigue mostrando pantalla en negro en Safari pese al fix anterior (overflow+mask+preserve-3d) y sin errores en el Web Inspector. Se agrega instrumentacion para que el motivo real del fallo aparezca EN PANTALLA en vez de una pantalla negra sin informacion",
+      "NUEVO: app/quiosco/error.tsx (error boundary de Next.js App Router) — muestra a pantalla completa el message y stack del error en texto monoespaciado con scroll, mas botones Reintentar y Volver al directorio; sin Framer Motion, canvas ni nada que pueda fallar tambien",
+      "NUEVO: KioskErrorBoundary (componente de clase con getDerivedStateFromError + componentDidCatch) envuelve el contenido de /quiosco como red de seguridad adicional por si el error.tsx no se activa en Safari; pinta la misma pantalla de diagnostico",
+      "NUEVO: try/catch defensivo en las derivaciones sensibles de la pagina (carga/filtro de empleados, indice de Fuse.js, calculo de filas, ejecucion de busqueda) con console.error contextual Y estado de error visible en pantalla (no depende de la consola)",
+      "NUEVO: HeroNetworkCanvas endurecido — todo el setup y el bucle de dibujo van en try/catch, se valida getContext('2d') null y ResizeObserver disponible; si el fondo falla, se omite silenciosamente sin tumbar el resto de /quiosco",
+      "NOTA: cambio puramente de diagnostico; no intenta adivinar la causa raiz todavia. Tras promover a produccion, reprobar en Safari (ventana privada) y reportar lo que aparezca en pantalla"
+    ]
+  },
+  {
     "version": "0.3.3",
     "date": "2026-07-24",
     "changes": [
