@@ -30,12 +30,13 @@ const ExtensionRow = memo(function ExtensionRow({
   return (
     <tr
       onClick={onClick}
-      className="cursor-pointer transition-all duration-150 hover:bg-white/[0.04] group active:scale-[0.99]"
+      className={`cursor-pointer transition-all duration-150 hover:bg-muted/60 group active:scale-[0.99] ${
+        isOdd ? "bg-muted/25" : "bg-transparent"
+      }`}
       style={{
         height: "44px",
         minHeight: "44px",
         maxHeight: "44px",
-        background: isOdd ? "rgba(255,255,255,0.015)" : "transparent",
       }}
     >
       {/* Extension */}
@@ -56,7 +57,7 @@ const ExtensionRow = memo(function ExtensionRow({
             {employee.extension}
           </span>
         ) : (
-          <span className="text-white/20 text-scale-xs">--</span>
+          <span className="text-muted-foreground/50 text-scale-xs">--</span>
         )}
       </td>
       {/* Name */}
@@ -68,21 +69,21 @@ const ExtensionRow = memo(function ExtensionRow({
       </td>
       {/* Position */}
       <td
-        className="px-3 hidden md:table-cell text-scale-sm text-muted-foreground truncate"
+        className="px-3 hidden md:table-cell text-scale-sm text-foreground/90 truncate"
         title={employee.position ?? ""}
       >
         {employee.position ?? "--"}
       </td>
       {/* Department */}
       <td
-        className="px-3 hidden lg:table-cell text-scale-sm text-muted-foreground/70 truncate"
+        className="px-3 hidden lg:table-cell text-scale-sm text-foreground/75 truncate"
         title={employee.department ?? ""}
       >
         {employee.department ?? "--"}
       </td>
       {/* Location */}
       <td
-        className="px-3 hidden xl:table-cell text-scale-xs text-muted-foreground/50 truncate"
+        className="px-3 hidden xl:table-cell text-scale-xs text-muted-foreground truncate"
         title={employee.location ?? ""}
       >
         {employee.location ?? "--"}
@@ -140,7 +141,7 @@ const LocationSubHeader = memo(function LocationSubHeader({
     >
       <td colSpan={5} style={{ paddingLeft: "80px" }}>
         <span
-          className="flex items-center gap-1 text-scale-xs text-muted-foreground/50"
+          className="flex items-center gap-1 text-scale-xs text-muted-foreground"
         >
           <MapPin className="w-3 h-3" />
           {location}
@@ -1000,9 +1001,9 @@ export function ExtensionDirectory({
                 />
               ))}
             </colgroup>
-            <thead className="print-thead sticky top-0 z-10" style={{ background: "#0A0C0F" }}>
+            <thead className="print-thead sticky top-0 z-10 bg-background">
               <tr
-                className="text-left border-b border-white/5 print-thead-row"
+                className="text-left border-b border-border-subtle print-thead-row"
                 style={{ height: "36px" }}
               >
                 {columnHeaders.map((header, idx) => {
@@ -1012,7 +1013,7 @@ export function ExtensionDirectory({
                   return (
                     <th
                       key={header}
-                      className={`px-3 relative select-none font-neuropol text-scale-xs tracking-wide text-muted-foreground/60 uppercase truncate ${hiddenClasses} ${idx === 0 ? "text-center" : ""}`}
+                      className={`px-3 relative select-none font-neuropol text-scale-xs tracking-wide text-muted-foreground uppercase truncate ${hiddenClasses} ${idx === 0 ? "text-center" : ""}`}
                     >
                       {header}
                       {idx < 4 && (

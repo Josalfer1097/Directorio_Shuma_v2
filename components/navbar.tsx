@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useState, useEffect, useRef, useMemo, useCallback } from "react";
-import { LayoutGrid, List, Menu, X, Phone, AlignJustify } from "lucide-react";
+import { LayoutGrid, List, Menu, X, Phone, AlignJustify, Monitor } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import type { ViewMode } from "@/types";
 import { cn } from "@/lib/utils";
@@ -23,6 +23,7 @@ export function Navbar() {
   const [viewMode, setViewMode] = useState<ViewMode>("grid");
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [phoneTooltipVisible, setPhoneTooltipVisible] = useState(false);
+  const [kioskTooltipVisible, setKioskTooltipVisible] = useState(false);
   const { mundialActive, openTracker } = useMundialTheme();
 
   const longPressTimer = useRef<NodeJS.Timeout | null>(null);
@@ -341,6 +342,66 @@ export function Navbar() {
             )}
           </div>
 
+          {/* Kiosk Mode Button */}
+          <div className="relative">
+            <Link
+              href="/quiosco"
+              prefetch={false}
+              onMouseEnter={() => setKioskTooltipVisible(true)}
+              onMouseLeave={() => setKioskTooltipVisible(false)}
+              aria-label="Abrir modo quiosco"
+              className="relative flex items-center justify-center transition-all duration-150 active:scale-95"
+              style={{
+                width: "36px",
+                height: "36px",
+                borderRadius: "8px",
+                background: "var(--bg-elevated)",
+                border: "1px solid var(--border-subtle)",
+              }}
+              onMouseOver={(e) => {
+                e.currentTarget.style.background = "rgba(0,201,167,0.12)";
+                e.currentTarget.style.borderColor = "rgba(0,201,167,0.35)";
+                const icon = e.currentTarget.querySelector("svg");
+                if (icon) (icon as SVGElement).style.color = "#00C9A7";
+              }}
+              onMouseOut={(e) => {
+                e.currentTarget.style.background = "var(--bg-elevated)";
+                e.currentTarget.style.borderColor = "var(--border-subtle)";
+                const icon = e.currentTarget.querySelector("svg");
+                if (icon) (icon as SVGElement).style.color = "var(--muted-foreground)";
+              }}
+            >
+              <Monitor
+                className="w-4 h-4"
+                style={{ color: "var(--muted-foreground)" }}
+              />
+            </Link>
+
+            {/* Tooltip */}
+            {kioskTooltipVisible && (
+              <div
+                className="absolute top-full left-1/2 -translate-x-1/2 mt-2 px-2 py-1 whitespace-nowrap pointer-events-none z-50 text-scale-xs"
+                style={{
+                  background: "var(--bg-surface)",
+                  border: "1px solid var(--border-subtle)",
+                  borderRadius: "6px",
+                  color: "var(--foreground)",
+                }}
+              >
+                Modo quiosco
+                {/* Arrow */}
+                <div
+                  className="absolute -top-1 left-1/2 -translate-x-1/2 w-2 h-2 rotate-45"
+                  style={{
+                    background: "var(--bg-surface)",
+                    borderTop: "1px solid var(--border-subtle)",
+                    borderLeft: "1px solid var(--border-subtle)",
+                  }}
+                />
+              </div>
+            )}
+          </div>
+
           {/* Theme Toggle */}
           <ThemeToggle />
 
@@ -424,6 +485,14 @@ export function Navbar() {
                 )}
               >
                 Directorio
+              </Link>
+              <Link
+                href="/quiosco"
+                onClick={() => setMobileMenuOpen(false)}
+                className="font-neuropol text-base uppercase tracking-wider py-3 px-4 rounded-lg transition-all min-h-[52px] flex items-center gap-3 touch-manipulation text-text-muted hover:text-text-primary hover:bg-muted"
+              >
+                <Monitor className="w-5 h-5" />
+                Modo quiosco
               </Link>
             </nav>
           </motion.div>

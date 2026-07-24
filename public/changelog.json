@@ -1,5 +1,15 @@
 [
   {
+    "version": "0.2.4",
+    "date": "2026-07-24",
+    "changes": [
+      "FIX: Contraste en la tabla 'Directorio rapido -- Extensiones' — las columnas PUESTO, DEPARTAMENTO y SUCURSAL usaban grises muy tenues (text-muted-foreground/70, /50) que no cumplian AA; ahora usan text-foreground/90, text-foreground/75 y text-muted-foreground completo para legibilidad en dark y light mode",
+      "FIX: Encabezados de columna (EXT., NOMBRE, PUESTO...) subidos de text-muted-foreground/60 a text-muted-foreground; siguen siendo secundarios pero legibles sin esfuerzo",
+      "FIX: Fondo del thead y zebra striping ahora usan tokens de tema (bg-background, bg-muted/25, hover:bg-muted/60) en lugar de valores hardcodeados dark-only (#0A0C0F, rgba(255,255,255,...)); las filas alternas ya no reducen el contraste en light mode",
+      "NUEVA FUNCION: Modo quiosco ahora accesible desde la UI — se agrego un boton con icono Monitor en los controles del header (junto a extensiones rapidas) que navega a /quiosco, con tooltip 'Modo quiosco'. Tambien disponible como enlace en el menu movil. Antes la ruta estaba huerfana y solo se accedia tecleando la URL manualmente."
+    ]
+  },
+  {
     "version": "0.2.3",
     "date": "2026-07-24",
     "changes": [
