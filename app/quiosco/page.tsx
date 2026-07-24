@@ -465,35 +465,53 @@ function QuioscoContent() {
       className="fixed inset-0 overflow-hidden"
       style={{ background: "#07070e", fontFamily: "var(--font-dm-sans, sans-serif)" }}
     >
-      {/* Emergency exit — rendered FIRST in the tree, before any canvas/animation/mask,
-          so WebKit paints it even if the rest of the page silently fails to composite.
-          Pure HTML + inline styles only: no Framer Motion, no backdrop-filter, no
-          mask-image, no 3D transforms, no JS required beyond standard <a> navigation. */}
+      {/* Emergency exit — bottom-right corner, away from the SHUMA logo.
+          Rendered FIRST in the DOM tree so WebKit paints it even when other
+          composited layers silently fail. Pure inline styles only: no Framer
+          Motion, no backdrop-filter, no mask-image, no 3D transforms. */}
       <a
         href="/"
         style={{
           position: "fixed",
-          top: 16,
-          left: 16,
+          bottom: 28,
+          right: 28,
           zIndex: 9999,
           display: "inline-flex",
           alignItems: "center",
-          gap: 6,
-          padding: "7px 14px",
-          borderRadius: 8,
-          background: "#1a1a2e",
-          border: "1px solid #3a3a5c",
-          color: "#c8c8e8",
-          fontSize: "0.8rem",
-          fontWeight: 600,
-          letterSpacing: "0.04em",
+          gap: 8,
+          padding: "10px 20px",
+          borderRadius: 999,
+          background: "rgba(0,0,0,0.55)",
+          border: "1px solid rgba(255,255,255,0.10)",
+          color: "rgba(255,255,255,0.55)",
+          fontSize: "0.75rem",
+          fontWeight: 500,
+          letterSpacing: "0.08em",
           textDecoration: "none",
+          textTransform: "uppercase",
           cursor: "pointer",
           userSelect: "none",
+          transition: "color 200ms ease, border-color 200ms ease, background 200ms ease",
+        }}
+        onMouseEnter={(e) => {
+          (e.currentTarget as HTMLAnchorElement).style.color = "rgba(255,255,255,0.90)";
+          (e.currentTarget as HTMLAnchorElement).style.borderColor = "rgba(255,255,255,0.28)";
+          (e.currentTarget as HTMLAnchorElement).style.background = "rgba(0,0,0,0.75)";
+        }}
+        onMouseLeave={(e) => {
+          (e.currentTarget as HTMLAnchorElement).style.color = "rgba(255,255,255,0.55)";
+          (e.currentTarget as HTMLAnchorElement).style.borderColor = "rgba(255,255,255,0.10)";
+          (e.currentTarget as HTMLAnchorElement).style.background = "rgba(0,0,0,0.55)";
         }}
         aria-label="Salir del modo quiosco"
       >
-        &#8592; Salir
+        {/* Inline SVG arrow — no external dependency, safe for WebKit */}
+        <svg width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden="true"
+          style={{ opacity: 0.7 }}>
+          <path d="M7 2L3 6L7 10" stroke="currentColor" strokeWidth="1.6"
+            strokeLinecap="round" strokeLinejoin="round"/>
+        </svg>
+        Salir
       </a>
 
       {/* Animated node/network backdrop */}
