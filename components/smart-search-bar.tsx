@@ -15,6 +15,58 @@ interface SearchResult {
   data: any;
 }
 
+/** Scrollable inner container that shows a bottom-fade gradient when more
+ *  content is available below. Keeps the outer border-radius of the dropdown
+ *  intact by separating overflow from visual chrome. */
+function ScrollFadeContainer({ children }: { children: React.ReactNode }) {
+  const scrollRef = useRef<HTMLDivElement>(null);
+  const [showFade, setShowFade] = useState(false);
+
+  const checkScroll = useCallback(() => {
+    const el = scrollRef.current;
+    if (!el) return;
+    // Show fade when there is at least 12px of hidden content below
+    setShowFade(el.scrollHeight - el.scrollTop - el.clientHeight > 12);
+  }, []);
+
+  useEffect(() => {
+    const el = scrollRef.current;
+    if (!el) return;
+    checkScroll();
+    el.addEventListener("scroll", checkScroll, { passive: true });
+    // Re-check when results change (content height change)
+    const ro = new ResizeObserver(checkScroll);
+    ro.observe(el);
+    return () => {
+      el.removeEventListener("scroll", checkScroll);
+      ro.disconnect();
+    };
+  }, [checkScroll]);
+
+  return (
+    <div className="relative">
+      <div
+        ref={scrollRef}
+        className="max-h-[min(60vh,420px)] overflow-y-auto overscroll-contain"
+        style={{ WebkitOverflowScrolling: "touch" } as React.CSSProperties}
+      >
+        {children}
+      </div>
+      {/* Bottom fade — visible only when more content is below */}
+      {showFade && (
+        <div
+          aria-hidden="true"
+          className="pointer-events-none absolute bottom-0 left-0 right-0 h-10 rounded-b-xl"
+          style={{
+            background:
+              "linear-gradient(to bottom, transparent 0%, rgba(10,10,20,0.92) 100%)",
+          }}
+        />
+      )}
+    </div>
+  );
+}
+
 export function SmartSearchBar() {
   const [query, setQuery] = useState("");
   const [isOpen, setIsOpen] = useState(false);
@@ -378,7 +430,7 @@ export function SmartSearchBar() {
           )}
 
           {query && !isLoading && results.length > 0 && (
-            <div className="absolute right-4 top-1/2 -translate-y-1/2 px-2 py-1 rounded bg-muted border border-border-subtle text-xs text-foreground font-medium">
+            <div className="absolute right-4 top-1/2 -translate-y-1/2 px-2 py-1 rounded bg-muted border border-border-subtle text-scale-xs text-foreground font-medium">
               {results.length} resultados
             </div>
           )}
@@ -393,13 +445,15 @@ export function SmartSearchBar() {
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -8 }}
             transition={{ duration: 0.15, ease: "easeOut" }}
-            className="absolute top-full left-0 right-0 mt-2 z-50 backdrop-blur-lg border border-border-subtle rounded-xl shadow-2xl max-h-[400px] overflow-y-auto"
+            className="absolute top-full left-0 right-0 mt-2 z-50 backdrop-blur-lg border border-border-subtle rounded-xl shadow-2xl overflow-hidden"
             style={{ background: "rgba(10,10,20,0.96)" }}
           >
+          {/* Scroll fade wrapper — keeps rounded corners intact */}
+          <ScrollFadeContainer>
             {results.length === 0 ? (
               <div className="flex flex-col items-center justify-center py-12 px-4">
                 <Ghost className="w-8 h-8 text-muted-foreground mb-2" />
-                <p className="text-muted-foreground text-sm">Sin resultados para "{query}"</p>
+                <p className="text-scale-sm text-muted-foreground">Sin resultados para &ldquo;{query}&rdquo;</p>
               </div>
             ) : (
               <div className="py-2">
@@ -411,7 +465,7 @@ export function SmartSearchBar() {
                       {groupIndex > 0 && (
                         <div className="my-1 mx-2 border-t border-border-subtle" />
                       )}
-                      <div className="px-3 py-1.5 text-xs font-semibold uppercase tracking-wider" style={{ color: "#8888AA" }}>
+                      <div className="px-3 py-1.5 text-scale-xs font-semibold uppercase tracking-wider" style={{ color: "#8888AA" }}>
                         {groupLabels[type]}
                       </div>
                       {items.map((result, index) => {
@@ -437,36 +491,38 @@ export function SmartSearchBar() {
                                 : "hover:bg-muted/50"
                             }`}
                           >
+                            {/* Icon container — size scales with font-scale via em */}
                             <div
-                              className={`flex-shrink-0 w-8 h-8 rounded-lg flex items-center justify-center transition-colors mt-0.5 ${
+                              className={`flex-shrink-0 rounded-lg flex items-center justify-center transition-colors mt-0.5 ${
                                 isSelected
                                   ? "bg-blue-500/30 text-blue-300"
                                   : "bg-muted text-muted-foreground group-hover:bg-muted/80"
                               }`}
+                              style={{ width: "calc(2em * var(--font-scale, 1))", height: "calc(2em * var(--font-scale, 1))" }}
                             >
                               {getResultIcon(result.type)}
                             </div>
 
                             <div className="flex-1 min-w-0">
-                              <div className="font-medium text-foreground text-sm truncate">
+                              <div className="text-scale-base font-medium text-foreground truncate">
                                 {result.label}
                               </div>
                               {result.secondary && (
-                                <div className="text-xs truncate" style={{ color: "#A8A8C0" }}>
+                                <div className="text-scale-sm truncate" style={{ color: "#C0C0D8" }}>
                                   {result.secondary}
                                 </div>
                               )}
                               {hasContactInfo && (
-                                <div className="mt-1.5 flex items-center gap-4 text-xs" style={{ color: "#A8A8C0" }}>
+                                <div className="mt-1.5 flex items-center gap-4 text-scale-sm" style={{ color: "#C0C0D8" }}>
                                   {result.data?.extension && (
                                     <div className="flex items-center gap-1.5">
-                                      <Phone className="w-3.5 h-3.5 flex-shrink-0" />
+                                      <Phone className="w-3.5 h-3.5 flex-shrink-0" style={{ color: "#C0C0D8" }} />
                                       <span>Ext. {result.data.extension}</span>
                                     </div>
                                   )}
                                   {result.data?.email && (
                                     <div className="flex items-center gap-1.5 truncate">
-                                      <Mail className="w-3.5 h-3.5 flex-shrink-0" />
+                                      <Mail className="w-3.5 h-3.5 flex-shrink-0" style={{ color: "#C0C0D8" }} />
                                       <span className="truncate">{result.data.email}</span>
                                     </div>
                                   )}
@@ -481,6 +537,7 @@ export function SmartSearchBar() {
                 })}
               </div>
             )}
+          </ScrollFadeContainer>
           </motion.div>
         )}
       </AnimatePresence>
