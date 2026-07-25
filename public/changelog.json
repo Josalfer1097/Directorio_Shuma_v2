@@ -1,5 +1,19 @@
 [
   {
+    "version": "0.4.0",
+    "date": "2026-07-24",
+    "changes": [
+      "DATOS: 67 empleados — se conservan los cambios más recientes de main: prefijos L.A. (Gustavo Adolfo González Rodríguez) y L.C. (Concepción Castañeda Santa Cruz), y todas las actualizaciones de puesto previas al merge (estos valores prevalecen sobre la rama del quiosco, que no tocó employees.json)",
+      "NUEVO — Modo quiosco (/quiosco): rediseño completo de pantalla en blanco a protector de pantalla profesional para recepción. Carrusel continuo con 3 filas en loop infinito (CSS puro @keyframes quioscoScroll, no Framer Motion), fila central a plena escala, filas superior e inferior inclinadas con skewY 2D y fade de bordes horizontal (mask). Fondo con red de nodos animada (HeroNetworkCanvas)",
+      "NUEVO — Buscador oculto en modo quiosco: se activa con cualquier tecla o toque. El carrusel se pausa instantáneamente (animation-play-state: paused) y un overlay oscuro cubre las filas congeladas. Búsqueda fuzzy con Fuse.js; resultados en grid con stagger. Auto-retorno al carrusel tras 18s de inactividad. ESC doble: 1.° cierra buscador, 2.° sale a /",
+      "FIX RENDIMIENTO (quiosco): eliminado el jank al abrir el buscador — antes Framer Motion seguía animando cards mientras se aplicaba filter:blur(14px) encima, forzando re-rasterización de contenido borroso en movimiento cada frame",
+      "FIX HIDRATACIÓN: error 'Hydration failed / <tbody> cannot be a child of <tbody>' en la vista de Extensiones — el mapa de grupos de empresa anidaba <tbody> dentro de <tbody> (HTML inválido). Corregido: cada grupo es un <tbody> hijo directo de <table>. Fragmentos por ubicación ahora usan <Fragment key=...>",
+      "FIX SAFARI — compositing WebKit: pantalla en negro en /quiosco por combinar overflow:hidden + mask-image + rotateX/preserve-3d en el mismo elemento. Corregido con 3 elementos anidados (tilt exterior, clip+mask intermedio, scroll interior) y tilt reemplazado por skewY 2D. Eliminado perspective del contenedor",
+      "DIAGNÓSTICO SAFARI: instrumentación defensiva — app/quiosco/error.tsx, KioskErrorBoundary (clase React), try/catch en derivaciones sensibles con estado initError visible en pantalla, HeroNetworkCanvas con try/catch en setup y bucle de dibujo",
+      "NUEVO — Botón de salida de emergencia en quiosco: <a href='/'> con estilos inline puros (sin Framer Motion, sin backdrop-filter, sin transforms 3D), renderizado como primer elemento del DOM para garantizar pintado en WebKit. Diseño: pill translúcido bottom-right con chevron SVG, hover inline, sin solaparse con el logo"
+    ]
+  },
+  {
     "version": "0.3.5",
     "date": "2026-07-24",
     "changes": [
