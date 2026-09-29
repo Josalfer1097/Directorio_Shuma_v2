@@ -6,6 +6,7 @@ import Link from "next/link";
 import { useState } from "react";
 import type { Company } from "@/types";
 import { getCompanyConfig, getAccentColor, alphaColor } from "@/lib/companyConfig";
+import { useCountUp } from "@/hooks/use-count-up";
 
 interface CompanyCardProps {
   company: Company & { employeeCount: number };
@@ -18,6 +19,7 @@ const premiumEase = [0.25, 0.46, 0.45, 0.94];
 export function CompanyCard({ company, index }: CompanyCardProps) {
   const [isHovered, setIsHovered] = useState(false);
   const companyConfig = getCompanyConfig(company.id);
+  const animatedCount = useCountUp(company.employeeCount, 800);
   
   return (
     <motion.div
@@ -102,8 +104,8 @@ export function CompanyCard({ company, index }: CompanyCardProps) {
             {/* Employee Count */}
             <div className="flex items-center gap-2 text-muted-foreground mt-auto">
               <Users className="w-4 h-4" />
-              <span className="text-sm">
-                {company.employeeCount}{" "}
+              <span className="text-sm tabular-nums">
+                {animatedCount}{" "}
                 {company.employeeCount === 1 ? "empleado" : "empleados"}
               </span>
             </div>

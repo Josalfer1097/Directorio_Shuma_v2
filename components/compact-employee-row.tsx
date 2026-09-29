@@ -1,7 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { Phone, Inbox } from "lucide-react";
+import { Phone, Inbox, MapPin } from "lucide-react";
 import type { Employee, Company } from "@/types";
 import { cn, getInitials } from "@/lib/utils";
 import { getCompanyConfig } from "@/lib/companyConfig";
@@ -103,6 +103,17 @@ export function CompactEmployeeRow({
       >
         {employee.department}
       </div>
+
+      {/* Location Chip */}
+      {employee.location && (
+        <div
+          className="hidden lg:flex items-center gap-1 px-2 py-0.5 rounded-full border text-[10px] text-text-muted shrink-0 max-w-28"
+          style={{ backgroundColor: "rgba(255,255,255,0.03)", borderColor: "rgba(255,255,255,0.10)" }}
+        >
+          <MapPin className="w-2.5 h-2.5 flex-shrink-0" style={{ color: colors.primary }} />
+          <span className="truncate">{employee.location}</span>
+        </div>
+      )}
 
       {/* Company Color Dot */}
       <div 

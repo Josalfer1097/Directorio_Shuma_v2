@@ -216,6 +216,17 @@ export function EmployeeCard({
               </p>
             </div>
 
+            {/* Location chip */}
+            {employee.location && (
+              <span
+                className="hidden lg:inline-flex items-center gap-1 rounded-full border text-xs text-muted-foreground shrink-0 px-2 py-0.5"
+                style={{ backgroundColor: 'var(--muted)', borderColor: 'var(--border)' }}
+              >
+                <MapPin className="w-3 h-3 flex-shrink-0" style={{ color: getAccentColor(companyConfig) }} />
+                <span className="max-w-24 truncate">{employee.location}</span>
+              </span>
+            )}
+
             {/* Contact info inline for list view */}
             <div className="hidden md:flex items-center gap-3 text-xs">
               <TooltipProvider>
@@ -433,17 +444,27 @@ export function EmployeeCard({
                 {employee.department}
               </p>
               {employee.location && (
-                <p 
-                  className="flex items-center text-muted-foreground/50 line-clamp-1"
-                  style={{ 
-                    fontSize: 'var(--font-xs)', 
+                <span
+                  className="inline-flex items-center rounded-full border text-muted-foreground line-clamp-1"
+                  style={{
+                    fontSize: 'var(--font-xs)',
                     gap: 'calc(4px * var(--font-scale, 1))',
-                    marginTop: 'calc(2px * var(--font-scale, 1))',
+                    marginTop: 'calc(4px * var(--font-scale, 1))',
+                    padding: 'calc(2px * var(--font-scale, 1)) calc(8px * var(--font-scale, 1))',
+                    backgroundColor: 'var(--muted)',
+                    borderColor: 'var(--border)',
                   }}
                 >
-                  <MapPin style={{ width: 'calc(10px * var(--font-scale, 1))', height: 'calc(10px * var(--font-scale, 1))' }} />
+                  <MapPin
+                    style={{
+                      width: 'calc(10px * var(--font-scale, 1))',
+                      height: 'calc(10px * var(--font-scale, 1))',
+                      color: getAccentColor(companyConfig),
+                      flexShrink: 0,
+                    }}
+                  />
                   {employee.location}
-                </p>
+                </span>
               )}
               {!hideCompanyBadge && (
                 <span

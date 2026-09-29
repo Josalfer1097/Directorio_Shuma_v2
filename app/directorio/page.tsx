@@ -4,7 +4,7 @@ import { useState, useMemo, useEffect, Suspense, useRef, useCallback, useDeferre
 import { useSearchParams } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import Fuse from "fuse.js";
-import { Search, LayoutGrid, List, Users, Filter, Phone } from "lucide-react";
+import { Search, LayoutGrid, List, Filter, Phone, SearchX } from "lucide-react";
 import { Navbar } from "@/components/navbar";
 import { EmployeeCard } from "@/components/employee-card";
 import { DirectoryFilters } from "@/components/directory-filters";
@@ -501,20 +501,35 @@ function DirectoryContent() {
                     </motion.div>
                 ) : (
                     <motion.div
-                        initial={{ opacity: 0 }}
-                        animate={{ opacity: 1 }}
-                        className="text-center py-16"
+                        initial={{ opacity: 0, y: 8 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ duration: 0.3 }}
+                        className="flex flex-col items-center text-center py-20 px-4"
                     >
-                      <div className="w-16 h-16 rounded-full bg-muted flex items-center justify-center mx-auto mb-4">
-                        <Users className="w-8 h-8 text-muted-foreground" />
+                      <div className="relative w-20 h-20 mb-6">
+                        <div className="absolute inset-0 rounded-full bg-primary/10 blur-xl" />
+                        <div className="relative w-20 h-20 rounded-full border border-border bg-muted/60 flex items-center justify-center">
+                          <SearchX className="w-9 h-9 text-muted-foreground" />
+                        </div>
                       </div>
                       <h3 className="text-lg font-medium text-foreground mb-2">
                         No se encontraron empleados
                       </h3>
-                      <p className="text-muted-foreground mb-4">
-                        Intenta ajustar los filtros o la búsqueda
+                      <p className="text-muted-foreground mb-6 max-w-sm">
+                        {searchQuery
+                          ? (
+                            <>
+                              No hay resultados para{" "}
+                              <span className="text-foreground font-medium">
+                                &quot;{searchQuery}&quot;
+                              </span>
+                              . Intenta ajustar los filtros o la búsqueda.
+                            </>
+                          )
+                          : "Intenta ajustar los filtros seleccionados"}
                       </p>
                       <Button variant="outline" onClick={clearFilters}>
+                        <Filter className="w-4 h-4 mr-2" />
                         Limpiar filtros
                       </Button>
                     </motion.div>
