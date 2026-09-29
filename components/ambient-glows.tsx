@@ -21,7 +21,7 @@ export function AmbientGlows() {
           width: '60vw',
           height: '60vh',
           background: 'radial-gradient(ellipse, var(--theme-bg-glow-a, rgba(0,201,167,0.06)), transparent 70%)',
-          transition: 'background 800ms ease',
+          transition: 'background 400ms ease',
           filter: 'blur(60px)',
         }}
       />
@@ -34,7 +34,7 @@ export function AmbientGlows() {
           width: '50vw',
           height: '50vh',
           background: 'radial-gradient(ellipse, var(--theme-bg-glow-b, rgba(132,94,194,0.05)), transparent 70%)',
-          transition: 'background 800ms ease',
+          transition: 'background 400ms ease',
           filter: 'blur(80px)',
         }}
       />

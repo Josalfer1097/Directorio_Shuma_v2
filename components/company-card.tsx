@@ -5,7 +5,9 @@ import { Building2, Users } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
 import type { Company } from "@/types";
-import { getCompanyConfig } from "@/lib/companyConfig";
+import { getCompanyConfig, getAccentColor, alphaColor } from "@/lib/companyConfig";
+import { useCountUp } from "@/hooks/use-count-up";
+import { useCompanyTheme, type ActiveTheme } from "@/lib/CompanyThemeContext";
 
 interface CompanyCardProps {
   company: Company & { employeeCount: number };
@@ -18,6 +20,18 @@ const premiumEase = [0.25, 0.46, 0.45, 0.94];
 export function CompanyCard({ company, index }: CompanyCardProps) {
   const [isHovered, setIsHovered] = useState(false);
   const companyConfig = getCompanyConfig(company.id);
+  const animatedCount = useCountUp(company.employeeCount, 800);
+  const { setActiveTheme } = useCompanyTheme();
+
+  const handleMouseEnter = () => {
+    setIsHovered(true);
+    setActiveTheme(company.id as ActiveTheme);
+  };
+
+  const handleMouseLeave = () => {
+    setIsHovered(false);
+    setActiveTheme("default");
+  };
   
   return (
     <motion.div
@@ -30,22 +44,22 @@ export function CompanyCard({ company, index }: CompanyCardProps) {
         <div
           className="card-shimmer corner-bracket group relative overflow-hidden rounded-xl p-6 h-full min-h-[200px] flex flex-col"
           style={{
-            ["--shimmer-color" as string]: companyConfig.primary,
-            ["--bracket-color" as string]: companyConfig.primary,
+            ["--shimmer-color" as string]: getAccentColor(companyConfig),
+            ["--bracket-color" as string]: getAccentColor(companyConfig),
             borderWidth: isHovered ? '1.5px' : '1px',
             borderStyle: 'solid',
-            borderColor: isHovered ? companyConfig.primary : 'var(--border)',
-            boxShadow: isHovered ? `0 0 0 1px ${companyConfig.primary}, 0 8px 32px ${companyConfig.glow}` : 'none',
+            borderColor: isHovered ? getAccentColor(companyConfig) : 'var(--border)',
+            boxShadow: isHovered ? `0 0 0 1px ${getAccentColor(companyConfig)}, 0 8px 32px ${companyConfig.glow}` : 'none',
             transform: isHovered ? 'translateY(-3px) scale(1.012)' : 'none',
             background: isHovered 
-              ? `linear-gradient(160deg, ${companyConfig.primary}10 0%, transparent 60%), rgba(255,255,255,0.07)` 
-              : `linear-gradient(135deg, ${companyConfig.primary}08 0%, transparent 50%), rgba(255,255,255,0.04)`,
+              ? `linear-gradient(160deg, ${alphaColor(companyConfig, "10")} 0%, transparent 60%), rgba(255,255,255,0.07)` 
+              : `linear-gradient(135deg, ${alphaColor(companyConfig, "08")} 0%, transparent 50%), rgba(255,255,255,0.04)`,
             transitionProperty: 'all',
             transitionDuration: '180ms',
             transitionTimingFunction: "cubic-bezier(0.25, 0.46, 0.45, 0.94)"
           }}
-          onMouseEnter={() => setIsHovered(true)}
-          onMouseLeave={() => setIsHovered(false)}
+          onMouseEnter={handleMouseEnter}
+          onMouseLeave={handleMouseLeave}
         >
           {/* Left accent bar */}
           <div 
@@ -53,8 +67,8 @@ export function CompanyCard({ company, index }: CompanyCardProps) {
             style={{
               width: isHovered ? '5px' : '3px',
               background: isHovered && companyConfig.accent 
-                ? `linear-gradient(to bottom, ${companyConfig.accent}, ${companyConfig.primary})`
-                : companyConfig.primary,
+                ? `linear-gradient(to bottom, ${companyConfig.accent}, ${getAccentColor(companyConfig)})`
+                : getAccentColor(companyConfig),
               opacity: isHovered ? 1 : 0.7,
             }}
           />
@@ -62,7 +76,7 @@ export function CompanyCard({ company, index }: CompanyCardProps) {
           {/* Glow effect */}
           <div
             className="absolute -top-24 -right-24 w-48 h-48 rounded-full opacity-0 group-hover:opacity-20 transition-opacity duration-[180ms] blur-3xl"
-            style={{ backgroundColor: companyConfig.primary }}
+            style={{ backgroundColor: getAccentColor(companyConfig) }}
           />
 
           <div className="relative flex flex-col flex-1 pl-2">
@@ -71,20 +85,20 @@ export function CompanyCard({ company, index }: CompanyCardProps) {
               <div
                 className="w-12 h-12 rounded-lg flex items-center justify-center transition-all duration-[180ms]"
                 style={{ 
-                  backgroundColor: `${companyConfig.primary}20`,
+                  backgroundColor: alphaColor(companyConfig, "20"),
                   boxShadow: isHovered ? `0 0 12px ${companyConfig.glow}` : 'none',
                 }}
               >
                 <Building2
                   className="w-6 h-6"
-                  style={{ color: companyConfig.primary }}
+                  style={{ color: getAccentColor(companyConfig) }}
                 />
               </div>
               <span
                 className="text-xs font-neuropol px-2 py-1 rounded-full uppercase tracking-wider"
                 style={{
-                  backgroundColor: `${companyConfig.primary}15`,
-                  color: companyConfig.primary,
+                  backgroundColor: alphaColor(companyConfig, "15"),
+                  color: getAccentColor(companyConfig),
                 }}
               >
                 Empresa
@@ -102,8 +116,8 @@ export function CompanyCard({ company, index }: CompanyCardProps) {
             {/* Employee Count */}
             <div className="flex items-center gap-2 text-muted-foreground mt-auto">
               <Users className="w-4 h-4" />
-              <span className="text-sm">
-                {company.employeeCount}{" "}
+              <span className="text-sm tabular-nums">
+                {animatedCount}{" "}
                 {company.employeeCount === 1 ? "empleado" : "empleados"}
               </span>
             </div>

@@ -2,10 +2,10 @@
 
 import { useMemo } from "react";
 import { motion } from "framer-motion";
-import { User } from "lucide-react";
+import { Inbox, User } from "lucide-react";
 import Link from "next/link";
 import type { Employee, Company } from "@/types";
-import { cn } from "@/lib/utils";
+import { cn, getInitials } from "@/lib/utils";
 
 // Premium easing curve for animations
 const premiumEase = [0.25, 0.46, 0.45, 0.94];
@@ -23,15 +23,6 @@ interface AgendaViewProps {
 function getCompanyColor(companyId: string, companies: Company[]): string {
   const company = companies.find((c) => c.id === companyId);
   return company?.colors?.primary || "#3B82F6";
-}
-
-// Get initials from name
-function getInitials(name: string): string {
-  const parts = name.split(" ").filter(Boolean);
-  if (parts.length >= 2) {
-    return `${parts[0][0]}${parts[parts.length - 1][0]}`.toUpperCase();
-  }
-  return parts[0]?.[0]?.toUpperCase() || "?";
 }
 
 // Get last name for sorting (last word in name)
@@ -149,7 +140,9 @@ export function AgendaView({
                       color: companyColor,
                     }}
                   >
-                    {getInitials(employee.name)}
+                    {getInitials(employee.name) ?? (
+                      <Inbox className="w-4 h-4" aria-label="Sin nombre asignado" />
+                    )}
                   </div>
                 )}
 

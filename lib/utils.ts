@@ -57,6 +57,21 @@ export function formatName(fullName: string | undefined | null): string {
   return fullName.trim();
 }
 
+// Returns initials for a real name, or null for empty/placeholder names
+// (e.g. "-", "—") so callers can render an "unassigned" fallback instead.
+export function getInitials(name: string | undefined | null): string | null {
+  const trimmed = name?.trim() ?? '';
+  if (!trimmed || trimmed === '-' || trimmed === '—' || trimmed === '??') return null;
+  const initials = trimmed
+    .split(' ')
+    .filter(Boolean)
+    .map((n) => n[0])
+    .slice(0, 2)
+    .join('')
+    .toUpperCase();
+  return initials || null;
+}
+
 export function normalizeCompanyId(raw: string | undefined | null): string {
   if (!raw) return '';
   return raw.toLowerCase().trim();

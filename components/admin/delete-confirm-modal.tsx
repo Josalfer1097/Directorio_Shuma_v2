@@ -2,12 +2,12 @@
 
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { AlertTriangle, Trash2 } from "lucide-react";
+import { AlertTriangle, Inbox, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { getEmployeeById, getCompanyById } from "@/lib/data";
-import { cn } from "@/lib/utils";
+import { cn, getInitials } from "@/lib/utils";
 
 interface DeleteConfirmModalProps {
   isOpen: boolean;
@@ -24,15 +24,6 @@ export function DeleteConfirmModal({
 
   const employee = employeeId ? getEmployeeById(employeeId) : null;
   const company = employee ? getCompanyById(employee.company) : null;
-
-  const getInitials = (name: string) => {
-    return name
-      .split(" ")
-      .map((n) => n[0])
-      .slice(0, 2)
-      .join("")
-      .toUpperCase();
-  };
 
   const handleDelete = async () => {
     if (!employee) return;
@@ -110,7 +101,9 @@ export function DeleteConfirmModal({
                     color: company?.colors?.primary,
                   }}
                 >
-                  {getInitials(employee.name)}
+                  {getInitials(employee.name) ?? (
+                    <Inbox className="w-5 h-5" aria-label="Sin nombre asignado" />
+                  )}
                 </AvatarFallback>
               </Avatar>
               <div className="flex-1 min-w-0">

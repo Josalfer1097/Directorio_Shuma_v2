@@ -1,9 +1,9 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { Phone } from "lucide-react";
+import { Phone, Inbox, MapPin } from "lucide-react";
 import type { Employee, Company } from "@/types";
-import { cn } from "@/lib/utils";
+import { cn, getInitials } from "@/lib/utils";
 import { getCompanyConfig } from "@/lib/companyConfig";
 
 interface CompactEmployeeRowProps {
@@ -17,15 +17,7 @@ export function CompactEmployeeRow({
   company,
   index,
 }: CompactEmployeeRowProps) {
-  const getInitials = (name?: string) => {
-    if (!name) return "??";
-    return name
-      .split(" ")
-      .map((n) => n[0])
-      .slice(0, 2)
-      .join("")
-      .toUpperCase();
-  };
+  const initials = getInitials(employee.name);
 
   const colors = getCompanyConfig(company?.id);
   const isFerrecapital = company?.id === "ferrecapital";
@@ -72,9 +64,7 @@ export function CompactEmployeeRow({
           border: isFerrecapital ? "1.5px solid #CC0000" : "none"
         }}
       >
-        <span style={{ fontFamily: "var(--font-neuropol), var(--font-orbitron), 'Orbitron', 'Courier New', monospace" }}>
-          {getInitials(employee.name)}
-        </span>
+        {initials ?? <Inbox className="w-3.5 h-3.5" aria-label="Sin nombre asignado" />}
       </div>
 
       {/* Name and Role */}
@@ -113,6 +103,17 @@ export function CompactEmployeeRow({
       >
         {employee.department}
       </div>
+
+      {/* Location Chip */}
+      {employee.location && (
+        <div
+          className="hidden lg:flex items-center gap-1 px-2 py-0.5 rounded-full border text-[10px] text-text-muted shrink-0 max-w-28"
+          style={{ backgroundColor: "rgba(255,255,255,0.03)", borderColor: "rgba(255,255,255,0.10)" }}
+        >
+          <MapPin className="w-2.5 h-2.5 flex-shrink-0" style={{ color: colors.primary }} />
+          <span className="truncate">{employee.location}</span>
+        </div>
+      )}
 
       {/* Company Color Dot */}
       <div 

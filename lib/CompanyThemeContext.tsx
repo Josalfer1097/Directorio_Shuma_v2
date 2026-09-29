@@ -40,11 +40,15 @@ const themeVars: Record<ActiveTheme, Record<string, string>> = {
     '--theme-bg-glow-b': 'rgba(255,77,94,0.04)',
   },
   ferrecapital: {
-    '--theme-primary': '#2C3338',
+    // Ferrecapital's brand primary (#2C3338) nearly disappears against the
+    // dark theme background, so the ambient tint follows the same
+    // theme-aware accent used elsewhere: #8A98A5 in dark mode, #2C3338 in
+    // light mode (see --color-ferrecapital-accent in globals.css).
+    '--theme-primary': 'var(--color-ferrecapital-accent)',
     '--theme-secondary': '#1A1E21',
-    '--theme-glow': 'rgba(44,51,56,0.20)',
+    '--theme-glow': 'color-mix(in srgb, var(--color-ferrecapital-accent) 20%, transparent)',
     '--theme-navbar-tint': 'rgba(26,30,33,0.35)',
-    '--theme-bg-glow-a': 'rgba(204,0,0,0.05)',
+    '--theme-bg-glow-a': 'color-mix(in srgb, var(--color-ferrecapital-accent) 7%, transparent)',
     '--theme-bg-glow-b': 'rgba(44,51,56,0.08)',
   },
   arkiramica: {

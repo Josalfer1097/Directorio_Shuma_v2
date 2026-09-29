@@ -2,6 +2,7 @@
 
 import { motion } from "framer-motion";
 import { Users, Building2, Briefcase } from "lucide-react";
+import { useCountUp } from "@/hooks/use-count-up";
 
 interface StatsCardsProps {
   totalEmployees: number;
@@ -33,6 +34,11 @@ const stats = [
   },
 ];
 
+function AnimatedStatValue({ value }: { value: number }) {
+  const animated = useCountUp(value, 800);
+  return <>{animated}</>;
+}
+
 export function StatsCards(props: StatsCardsProps) {
   return (
     <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
@@ -60,8 +66,8 @@ export function StatsCards(props: StatsCardsProps) {
               <stat.icon className="w-6 h-6" style={{ color: stat.color }} />
             </div>
             <div>
-              <p className="text-3xl font-bold text-foreground">
-                {stat.getValue(props)}
+              <p className="text-3xl font-bold text-foreground tabular-nums">
+                <AnimatedStatValue value={stat.getValue(props)} />
               </p>
               <p className="text-sm text-muted-foreground">{stat.label}</p>
             </div>

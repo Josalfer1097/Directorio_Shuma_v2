@@ -3,7 +3,7 @@
 import React from "react";
 import { motion } from "framer-motion";
 import type { MouseEvent } from "react";
-import { ChevronLeft, ChevronRight, Mail, Phone, Copy, Check } from "lucide-react";
+import { ChevronLeft, ChevronRight, Mail, Phone, Copy, Check, Inbox } from "lucide-react";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
@@ -11,7 +11,8 @@ import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import type { Employee, Company } from "@/types";
-import { getCompanyConfig } from "@/lib/companyConfig";
+import { getCompanyConfig, getAccentColor, alphaColor } from "@/lib/companyConfig";
+import { getInitials as getEmployeeInitials } from "@/lib/utils";
 
 // Premium easing curve
 const premiumEase = [0.25, 0.46, 0.45, 0.94];
@@ -64,7 +65,6 @@ interface FeaturedEmployeeCardProps {
   employee: Employee;
   companyConfig: { primary: string; secondary: string; glow: string; highlight: string };
   companyName: string;
-  getInitials: (name: string) => string;
   handleCardClick: (employeeId: string) => void;
   copyToClipboard: (e: MouseEvent, text: string | null | undefined, field: string) => void;
   copiedField: string | null;
@@ -74,7 +74,6 @@ function FeaturedEmployeeCard({
   employee,
   companyConfig,
   companyName,
-  getInitials,
   handleCardClick,
   copyToClipboard,
   copiedField,
@@ -92,16 +91,16 @@ function FeaturedEmployeeCard({
         onClick={() => handleCardClick(employee.id)}
         className="card-shimmer corner-bracket group relative overflow-hidden rounded-xl p-4 flex flex-col cursor-pointer"
         style={{
-          ["--shimmer-color" as string]: companyConfig.primary,
-          ["--bracket-color" as string]: companyConfig.primary,
+          ["--shimmer-color" as string]: getAccentColor(companyConfig),
+          ["--bracket-color" as string]: getAccentColor(companyConfig),
           minHeight: 'calc(220px * var(--font-scale))',
           borderWidth: isHovered ? '1.5px' : '1px',
           borderStyle: 'solid',
-          borderColor: isHovered ? companyConfig.primary : 'var(--border)',
-          boxShadow: isHovered ? `0 0 0 1px ${companyConfig.primary}, 0 8px 32px ${companyConfig.glow}` : 'none',
+          borderColor: isHovered ? getAccentColor(companyConfig) : 'var(--border)',
+          boxShadow: isHovered ? `0 0 0 1px ${getAccentColor(companyConfig)}, 0 8px 32px ${companyConfig.glow}` : 'none',
           transform: isHovered ? 'translateY(-3px) scale(1.012)' : 'none',
           background: isHovered 
-            ? `linear-gradient(160deg, ${companyConfig.primary}10 0%, transparent 60%), rgba(255,255,255,0.07)` 
+            ? `linear-gradient(160deg, ${alphaColor(companyConfig, "10")} 0%, transparent 60%), rgba(255,255,255,0.07)` 
             : 'rgba(255,255,255,0.04)',
           transitionProperty: 'all',
           transitionDuration: '180ms',
@@ -114,8 +113,8 @@ function FeaturedEmployeeCard({
             style={{
               width: isHovered ? '5px' : '3px',
               background: isHovered && companyConfig.highlight 
-                ? `linear-gradient(to bottom, ${companyConfig.highlight}, ${companyConfig.primary})`
-                : companyConfig.primary,
+                ? `linear-gradient(to bottom, ${companyConfig.highlight}, ${getAccentColor(companyConfig)})`
+                : getAccentColor(companyConfig),
               opacity: isHovered ? 1 : 0.7,
             }}
           />
@@ -130,8 +129,8 @@ function FeaturedEmployeeCard({
                 borderWidth: isHovered ? '2px' : '1.5px',
                 borderStyle: 'solid',
                 borderColor: isHovered 
-                  ? (companyConfig.highlight || companyConfig.primary) 
-                  : `${companyConfig.primary}66`,
+                  ? (companyConfig.highlight || getAccentColor(companyConfig)) 
+                  : alphaColor(companyConfig, "66"),
                 boxShadow: isHovered 
                   ? `0 0 12px ${companyConfig.glow}` 
                   : 'none',
@@ -141,11 +140,11 @@ function FeaturedEmployeeCard({
               <AvatarFallback
                 className="text-sm font-semibold"
                 style={{
-                  background: `linear-gradient(135deg, ${companyConfig.secondary}, ${companyConfig.primary})`,
+                  background: `linear-gradient(135deg, ${companyConfig.secondary}, ${getAccentColor(companyConfig)})`,
                   color: 'white',
                 }}
               >
-              {getInitials(employee.name)}
+              {getEmployeeInitials(employee.name) ?? <Inbox className="w-5 h-5" aria-label="Sin nombre asignado" />}
             </AvatarFallback>
           </Avatar>
 
@@ -161,9 +160,9 @@ function FeaturedEmployeeCard({
               <span
                 className="inline-block font-medium px-1.5 py-0.5 rounded-full mt-1 text-scale-xs"
                 style={{
-                  backgroundColor: companyConfig.highlight ? companyConfig.secondary : `${companyConfig.primary}15`,
-                  border: companyConfig.highlight ? `1px solid ${companyConfig.primary}` : 'none',
-                  color: companyConfig.highlight || companyConfig.primary,
+                  backgroundColor: companyConfig.highlight ? companyConfig.secondary : alphaColor(companyConfig, "15"),
+                  border: companyConfig.highlight ? `1px solid ${getAccentColor(companyConfig)}` : 'none',
+                  color: companyConfig.highlight || getAccentColor(companyConfig),
                 }}
               >
               {companyName}
@@ -277,15 +276,6 @@ export function FeaturedEmployees({
     return company?.shortName || company?.name || companyId;
   };
 
-  const getInitials = (name: string) => {
-    return name
-      .split(" ")
-      .map((n) => n[0])
-      .slice(0, 2)
-      .join("")
-      .toUpperCase();
-  };
-
   const [copiedField, setCopiedField] = useState<string | null>(null);
 
   const handleCardClick = (employeeId: string) => {
@@ -354,11 +344,10 @@ export function FeaturedEmployees({
             <FeaturedEmployeeCard
               key={employee.id}
               employee={employee}
-              companyConfig={companyConfig}
-              companyName={getCompanyName(employee.company)}
-              getInitials={getInitials}
-              handleCardClick={handleCardClick}
-              copyToClipboard={copyToClipboard}
+                  companyConfig={companyConfig}
+                  companyName={getCompanyName(employee.company)}
+                  handleCardClick={handleCardClick}
+                  copyToClipboard={copyToClipboard}
               copiedField={copiedField}
             />
           );

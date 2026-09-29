@@ -2,11 +2,11 @@
 
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { X, Search } from "lucide-react";
+import { Inbox, X, Search } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { getEmployees, getCompanyById } from "@/lib/data";
-import { cn } from "@/lib/utils";
+import { cn, getInitials } from "@/lib/utils";
 import { getCompanyConfig } from "@/lib/companyConfig";
 
 interface EmployeeSelectModalProps {
@@ -30,15 +30,6 @@ export function EmployeeSelectModal({
     (emp.position ?? "").toLowerCase().includes(searchQuery.toLowerCase()) ||
     (emp.department ?? "").toLowerCase().includes(searchQuery.toLowerCase())
   );
-
-  const getInitials = (name: string) => {
-    return name
-      .split(" ")
-      .map((n) => n[0])
-      .slice(0, 2)
-      .join("")
-      .toUpperCase();
-  };
 
   const handleSelect = (employeeId: string) => {
     onSelect(employeeId);
@@ -125,7 +116,9 @@ export function EmployeeSelectModal({
                               color: company?.colors?.primary,
                             }}
                           >
-                            {getInitials(employee.name)}
+                            {getInitials(employee.name) ?? (
+                              <Inbox className="w-4 h-4" aria-label="Sin nombre asignado" />
+                            )}
                           </AvatarFallback>
                         </Avatar>
                         <div className="flex-1 min-w-0">
