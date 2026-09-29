@@ -15,6 +15,8 @@ import {
   Star,
   ClipboardList,
   Inbox,
+  Download,
+  Share2,
 } from "lucide-react";
 import {
   getEmployeeById,
@@ -24,6 +26,8 @@ import { getCompanyConfig } from "@/lib/companyConfig";
 import { useFavorites } from "@/lib/useFavorites";
 import { haptics } from "@/lib/haptics";
 import { getInitials } from "@/lib/utils";
+import { buildVCard, downloadVCard, getVCardDisplayName } from "@/lib/vcard";
+import { EmployeeQrCode } from "@/components/employee-qr-code";
 
 interface Props {
   params: Promise<{ id: string }>;
@@ -140,6 +144,34 @@ function EmployeeDetailContent({ id }: { id: string }) {
   const openTeamsChat = () => {
     if (employee.email) {
       window.open(`https://teams.microsoft.com/l/chat/0/0?users=${employee.email}`, "_blank");
+    }
+  };
+
+  const handleSaveContact = () => {
+    haptics.light();
+    downloadVCard(employee, company);
+  };
+
+  const handleShare = async () => {
+    const url = `${window.location.origin}/directorio/${employee.id}`;
+    const title = `${getVCardDisplayName(employee)} — ${employee.position}`;
+
+    if (typeof navigator.share === "function") {
+      try {
+        await navigator.share({ title, url });
+        haptics.light();
+      } catch {
+        // User cancelled the native share sheet - no error to surface.
+      }
+      return;
+    }
+
+    try {
+      await navigator.clipboard.writeText(url);
+      haptics.light();
+      toast.success("Link copiado");
+    } catch {
+      toast.error("Error al copiar el link");
     }
   };
 
@@ -467,13 +499,14 @@ function EmployeeDetailContent({ id }: { id: string }) {
 
         {/* Action Row */}
         <div 
-          className="px-7 py-4 flex gap-3"
+          className="px-7 py-4 flex flex-col gap-3"
           style={{
             background: 'rgba(255,255,255,0.015)',
             borderTop: '1px solid rgba(255,255,255,0.06)',
             paddingBottom: '20px',
           }}
         >
+        <div className="flex gap-3">
           {/* Copy Email */}
           <button
             onClick={() => employee.email && copyToClipboard(employee.email, 'email')}
@@ -626,6 +659,69 @@ function EmployeeDetailContent({ id }: { id: string }) {
               </>
             )}
           </button>
+        </div>
+
+          <div className="flex gap-3 items-start">
+            <div className="flex-1 flex gap-3">
+              {/* Save Contact (vCard) */}
+              <button
+                onClick={handleSaveContact}
+                className="flex-1 rounded-[10px] flex items-center justify-center gap-1.5 transition-all duration-[180ms]"
+                style={{
+                  height: '38px',
+                  background: 'rgba(255,255,255,0.04)',
+                  border: '1px solid rgba(255,255,255,0.08)',
+                  color: 'rgba(255,255,255,0.44)',
+                  fontSize: 'var(--font-sm)',
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.background = `color-mix(in srgb, ${config.primary} 15%, transparent)`;
+                  e.currentTarget.style.borderColor = `color-mix(in srgb, ${config.primary} 50%, transparent)`;
+                  e.currentTarget.style.color = 'white';
+                  e.currentTarget.style.boxShadow = `0 0 12px ${config.glow}`;
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.background = 'rgba(255,255,255,0.04)';
+                  e.currentTarget.style.borderColor = 'rgba(255,255,255,0.08)';
+                  e.currentTarget.style.color = 'rgba(255,255,255,0.44)';
+                  e.currentTarget.style.boxShadow = 'none';
+                }}
+              >
+                <Download className="w-3.5 h-3.5" />
+                <span>Guardar contacto</span>
+              </button>
+
+              {/* Share */}
+              <button
+                onClick={handleShare}
+                className="flex-1 rounded-[10px] flex items-center justify-center gap-1.5 transition-all duration-[180ms]"
+                style={{
+                  height: '38px',
+                  background: 'rgba(255,255,255,0.04)',
+                  border: '1px solid rgba(255,255,255,0.08)',
+                  color: 'rgba(255,255,255,0.44)',
+                  fontSize: 'var(--font-sm)',
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.background = `color-mix(in srgb, ${config.primary} 15%, transparent)`;
+                  e.currentTarget.style.borderColor = `color-mix(in srgb, ${config.primary} 50%, transparent)`;
+                  e.currentTarget.style.color = 'white';
+                  e.currentTarget.style.boxShadow = `0 0 12px ${config.glow}`;
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.background = 'rgba(255,255,255,0.04)';
+                  e.currentTarget.style.borderColor = 'rgba(255,255,255,0.08)';
+                  e.currentTarget.style.color = 'rgba(255,255,255,0.44)';
+                  e.currentTarget.style.boxShadow = 'none';
+                }}
+              >
+                <Share2 className="w-3.5 h-3.5" />
+                <span>Compartir</span>
+              </button>
+            </div>
+
+            <EmployeeQrCode value={buildVCard(employee, company)} primaryColor={config.primary} />
+          </div>
         </div>
       </motion.div>
 
@@ -998,6 +1094,38 @@ function EmployeeDetailContent({ id }: { id: string }) {
             >
               <Star className={`w-3.5 h-3.5 ${isEmployeeFavorite ? 'fill-[#F5C400]' : ''}`} />
               <span>{isEmployeeFavorite ? 'Guardado' : 'Favorito'}</span>
+            </button>
+
+            {/* Save Contact (vCard) */}
+            <button
+              onClick={handleSaveContact}
+              className="rounded-lg flex items-center justify-center gap-1.5 transition-all duration-150 active:scale-[0.98]"
+              style={{
+                height: '38px',
+                background: 'rgba(255,255,255,0.04)',
+                border: '1px solid rgba(255,255,255,0.08)',
+                color: 'rgba(255,255,255,0.5)',
+                fontSize: '12px',
+              }}
+            >
+              <Download className="w-3.5 h-3.5" />
+              <span>Contacto</span>
+            </button>
+
+            {/* Share */}
+            <button
+              onClick={handleShare}
+              className="rounded-lg flex items-center justify-center gap-1.5 transition-all duration-150 active:scale-[0.98]"
+              style={{
+                height: '38px',
+                background: 'rgba(255,255,255,0.04)',
+                border: '1px solid rgba(255,255,255,0.08)',
+                color: 'rgba(255,255,255,0.5)',
+                fontSize: '12px',
+              }}
+            >
+              <Share2 className="w-3.5 h-3.5" />
+              <span>Compartir</span>
             </button>
 
             {/* Copy All - Full width */}
