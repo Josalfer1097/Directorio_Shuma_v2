@@ -305,6 +305,19 @@ export function EmployeeCard({
   const animationDelay = shouldAnimate ? `${Math.min(index * 25, 500)}ms` : '0ms';
   const animationStyle = shouldAnimate ? 'cardRain 350ms cubic-bezier(0.16,1,0.3,1) both' : 'none';
 
+  // Cursor spotlight - tracks the pointer via CSS variables instead of React
+  // state so it never triggers a re-render on mousemove.
+  const spotlightCardRef = useRef<HTMLDivElement>(null);
+  const handleSpotlightMove = (e: React.MouseEvent<HTMLDivElement>) => {
+    const el = spotlightCardRef.current;
+    if (!el) return;
+    const rect = el.getBoundingClientRect();
+    const x = ((e.clientX - rect.left) / rect.width) * 100;
+    const y = ((e.clientY - rect.top) / rect.height) * 100;
+    el.style.setProperty("--spot-x", `${x}%`);
+    el.style.setProperty("--spot-y", `${y}%`);
+  };
+
   // Grid view - reduced height ~200px
   return (
     <div
@@ -321,6 +334,8 @@ export function EmployeeCard({
     >
       <Link href={`/directorio/${employee.id}`}>
         <div
+          ref={spotlightCardRef}
+          onMouseMove={handleSpotlightMove}
           className={cn(
             "card-shimmer corner-bracket group relative overflow-hidden rounded-xl flex flex-col touch-manipulation select-none employee-card",
             "transition-all duration-[180ms]"
@@ -343,6 +358,9 @@ export function EmployeeCard({
             transitionTimingFunction: "cubic-bezier(0.25, 0.46, 0.45, 0.94)"
           }}
         >
+          {/* Cursor-tracking spotlight (desktop, precise pointer only) */}
+          <div className="spotlight-layer" aria-hidden="true" />
+
           {/* Favorite button */}
           <button
             onClick={handleToggleFavorite}

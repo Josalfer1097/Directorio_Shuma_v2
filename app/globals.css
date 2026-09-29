@@ -733,6 +733,32 @@
   }
 }
 
+/* Cursor-tracking spotlight - desktop with a precise pointer only */
+.employee-card .spotlight-layer {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 220ms ease;
+  background: radial-gradient(
+    280px circle at var(--spot-x, 50%) var(--spot-y, 50%),
+    color-mix(in srgb, var(--card-color, var(--gold)) 16%, transparent),
+    transparent 70%
+  );
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .employee-card:hover .spotlight-layer {
+    opacity: 1;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .employee-card .spotlight-layer {
+    display: none;
+  }
+}
+
 /* Card watermark (company initial) */
 .card-watermark {
   position: absolute;
@@ -761,7 +787,7 @@
 
 /* ══════════════════════════════════════════════════════════════���════
    MONOGRAM AVATAR
-   ═══════════════════════════════════════════════════════════════════ */
+   ════════════════════════════════���══════════════════════════════════ */
 
 .monogram {
   display: flex;
