@@ -7,6 +7,7 @@ import { useState } from "react";
 import type { Company } from "@/types";
 import { getCompanyConfig, getAccentColor, alphaColor } from "@/lib/companyConfig";
 import { useCountUp } from "@/hooks/use-count-up";
+import { useCompanyTheme, type ActiveTheme } from "@/lib/CompanyThemeContext";
 
 interface CompanyCardProps {
   company: Company & { employeeCount: number };
@@ -20,6 +21,17 @@ export function CompanyCard({ company, index }: CompanyCardProps) {
   const [isHovered, setIsHovered] = useState(false);
   const companyConfig = getCompanyConfig(company.id);
   const animatedCount = useCountUp(company.employeeCount, 800);
+  const { setActiveTheme } = useCompanyTheme();
+
+  const handleMouseEnter = () => {
+    setIsHovered(true);
+    setActiveTheme(company.id as ActiveTheme);
+  };
+
+  const handleMouseLeave = () => {
+    setIsHovered(false);
+    setActiveTheme("default");
+  };
   
   return (
     <motion.div
@@ -46,8 +58,8 @@ export function CompanyCard({ company, index }: CompanyCardProps) {
             transitionDuration: '180ms',
             transitionTimingFunction: "cubic-bezier(0.25, 0.46, 0.45, 0.94)"
           }}
-          onMouseEnter={() => setIsHovered(true)}
-          onMouseLeave={() => setIsHovered(false)}
+          onMouseEnter={handleMouseEnter}
+          onMouseLeave={handleMouseLeave}
         >
           {/* Left accent bar */}
           <div 
