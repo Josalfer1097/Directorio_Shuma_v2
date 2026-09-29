@@ -53,6 +53,11 @@
   --gold-glow: rgba(201, 168, 76, 0.18);
   --danger: #E05252;
   
+  /* Ferrecapital's primary (#2C3338) is near-black and loses contrast against
+     this (default/dark) theme. Icons/borders/badges use this lighter tone
+     instead here; .light below restores the original #2C3338. */
+  --color-ferrecapital-accent: #8A98A5;
+
   /* Company Colors - Comercializadora (Cobalt Blue) */
   --comercializadora-primary: #0047AB;
   --comercializadora-secondary: #002D6E;
@@ -142,6 +147,9 @@
   --gold-glow: rgba(201, 168, 76, 0.2);
   --danger: #E05252;
   
+  /* Ferrecapital keeps its original brand color in light mode */
+  --color-ferrecapital-accent: #2C3338;
+
   /* Company Colors remain the same */
   --comercializadora-primary: #0047AB;
   --comercializadora-secondary: #002D6E;
@@ -1090,7 +1098,7 @@
 
 /* ═════��══════════════════════���══════════════════════════════════════
    REACT FLOW OVERRIDES
-   ════════════════════════════════════════════���══════════════════════ */
+   ════════════════════════════════════════���═══���══════════════════════ */
 
 .react-flow__background {
   background: var(--bg-base) !important;
@@ -1396,7 +1404,7 @@ button, a, [role="button"], .clickable {
 
 /* ═══════════════════════════════════════════════════════════════════
    ANIMATED AVATAR MONOGRAM
-   ════════════════════════════════════���══════════════════════════════ */
+   ══════════════════════════════���═════���══════════════════════════════ */
 
 @property --avatar-angle {
   syntax: '<angle>';
@@ -1632,7 +1640,7 @@ button, a, [role="button"], .clickable {
   opacity: 0.85;
 }
 
-/* ── Shuma logo: ball-roll bounce on hover ─────────────────────────── */
+/* ── Shuma logo: ball-roll bounce on hover ───────────────────��─────── */
 @keyframes mundialBallRoll {
   0%   { transform: translateY(0) rotate(0deg); }
   30%  { transform: translateY(-5px) rotate(8deg); }

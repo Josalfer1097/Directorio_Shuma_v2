@@ -4,7 +4,7 @@ import { useState, useMemo, useCallback, memo, useRef, useEffect, Fragment } fro
 import { useRouter } from "next/navigation";
 import { Printer, Download, MapPin, Search, X, ClipboardList, Phone, RotateCcw } from "lucide-react";
 import { getEmployees, getCompanies } from "@/lib/data";
-import { getCompanyConfig } from "@/lib/companyConfig";
+import { getCompanyConfig, getAccentColor, alphaColor } from "@/lib/companyConfig";
 import type { Employee } from "@/types";
 
 type SubMode = "completo" | "solo-extensiones";
@@ -48,8 +48,8 @@ const ExtensionRow = memo(function ExtensionRow({
           <span
             className="inline-block font-mono font-bold text-scale-base"
             style={{
-              color: companyConfig.primary,
-              background: `${companyConfig.primary}1f`,
+              color: getAccentColor(companyConfig),
+              background: alphaColor(companyConfig, "1f"),
               borderRadius: "6px",
               padding: "2px 8px",
             }}
@@ -106,15 +106,15 @@ const CompanyHeader = memo(function CompanyHeader({
     <tr
       style={{
         height: "36px",
-        background: `${companyConfig.primary}1a`,
-        borderLeft: `3px solid ${companyConfig.primary}`,
+        background: alphaColor(companyConfig, "1a"),
+        borderLeft: `3px solid ${getAccentColor(companyConfig)}`,
       }}
     >
       <td colSpan={5} className="px-4">
         <div className="flex items-center justify-between">
           <span
             className="font-neuropol uppercase tracking-widest text-scale-xs"
-            style={{ color: companyConfig.primary }}
+            style={{ color: getAccentColor(companyConfig) }}
           >
             {companyName}
           </span>
@@ -184,14 +184,15 @@ const ExtensionCard = memo(function ExtensionCard({
         background: "rgba(255,255,255,0.03)",
         border: "1px solid rgba(255,255,255,0.08)",
         borderLeftWidth: "3px",
-        borderLeftColor: companyConfig.primary,
+        borderLeftColor: getAccentColor(companyConfig),
         padding: "10px 12px",
         transition: "transform 80ms ease, box-shadow 150ms ease",
       }}
       onMouseEnter={(e) => {
         if (window.matchMedia('(hover: hover)').matches) {
           const el = e.currentTarget;
-          el.style.boxShadow = `0 0 0 1px rgba(${hexToRgb(companyConfig.primary)}, 0.20), 0 4px 16px rgba(${hexToRgb(companyConfig.primary)}, 0.10)`;
+          const accent = getAccentColor(companyConfig);
+          el.style.boxShadow = `0 0 0 1px rgba(${hexToRgb(accent)}, 0.20), 0 4px 16px rgba(${hexToRgb(accent)}, 0.10)`;
           el.style.background = "rgba(255,255,255,0.05)";
         }
       }}
@@ -210,7 +211,7 @@ const ExtensionCard = memo(function ExtensionCard({
           fontFamily: "var(--font-neuropol), var(--font-orbitron), 'Orbitron', monospace",
           fontSize: "44px",
           fontWeight: 900,
-          color: companyConfig.primary,
+          color: getAccentColor(companyConfig),
           opacity: 0.06,
           zIndex: 0,
         }}
@@ -227,7 +228,7 @@ const ExtensionCard = memo(function ExtensionCard({
           width: "5px",
           height: "5px",
           borderRadius: "50%",
-          background: companyConfig.primary,
+          background: getAccentColor(companyConfig),
           opacity: 0.5,
         }}
       />
@@ -247,16 +248,16 @@ const ExtensionCard = memo(function ExtensionCard({
           <div
             className="inline-flex items-center gap-[4px] w-fit mt-1.5"
             style={{
-              background: `rgba(${hexToRgb(companyConfig.primary)}, 0.12)`,
-              border: `1px solid rgba(${hexToRgb(companyConfig.primary)}, 0.25)`,
+              background: `rgba(${hexToRgb(getAccentColor(companyConfig))}, 0.12)`,
+              border: `1px solid rgba(${hexToRgb(getAccentColor(companyConfig))}, 0.25)`,
               borderRadius: "5px",
               padding: "2px 8px",
             }}
           >
-            <Phone size={9} style={{ color: companyConfig.primary }} />
+            <Phone size={9} style={{ color: getAccentColor(companyConfig) }} />
             <span
               className="text-scale-base font-bold font-mono tracking-wide"
-              style={{ color: companyConfig.primary }}
+              style={{ color: getAccentColor(companyConfig) }}
             >
               {employee.extension}
             </span>
