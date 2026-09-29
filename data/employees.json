@@ -194,14 +194,14 @@
     {
       "id": "emp011",
       "name": "Ilse Rodríguez Rosas",
-      "department": "Contabilidad",
-      "position": "Analista de cuentas por pagar",
+      "department": "Crédito y Cobranza",
+      "position": "Auxiliar de Crédito y Cobranza",
       "phone": "55 55498999",
-      "extension": "233",
-      "email": "ilse.rodriguez@shuma.mx",
+      "extension": "205",
+      "email": "ilse.rdgzrosas@shuma.mx",
       "company": "comercializadora",
       "location": "División",
-      "reportsTo": "emp008",
+      "reportsTo": "emp015",
       "avatar": null
     },
     {
@@ -272,14 +272,14 @@
     {
       "id": "emp017",
       "name": "Carmen Berenice Medina Medina",
-      "department": "Crédito y Cobranza",
-      "position": "Auxiliar Crédito y Cobranza",
+      "department": "Ventas",
+      "position": "Agente de Ventas",
       "phone": "55 55498999",
-      "extension": "205",
-      "email": "berenice.medina@shuma.mx",
+      "extension": "211",
+      "email": "cberenice.medina@shuma.mx",
       "company": "comercializadora",
       "location": "División",
-      "reportsTo": "emp015",
+      "reportsTo": "emp029",
       "avatar": null
     },
     {
@@ -297,7 +297,7 @@
     },
     {
       "id": "emp019",
-      "name": "Juan Pablo Trejo Pérez",
+      "name": "-",
       "department": "Crédito y Cobranza",
       "position": "Auxiliar Crédito y Cobranza",
       "phone": "55 55498999",
@@ -602,19 +602,6 @@
       "phone": "55 55498999",
       "extension": "302",
       "email": "juan.monter@shuma.mx",
-      "company": "comercializadora",
-      "location": "San Pablo",
-      "reportsTo": "emp035",
-      "avatar": null
-    },
-    {
-      "id": "emp041",
-      "name": "Maria Yamileth Mendoza Garcia",
-      "department": "Administración",
-      "position": "Recepción Digital de Mercancia",
-      "phone": "55 55498999",
-      "extension": "305",
-      "email": "yamileth.mendoza@shuma.mx",
       "company": "comercializadora",
       "location": "San Pablo",
       "reportsTo": "emp035",
@@ -930,6 +917,45 @@
       "company": "comercializadora",
       "location": "División",
       "reportsTo": "emp001",
+      "avatar": null
+    },
+    {
+      "id": "emp072",
+      "name": "Ma. Fernanda Rodríguez Ramírez",
+      "department": "Contabilidad",
+      "position": "Analista de Cuentas por Pagar",
+      "phone": "55 55498999",
+      "extension": "231",
+      "email": "mfernanda.rodriguez@shuma.mx",
+      "company": "comercializadora",
+      "location": "División",
+      "reportsTo": "emp008",
+      "avatar": null
+    },
+    {
+      "id": "emp073",
+      "name": "Paloma Gpe Flores Carmona",
+      "department": "Administración",
+      "position": "Recepción Digital de Mercancia",
+      "phone": "55 55498999",
+      "extension": "305",
+      "email": "paloma.flores@shuma.mx",
+      "company": "comercializadora",
+      "location": "San Pablo",
+      "reportsTo": "emp035",
+      "avatar": null
+    },
+    {
+      "id": "emp074",
+      "name": "Cinthia Gisela Díaz Cruz",
+      "department": "Compras",
+      "position": "Auxiliar de Compras",
+      "phone": "55 55498999",
+      "extension": "218",
+      "email": "gisela.diaz@shuma.mx",
+      "company": "comercializadora",
+      "location": "División",
+      "reportsTo": "emp002",
       "avatar": null
     }
   ]
