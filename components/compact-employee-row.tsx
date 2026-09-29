@@ -1,9 +1,9 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { Phone } from "lucide-react";
+import { Phone, Inbox } from "lucide-react";
 import type { Employee, Company } from "@/types";
-import { cn } from "@/lib/utils";
+import { cn, getInitials } from "@/lib/utils";
 import { getCompanyConfig } from "@/lib/companyConfig";
 
 interface CompactEmployeeRowProps {
@@ -17,15 +17,7 @@ export function CompactEmployeeRow({
   company,
   index,
 }: CompactEmployeeRowProps) {
-  const getInitials = (name?: string) => {
-    if (!name) return "??";
-    return name
-      .split(" ")
-      .map((n) => n[0])
-      .slice(0, 2)
-      .join("")
-      .toUpperCase();
-  };
+  const initials = getInitials(employee.name);
 
   const colors = getCompanyConfig(company?.id);
   const isFerrecapital = company?.id === "ferrecapital";
@@ -72,9 +64,7 @@ export function CompactEmployeeRow({
           border: isFerrecapital ? "1.5px solid #CC0000" : "none"
         }}
       >
-        <span style={{ fontFamily: "var(--font-neuropol), var(--font-orbitron), 'Orbitron', 'Courier New', monospace" }}>
-          {getInitials(employee.name)}
-        </span>
+        {initials ?? <Inbox className="w-3.5 h-3.5" aria-label="Sin nombre asignado" />}
       </div>
 
       {/* Name and Role */}

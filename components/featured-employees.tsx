@@ -3,7 +3,7 @@
 import React from "react";
 import { motion } from "framer-motion";
 import type { MouseEvent } from "react";
-import { ChevronLeft, ChevronRight, Mail, Phone, Copy, Check } from "lucide-react";
+import { ChevronLeft, ChevronRight, Mail, Phone, Copy, Check, Inbox } from "lucide-react";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
@@ -12,6 +12,7 @@ import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import type { Employee, Company } from "@/types";
 import { getCompanyConfig, getAccentColor, alphaColor } from "@/lib/companyConfig";
+import { getInitials as getEmployeeInitials } from "@/lib/utils";
 
 // Premium easing curve
 const premiumEase = [0.25, 0.46, 0.45, 0.94];
@@ -64,7 +65,6 @@ interface FeaturedEmployeeCardProps {
   employee: Employee;
   companyConfig: { primary: string; secondary: string; glow: string; highlight: string };
   companyName: string;
-  getInitials: (name: string) => string;
   handleCardClick: (employeeId: string) => void;
   copyToClipboard: (e: MouseEvent, text: string | null | undefined, field: string) => void;
   copiedField: string | null;
@@ -74,7 +74,6 @@ function FeaturedEmployeeCard({
   employee,
   companyConfig,
   companyName,
-  getInitials,
   handleCardClick,
   copyToClipboard,
   copiedField,
@@ -145,7 +144,7 @@ function FeaturedEmployeeCard({
                   color: 'white',
                 }}
               >
-              {getInitials(employee.name)}
+              {getEmployeeInitials(employee.name) ?? <Inbox className="w-5 h-5" aria-label="Sin nombre asignado" />}
             </AvatarFallback>
           </Avatar>
 
@@ -277,15 +276,6 @@ export function FeaturedEmployees({
     return company?.shortName || company?.name || companyId;
   };
 
-  const getInitials = (name: string) => {
-    return name
-      .split(" ")
-      .map((n) => n[0])
-      .slice(0, 2)
-      .join("")
-      .toUpperCase();
-  };
-
   const [copiedField, setCopiedField] = useState<string | null>(null);
 
   const handleCardClick = (employeeId: string) => {
@@ -354,11 +344,10 @@ export function FeaturedEmployees({
             <FeaturedEmployeeCard
               key={employee.id}
               employee={employee}
-              companyConfig={companyConfig}
-              companyName={getCompanyName(employee.company)}
-              getInitials={getInitials}
-              handleCardClick={handleCardClick}
-              copyToClipboard={copyToClipboard}
+                  companyConfig={companyConfig}
+                  companyName={getCompanyName(employee.company)}
+                  handleCardClick={handleCardClick}
+                  copyToClipboard={copyToClipboard}
               copiedField={copiedField}
             />
           );

@@ -1,7 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { Mail, Phone, Copy, Check, MessageSquare, MapPin, Star } from "lucide-react";
+import { Mail, Phone, Copy, Check, MessageSquare, MapPin, Star, Inbox } from "lucide-react";
 import { useFavorites } from "@/lib/useFavorites";
 import { haptics } from "@/lib/haptics";
 import { useState, useRef, useEffect } from "react";
@@ -10,7 +10,7 @@ import { toast } from "sonner";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import type { Employee, Company } from "@/types";
-import { cn } from "@/lib/utils";
+import { cn, getInitials } from "@/lib/utils";
 import { getCompanyConfig, getAccentColor, alphaColor } from "@/lib/companyConfig";
 
 interface EmployeeCardProps {
@@ -85,14 +85,7 @@ export function EmployeeCard({
   // Get company-specific config using the shared module
   const companyConfig = getCompanyConfig(employee.company);
 
-  const getInitials = (name: string) => {
-    return name
-      .split(" ")
-      .map((n) => n[0])
-      .slice(0, 2)
-      .join("")
-      .toUpperCase();
-  };
+  const initials = getInitials(employee.name);
 
   const copyToClipboard = (e: React.MouseEvent, text: string | null | undefined, field: string) => {
     e.preventDefault();
@@ -195,7 +188,7 @@ export function EmployeeCard({
                     color: 'white',
                   }}
                 >
-                  {getInitials(employee.name)}
+                  {initials ?? <Inbox className="w-5 h-5" aria-label="Sin nombre asignado" />}
                 </AvatarFallback>
               </Avatar>
             </div>
@@ -416,7 +409,12 @@ export function EmployeeCard({
                     animation: isVisible ? 'rotateGradient 4s linear infinite' : 'none',
                   }}
                 >
-                  {getInitials(employee.name)}
+                  {initials ?? (
+                    <Inbox
+                      style={{ width: 'calc(20px * var(--font-scale, 1))', height: 'calc(20px * var(--font-scale, 1))' }}
+                      aria-label="Sin nombre asignado"
+                    />
+                  )}
                 </AvatarFallback>
               </Avatar>
             </div>

@@ -1,7 +1,9 @@
 'use client';
 
 import { memo } from 'react';
+import { Inbox } from 'lucide-react';
 import type { Employee, Company } from '@/types';
+import { getInitials } from '@/lib/utils';
 
 const NODE_WIDTH = 220;
 const NODE_HEIGHT = 88;
@@ -21,15 +23,6 @@ const getCompanyColor = (companyId: string): string => {
     grupo: '#059669',
   };
   return colors[companyId] || '#6b7280';
-};
-
-const getInitials = (name: string): string => {
-  return name
-    .split(' ')
-    .map((n) => n[0])
-    .join('')
-    .toUpperCase()
-    .slice(0, 2);
 };
 
 export const OrgChartNode = memo(function OrgChartNode({
@@ -60,10 +53,10 @@ export const OrgChartNode = memo(function OrgChartNode({
       >
         {/* Avatar */}
         <div
-          className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-full text-xs font-bold text-white"
+          className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-full text-xs font-bold text-white ring-2 ring-white/20"
           style={{ backgroundColor: bgColor }}
         >
-          {getInitials(employee.name)}
+          {getInitials(employee.name) ?? <Inbox className="h-4 w-4" aria-label="Sin nombre asignado" />}
         </div>
 
         {/* Content */}

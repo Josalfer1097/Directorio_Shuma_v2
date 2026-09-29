@@ -14,6 +14,7 @@ import {
   MapPin,
   Star,
   ClipboardList,
+  Inbox,
 } from "lucide-react";
 import {
   getEmployeeById,
@@ -22,6 +23,7 @@ import {
 import { getCompanyConfig } from "@/lib/companyConfig";
 import { useFavorites } from "@/lib/useFavorites";
 import { haptics } from "@/lib/haptics";
+import { getInitials } from "@/lib/utils";
 
 interface Props {
   params: Promise<{ id: string }>;
@@ -139,15 +141,6 @@ function EmployeeDetailContent({ id }: { id: string }) {
     if (employee.email) {
       window.open(`https://teams.microsoft.com/l/chat/0/0?users=${employee.email}`, "_blank");
     }
-  };
-
-  const getInitials = (name: string) => {
-    return name
-      .split(" ")
-      .map((n) => n[0])
-      .slice(0, 2)
-      .join("")
-      .toUpperCase();
   };
 
   // Animation variants
@@ -278,7 +271,9 @@ function EmployeeDetailContent({ id }: { id: string }) {
                   fontSize: 'var(--font-2xl)',
                 }}
               >
-                {getInitials(employee.name)}
+                {getInitials(employee.name) ?? (
+                  <Inbox className="w-8 h-8" aria-label="Sin nombre asignado" />
+                )}
               </span>
             </div>
 
@@ -737,7 +732,9 @@ function EmployeeDetailContent({ id }: { id: string }) {
                   fontSize: 'var(--font-base)',
                 }}
               >
-                {getInitials(employee.name)}
+                {getInitials(employee.name) ?? (
+                  <Inbox className="w-5 h-5" aria-label="Sin nombre asignado" />
+                )}
               </span>
             </div>
 

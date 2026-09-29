@@ -3,12 +3,13 @@
 import { useEffect, useState, useCallback, useRef, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import Fuse from "fuse.js";
-import { Phone, Mail, MapPin, Search, X } from "lucide-react";
+import { Inbox, Phone, Mail, MapPin, Search, X } from "lucide-react";
 import { getEmployees, getCompanies, getCompanyColors } from "@/lib/data";
 import type { Employee } from "@/types";
 import { HeroNetworkCanvas } from "@/components/hero-network-canvas";
 import { KioskErrorBoundary } from "@/components/quiosco/kiosk-error-boundary";
 import { KioskErrorView } from "@/components/quiosco/kiosk-error-view";
+import { getInitials } from "@/lib/utils";
 
 // ── Config ──────────────────────────────────────────────────────────
 const INACTIVITY_MS = 18000; // auto-return to carousel after inactivity
@@ -26,15 +27,6 @@ const COMPANY_TEXT_COLOR: Record<string, string> = {
   ferrecapital: "#fff",
   arkiramica: "#0a0a0f",
 };
-
-function initialsOf(name: string): string {
-  return name
-    .split(" ")
-    .filter(Boolean)
-    .slice(0, 2)
-    .map((w) => w[0].toUpperCase())
-    .join("");
-}
 
 function Monogram({ name, company, size }: { name: string; company: string; size: number }) {
   return (
@@ -55,7 +47,7 @@ function Monogram({ name, company, size }: { name: string; company: string; size
         boxShadow: "0 6px 24px rgba(0,0,0,0.45)",
       }}
     >
-      {initialsOf(name)}
+      {getInitials(name) ?? <Inbox size={size * 0.34} aria-label="Sin nombre asignado" />}
     </div>
   );
 }
