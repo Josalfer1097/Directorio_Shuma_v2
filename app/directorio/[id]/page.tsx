@@ -26,8 +26,7 @@ import { getCompanyConfig } from "@/lib/companyConfig";
 import { useFavorites } from "@/lib/useFavorites";
 import { haptics } from "@/lib/haptics";
 import { getInitials } from "@/lib/utils";
-import { buildVCard, downloadVCard, getVCardDisplayName } from "@/lib/vcard";
-import { EmployeeQrCode } from "@/components/employee-qr-code";
+import { downloadVCard, getVCardDisplayName } from "@/lib/vcard";
 
 interface Props {
   params: Promise<{ id: string }>;
@@ -719,8 +718,6 @@ function EmployeeDetailContent({ id }: { id: string }) {
                 <span>Compartir</span>
               </button>
             </div>
-
-            <EmployeeQrCode value={buildVCard(employee, company)} primaryColor={config.primary} />
           </div>
         </div>
       </motion.div>
