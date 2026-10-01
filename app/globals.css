@@ -1737,6 +1737,9 @@ button, a, [role="button"], .clickable {
 @keyframes papel-sway { 0%, 100% { transform: rotate(-2.5deg); } 50% { transform: rotate(2.5deg); } }
 .papel-flag { transform-box: fill-box; transform-origin: 50% 0; animation: papel-sway 4s ease-in-out infinite; }
 @media (prefers-reduced-motion: reduce) { .papel-flag { animation: none; } }
+@media (max-width: 767px) {
+  .papel-flag { animation: none; }
+}
 
 @keyframes petal-fall {
   0% { transform: translate3d(0, -20px, 0) rotate(0deg); }
