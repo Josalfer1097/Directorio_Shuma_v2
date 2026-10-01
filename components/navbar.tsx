@@ -10,6 +10,7 @@ import { cn } from "@/lib/utils";
 import { getEmployees } from "@/lib/data";
 import FontScaleButton from '@/components/ui/FontScaleButton';
 import { ThemeToggle } from "./theme-toggle";
+import { MemorialChip } from "./seasonal/memorial-chip";
 import { useCountUp } from "@/hooks/use-count-up";
 
 export function Navbar() {
@@ -224,6 +225,8 @@ export function Navbar() {
               <span className="absolute -bottom-1.5 left-0 right-0 h-0.5 bg-gradient-to-r from-[#C9A84C] to-[#E0C060] rounded-full" />
             )}
           </Link>
+
+          <MemorialChip />
 
           {/* Font Scale Control */}
           <FontScaleButton />
