@@ -1681,3 +1681,55 @@ button, a, [role="button"], .clickable {
   }
 }
 /* end of Modo Mundial theme layer */
+
+/* ═══════════════════════════════════════════════════════════════════
+   DÍA DE MUERTOS — Seasonal theme layer
+   Activated by .theme-muertos on <html> (SeasonalThemeProvider).
+   Dark is the default; this project toggles light via the .light class.
+   Company brand colors are never touched.
+   ═══════════════════════════════════════════════════════════════════ */
+
+.theme-muertos {
+  --muertos-marigold: #FFB347;
+  --muertos-marigold-deep: #F28C1B;
+  --muertos-rosa: #E4007C;
+  --muertos-purple: #4B1E6D;
+  --muertos-bg: #140C1E;
+  --muertos-card: #1F1430;
+  --muertos-text: #F6EBDD;
+  --muertos-text-2: #B9A8C9;
+  --muertos-line: #3A2752;
+  --muertos-accent: #FFB347;
+  --muertos-on-accent: #2A1200;
+}
+
+.theme-muertos.light {
+  --muertos-bg: #FBF3E4;
+  --muertos-card: #FFFFFF;
+  --muertos-text: #2E1247;
+  --muertos-text-2: #6B5580;
+  --muertos-line: #E8D9BE;
+  /* #B85C00 measured ~4.2:1 on #FBF3E4; darkened to keep >= 4.5:1 (~5.5:1) */
+  --muertos-accent: #9A4D00;
+  --muertos-on-accent: #FFFFFF;
+}
+
+/* Map onto the project's existing tokens so components inherit the palette */
+.theme-muertos,
+.theme-muertos.light {
+  --bg-base: var(--muertos-bg);
+  --bg-surface: var(--muertos-card);
+  --bg-elevated: color-mix(in srgb, var(--muertos-card) 88%, var(--muertos-text) 12%);
+  --border-subtle: var(--muertos-line);
+  --border-strong: color-mix(in srgb, var(--muertos-line) 70%, var(--muertos-text-2) 30%);
+  --text-primary: var(--muertos-text);
+  --text-muted: var(--muertos-text-2);
+  --gold: var(--muertos-accent);
+  --gold-glow: color-mix(in srgb, var(--muertos-marigold) 20%, transparent);
+  --primary-foreground: var(--muertos-on-accent);
+  --node-bg: var(--muertos-card);
+  --node-text: var(--muertos-text);
+  --node-text-muted: var(--muertos-text-2);
+  --search-result-secondary: var(--muertos-text-2);
+}
+/* end of Día de Muertos palette */
