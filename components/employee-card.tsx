@@ -12,6 +12,10 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/comp
 import type { Employee, Company } from "@/types";
 import { cn, getInitials } from "@/lib/utils";
 import { getCompanyConfig, getAccentColor, alphaColor } from "@/lib/companyConfig";
+import { getCalaveraSrc } from "@/lib/seasonal-calaveras";
+import { useSeasonalVariant } from "@/components/seasonal/seasonal-provider";
+import { MarigoldWreath } from "@/components/seasonal/marigold-wreath";
+import { PicadoBand } from "@/components/seasonal/picado-band";
 
 interface EmployeeCardProps {
   employee: Employee;
@@ -59,6 +63,7 @@ export function EmployeeCard({
   const [isHovered, setIsHovered] = useState(false);
   const [favoriteAnimating, setFavoriteAnimating] = useState(false);
   const { isFavorite, toggleFavorite } = useFavorites();
+  const variant = useSeasonalVariant();
   const isEmployeeFavorite = isFavorite(employee.id);
 
   const avatarRef = useRef<HTMLDivElement>(null);
@@ -358,6 +363,20 @@ export function EmployeeCard({
             transitionTimingFunction: "cubic-bezier(0.25, 0.46, 0.45, 0.94)"
           }}
         >
+          {variant ? (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img
+              src={getCalaveraSrc(employee.id)}
+              alt=""
+              aria-hidden="true"
+              draggable={false}
+              loading="lazy"
+              decoding="async"
+              className="seasonal-calavera pointer-events-none absolute select-none"
+              style={{ right: -18, bottom: -28, width: 112, height: 119, maxWidth: "none", transform: "rotate(-10deg)", zIndex: 0 }}
+            />
+          ) : null}
+
           {/* Cursor-tracking spotlight (desktop, precise pointer only) */}
           <div className="spotlight-layer" aria-hidden="true" />
 
@@ -386,15 +405,21 @@ export function EmployeeCard({
             />
           </button>
 
-          {/* Top accent line */}
-          <div 
-            className="absolute top-0 left-0 right-0 transition-all duration-[180ms]"
-            style={{
-              height: '2px',
-              backgroundColor: companyConfig.highlight || companyConfig.primary,
-              opacity: isHovered ? 1 : 0.4,
-            }}
-          />
+          {variant ? (
+            <div className="pointer-events-none absolute inset-x-0 top-0 z-[2]">
+              <PicadoBand color={getAccentColor(companyConfig)} holeColor="var(--bg-base)" height={8} />
+            </div>
+          ) : (
+            /* Top accent line */
+            <div 
+              className="absolute top-0 left-0 right-0 transition-all duration-[180ms]"
+              style={{
+                height: '2px',
+                backgroundColor: companyConfig.highlight || companyConfig.primary,
+                opacity: isHovered ? 1 : 0.4,
+              }}
+            />
+          )}
           
           {/* Left accent bar */}
           <div 
@@ -409,8 +434,12 @@ export function EmployeeCard({
           />
           
           {/* Top section: Avatar + Info */}
-          <div className="flex items-start flex-1 pl-2" style={{ gap: 'calc(12px * var(--font-scale, 1))' }}>
-            <div ref={avatarRef} className="shrink-0">
+          <div
+            className={cn("flex items-start flex-1 pl-2", variant && "relative z-[1] pt-3")}
+            style={{ gap: 'calc(12px * var(--font-scale, 1))' }}
+          >
+            <div ref={avatarRef} className={cn("shrink-0", variant && "mr-2")}>
+              <MarigoldWreath>
               <Avatar 
                 className="transition-all duration-[180ms]"
                 style={{
@@ -446,6 +475,7 @@ export function EmployeeCard({
                   )}
                 </AvatarFallback>
               </Avatar>
+              </MarigoldWreath>
             </div>
 
             <div className="flex-1 min-w-0">
@@ -506,7 +536,7 @@ export function EmployeeCard({
           <div className="gradient-divider my-2" />
 
           {/* Bottom section: Contact info */}
-          <div className="space-y-1.5" style={{ fontSize: 'var(--font-sm)' }}>
+          <div className={cn("space-y-1.5", variant && "relative z-[1]")} style={{ fontSize: 'var(--font-sm)' }}>
             {/* Email row */}
             <div className="flex items-center gap-1">
               <button
