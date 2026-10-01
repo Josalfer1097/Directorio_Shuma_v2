@@ -6,6 +6,7 @@ import { ThemeProvider } from '@/components/theme-provider'
 import { FontScaleProvider } from '@/lib/FontScaleContext'
 import { CompanyThemeProvider } from '@/lib/CompanyThemeContext'
 import { SeasonalThemeProvider } from '@/components/seasonal/seasonal-provider'
+import { SeasonalPetals } from '@/components/seasonal/petals'
 import { RgbSignature } from '@/components/rgb-signature'
 import { Toaster } from 'sonner'
 import { ScrollToTop } from '@/components/scroll-to-top'
@@ -88,6 +89,7 @@ export default function RootLayout({
               <SeasonalThemeProvider>
                 <AmbientGlows />
                 <ParticleBackground />
+                <SeasonalPetals />
                 <div className="dot-grid-overlay" />
                 <div className="pb-7 md:pb-7 relative z-[1]" style={{ paddingBottom: 'calc(28px + max(env(safe-area-inset-bottom), 8px))' }}>
                   {children}
