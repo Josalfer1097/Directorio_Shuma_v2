@@ -14,6 +14,7 @@ const BASE = {
     "radial-gradient(ellipse 60% 50% at 20% 30%, rgba(0,201,167,0.08), transparent 60%), radial-gradient(ellipse 60% 50% at 80% 70%, rgba(0,194,255,0.07), transparent 60%)",
   searchBorder: "rgba(0,201,167,0.35)",
   searchGlow: "rgba(0,201,167,0.12)",
+  seasonal: false as boolean,
 };
 
 const MUERTOS: typeof BASE = {
@@ -24,6 +25,7 @@ const MUERTOS: typeof BASE = {
     "radial-gradient(ellipse 60% 50% at 20% 30%, rgba(228,0,124,0.09), transparent 60%), radial-gradient(ellipse 60% 50% at 80% 70%, rgba(242,140,27,0.08), transparent 60%)",
   searchBorder: "rgba(255,179,71,0.35)",
   searchGlow: "rgba(255,179,71,0.12)",
+  seasonal: true,
 };
 
 export type KioskPalette = typeof BASE;
@@ -62,15 +64,30 @@ function useCycle(enabled: boolean, onMs: number, offMs: number) {
   return enabled && on;
 }
 
-function StaticGarland({ dim }: { dim: boolean }) {
+export function KioskSeasonalHeader({ dim }: { dim: boolean }) {
   return (
-    <div
-      aria-hidden="true"
-      className="pointer-events-none absolute inset-x-0 top-[72px] z-10 px-10"
-      style={{ opacity: dim ? 0.3 : 1, transition: "opacity 320ms ease" }}
-    >
-      <PapelPicado className="papel-static mx-auto block max-w-3xl" />
-    </div>
+    <SeasonalGuard>
+      <div
+        className="relative z-10 flex flex-col items-center px-10 pt-6"
+        style={{ opacity: dim ? 0.35 : 1, transition: "opacity 320ms ease" }}
+      >
+        <h1 className="sr-only">SHUMA · Directorio Corporativo</h1>
+        <PapelPicado className="papel-static block w-full max-w-3xl" />
+        <span
+          aria-hidden="true"
+          style={{
+            marginTop: 10,
+            fontFamily: "var(--font-neuropol), var(--font-orbitron), monospace",
+            fontSize: "0.72rem",
+            letterSpacing: "0.3em",
+            color: "#B9A8C9",
+            textTransform: "uppercase",
+          }}
+        >
+          Directorio Corporativo
+        </span>
+      </div>
+    </SeasonalGuard>
   );
 }
 
@@ -122,15 +139,14 @@ function KioskMessage({ searchActive }: { searchActive: boolean }) {
   );
 }
 
-// "light" variant: palette + garland only. "full" variant: + petals + periodic message.
+// The garland lives in KioskSeasonalHeader. "full" variant adds petals + periodic message.
 export function KioskSeasonalLayer({ searchActive }: { searchActive: boolean }) {
   const variant = useSeasonalVariant();
-  if (!variant) return null;
+  if (variant !== "full") return null;
   return (
     <SeasonalGuard>
-      {variant === "full" && <KioskPetals />}
-      <StaticGarland dim={searchActive} />
-      {variant === "full" && <KioskMessage searchActive={searchActive} />}
+      <KioskPetals />
+      <KioskMessage searchActive={searchActive} />
     </SeasonalGuard>
   );
 }

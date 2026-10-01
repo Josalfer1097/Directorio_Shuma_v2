@@ -9,7 +9,7 @@ import type { Employee } from "@/types";
 import { HeroNetworkCanvas } from "@/components/hero-network-canvas";
 import { KioskErrorBoundary } from "@/components/quiosco/kiosk-error-boundary";
 import { KioskErrorView } from "@/components/quiosco/kiosk-error-view";
-import { KioskSeasonalLayer, useKioskPalette } from "@/components/quiosco/kiosk-seasonal";
+import { KioskSeasonalHeader, KioskSeasonalLayer, useKioskPalette } from "@/components/quiosco/kiosk-seasonal";
 import { getInitials } from "@/lib/utils";
 
 // ── Config ──────────────────────────────────────────────────────────
@@ -523,6 +523,7 @@ function QuioscoContent() {
       <KioskSeasonalLayer searchActive={searchActive} />
 
       {/* Branding header */}
+      {pal.seasonal ? <KioskSeasonalHeader dim={searchActive} /> : (
       <div className="relative z-10 flex items-center justify-between px-10 pt-7">
         <span
           style={{
@@ -552,6 +553,7 @@ function QuioscoContent() {
           Directorio Corporativo
         </span>
       </div>
+      )}
 
       {/* Continuous conveyor carousel.
           When search is active the rows are truly PAUSED (animation-play-state)
@@ -624,7 +626,7 @@ function QuioscoContent() {
               animate={{ y: 0, opacity: 1 }}
               exit={{ y: -80, opacity: 0 }}
               transition={{ type: "spring", stiffness: 320, damping: 30 }}
-              className="w-full max-w-2xl px-6 pt-10"
+              className={`w-full max-w-2xl px-6 ${pal.seasonal ? "pt-36" : "pt-10"}`}
             >
               <div
                 className="flex items-center gap-3 px-5"
