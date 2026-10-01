@@ -1747,3 +1747,9 @@ button, a, [role="button"], .clickable {
 }
 .petal { position: absolute; top: 0; width: 8px; height: 12px; border-radius: 50% 50% 50% 0; opacity: 0.75; animation: petal-fall linear infinite; will-change: transform; }
 @media (prefers-reduced-motion: reduce) { .petal { animation: none; } }
+
+/* Slim garland on internal pages and static garland in the kiosk: no sway */
+.papel-slim svg { height: 28px; width: auto; }
+@media (min-width: 768px) { .papel-slim svg { height: 32px; } }
+.papel-slim .papel-flag,
+.papel-static .papel-flag { animation: none; }
