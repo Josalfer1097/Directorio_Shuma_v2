@@ -9,6 +9,7 @@ import type { Employee } from "@/types";
 import { HeroNetworkCanvas } from "@/components/hero-network-canvas";
 import { KioskErrorBoundary } from "@/components/quiosco/kiosk-error-boundary";
 import { KioskErrorView } from "@/components/quiosco/kiosk-error-view";
+import { KioskSeasonalLayer, useKioskPalette } from "@/components/quiosco/kiosk-seasonal";
 import { getInitials } from "@/lib/utils";
 
 // ── Config ──────────────────────────────────────────────────────────
@@ -281,6 +282,7 @@ function QuioscoContent() {
   // derivations below. Because Safari's console has been silent, we surface
   // failures ON SCREEN, not only via console.error.
   const [initError, setInitError] = useState<Error | null>(null);
+  const pal = useKioskPalette();
 
   const allEmployees = useMemo(() => {
     try {
@@ -455,7 +457,7 @@ function QuioscoContent() {
   return (
     <div
       className="fixed inset-0 overflow-hidden"
-      style={{ background: "#07070e", fontFamily: "var(--font-dm-sans, sans-serif)" }}
+      style={{ background: pal.bg, fontFamily: "var(--font-dm-sans, sans-serif)" }}
     >
       {/* Emergency exit — bottom-right corner, away from the SHUMA logo.
           Rendered FIRST in the DOM tree so WebKit paints it even when other
@@ -513,11 +515,12 @@ function QuioscoContent() {
       <div
         className="absolute inset-0 pointer-events-none"
         style={{
-          background:
-            "radial-gradient(ellipse 60% 50% at 20% 30%, rgba(0,201,167,0.08), transparent 60%), radial-gradient(ellipse 60% 50% at 80% 70%, rgba(0,194,255,0.07), transparent 60%)",
+          background: pal.wash,
           animation: "quioscoWash 18s ease-in-out infinite alternate",
         }}
       />
+
+      <KioskSeasonalLayer searchActive={searchActive} />
 
       {/* Branding header */}
       <div className="relative z-10 flex items-center justify-between px-10 pt-7">
@@ -526,7 +529,7 @@ function QuioscoContent() {
             fontFamily: "var(--font-neuropol), var(--font-orbitron), monospace",
             fontSize: "1.5rem",
             fontWeight: 900,
-            background: "linear-gradient(90deg, #00C9A7, #845EC2, #00C2FF, #00C9A7)",
+            background: pal.brandGradient,
             backgroundSize: "200% auto",
             WebkitBackgroundClip: "text",
             WebkitTextFillColor: "transparent",
@@ -629,11 +632,11 @@ function QuioscoContent() {
                   height: 64,
                   borderRadius: 16,
                   background: "rgba(18,18,30,0.96)",
-                  border: "1px solid rgba(0,201,167,0.35)",
-                  boxShadow: "0 20px 60px rgba(0,0,0,0.6), 0 0 40px rgba(0,201,167,0.12)",
+                  border: `1px solid ${pal.searchBorder}`,
+                  boxShadow: `0 20px 60px rgba(0,0,0,0.6), 0 0 40px ${pal.searchGlow}`,
                 }}
               >
-                <Search size={22} style={{ color: "#00C9A7", flexShrink: 0 }} />
+                <Search size={22} style={{ color: pal.accent, flexShrink: 0 }} />
                 <input
                   ref={inputRef}
                   value={query}
