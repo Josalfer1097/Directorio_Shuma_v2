@@ -10,9 +10,6 @@ import { cn } from "@/lib/utils";
 import { getEmployees } from "@/lib/data";
 import FontScaleButton from '@/components/ui/FontScaleButton';
 import { ThemeToggle } from "./theme-toggle";
-import { MundialBallButton } from "./mundial/mundial-ball-button";
-import { EagleIcon } from "./mundial/eagle-icon";
-import { useMundialTheme } from "@/lib/MundialThemeContext";
 import { useCountUp } from "@/hooks/use-count-up";
 
 export function Navbar() {
@@ -24,7 +21,6 @@ export function Navbar() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [phoneTooltipVisible, setPhoneTooltipVisible] = useState(false);
   const [kioskTooltipVisible, setKioskTooltipVisible] = useState(false);
-  const { mundialActive, openTracker } = useMundialTheme();
 
   const longPressTimer = useRef<NodeJS.Timeout | null>(null);
 
@@ -157,17 +153,8 @@ export function Navbar() {
             onMouseDown={handleTouchStart}
             onMouseUp={handleTouchEnd}
           >
-            {/* SHUMA — iridescent shimmer (ball-roll bounce on hover in Modo Mundial) */}
+            {/* SHUMA — iridescent shimmer */}
             <motion.span
-              whileHover={
-                mundialActive
-                  ? {
-                      y: [0, -5, 0, -2, 0],
-                      rotate: [0, 8, -4, 3, 0],
-                      transition: { duration: 0.6, ease: [0.25, 0.46, 0.45, 0.94] },
-                    }
-                  : undefined
-              }
               style={{
                 display: 'inline-block',
                 fontFamily: 'Neuropol, var(--font-orbitron), monospace',
@@ -237,44 +224,6 @@ export function Navbar() {
               <span className="absolute -bottom-1.5 left-0 right-0 h-0.5 bg-gradient-to-r from-[#C9A84C] to-[#E0C060] rounded-full" />
             )}
           </Link>
-
-          {/* Modo Mundial: "¿Y si sí?" badge with vertical tricolor +
-              eagle accent — opens the match tracker (easter egg) */}
-          <div className="hidden md:block">
-            <button
-              type="button"
-              onClick={openTracker}
-              className="mundial-only items-center gap-1.5 px-2 py-1 rounded-full text-[9px] font-dm-sans font-semibold tracking-normal whitespace-nowrap transition-transform hover:scale-105 active:scale-95"
-              style={{
-                background: "rgba(31,168,92,0.12)",
-                border: "1px solid rgba(31,168,92,0.35)",
-                color: "#1FA85C",
-              }}
-              aria-label="¿Y si sí? Ver partidos de México en el Mundial 2026"
-            >
-              {/* Vertical green-white-red stripes (Mexican flag order) with a
-                  small brown/gold emblem dot in the white stripe so it doesn't
-                  read as the Italian flag at this size */}
-              <span
-                className="relative flex h-2.5 w-3.5 overflow-hidden rounded-[2px] shrink-0"
-                aria-hidden="true"
-              >
-                <span className="flex-1" style={{ background: "#1FA85C" }} />
-                <span className="flex-1" style={{ background: "#F4F4F4" }} />
-                <span className="flex-1" style={{ background: "#CE1126" }} />
-                <span
-                  className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 rounded-full"
-                  style={{
-                    width: "3.5px",
-                    height: "3.5px",
-                    background: "radial-gradient(circle at 35% 35%, #D4A574, #8B5E34)",
-                  }}
-                />
-              </span>
-              <EagleIcon size={12} strokeWidth={1.8} className="shrink-0" />
-              {'¿Y si sí?'}
-            </button>
-          </div>
 
           {/* Font Scale Control */}
           <FontScaleButton />
@@ -404,9 +353,6 @@ export function Navbar() {
 
           {/* Theme Toggle */}
           <ThemeToggle />
-
-          {/* Mundial 2026: soccer ball — opens the match tracker */}
-          <MundialBallButton />
 
           {/* View Toggle - Hidden on mobile (agenda is default there) */}
           <button
