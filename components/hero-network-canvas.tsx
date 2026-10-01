@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef } from "react";
+import { useSeasonalVariant } from "@/components/seasonal/seasonal-provider";
 
 /**
  * Subtle animated node/network canvas for the hero section.
@@ -10,6 +11,9 @@ import { useEffect, useRef } from "react";
  */
 export function HeroNetworkCanvas() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const variant = useSeasonalVariant();
+  const rgbRef = useRef("0,201,167");
+  rgbRef.current = variant ? "255,179,71" : "0,201,167";
 
   useEffect(() => {
     // Defensive: this is a purely decorative background. If ANY part of it
@@ -96,7 +100,7 @@ export function HeroNetworkCanvas() {
                 ctx.beginPath();
                 ctx.moveTo(nodes[i].x, nodes[i].y);
                 ctx.lineTo(nodes[j].x, nodes[j].y);
-                ctx.strokeStyle = `rgba(0,201,167,${lineAlpha})`;
+                ctx.strokeStyle = `rgba(${rgbRef.current},${lineAlpha})`;
                 ctx.lineWidth = 0.7;
                 ctx.stroke();
               }
@@ -107,7 +111,7 @@ export function HeroNetworkCanvas() {
           for (const n of nodes) {
             ctx.beginPath();
             ctx.arc(n.x, n.y, n.r, 0, Math.PI * 2);
-            ctx.fillStyle = `rgba(0,201,167,${n.alpha})`;
+            ctx.fillStyle = `rgba(${rgbRef.current},${n.alpha})`;
             ctx.fill();
           }
         } catch (drawErr) {

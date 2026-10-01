@@ -5,9 +5,9 @@ import { Analytics } from '@vercel/analytics/next'
 import { ThemeProvider } from '@/components/theme-provider'
 import { FontScaleProvider } from '@/lib/FontScaleContext'
 import { CompanyThemeProvider } from '@/lib/CompanyThemeContext'
-import { MundialThemeProvider } from '@/lib/MundialThemeContext'
-import { PitchPattern } from '@/components/mundial/pitch-pattern'
-import { MundialMatchTracker } from '@/components/mundial/match-tracker'
+import { SeasonalThemeProvider } from '@/components/seasonal/seasonal-provider'
+import { SeasonalPetals } from '@/components/seasonal/petals'
+import { SeasonalPageGarland } from '@/components/seasonal/page-garland'
 import { RgbSignature } from '@/components/rgb-signature'
 import { Toaster } from 'sonner'
 import { ScrollToTop } from '@/components/scroll-to-top'
@@ -87,19 +87,19 @@ export default function RootLayout({
         >
           <FontScaleProvider>
             <CompanyThemeProvider>
-              <MundialThemeProvider>
+              <SeasonalThemeProvider>
                 <AmbientGlows />
                 <ParticleBackground />
-                <PitchPattern />
+                <SeasonalPetals />
                 <div className="dot-grid-overlay" />
                 <div className="pb-7 md:pb-7 relative z-[1]" style={{ paddingBottom: 'calc(28px + max(env(safe-area-inset-bottom), 8px))' }}>
+                  <SeasonalPageGarland />
                   {children}
                 </div>
-                <MundialMatchTracker />
                 <RgbSignature />
                 <ScrollToTop />
                 <Toaster position="bottom-right" richColors />
-              </MundialThemeProvider>
+              </SeasonalThemeProvider>
             </CompanyThemeProvider>
           </FontScaleProvider>
         </ThemeProvider>

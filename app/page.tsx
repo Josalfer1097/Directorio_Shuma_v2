@@ -14,15 +14,10 @@ import { AdminTrigger } from "@/components/admin/admin-trigger";
 import { AdminToolbar } from "@/components/admin/admin-toolbar";
 import { PinModal } from "@/components/admin/pin-modal";
 import { AdminProvider } from "@/components/admin/admin-context";
-import { SoccerBallIcon } from "@/components/mundial/soccer-ball-icon";
-import { MundialCountdown } from "@/components/mundial/mundial-countdown";
-import { fireMundialConfetti } from "@/components/mundial/mundial-confetti";
-import { MundialOnboardingTooltip } from "@/components/mundial/mundial-onboarding-tooltip";
-import { useMundialTheme } from "@/lib/MundialThemeContext";
 import { HeroNetworkCanvas } from "@/components/hero-network-canvas";
+import { HeroPapelPicado } from "@/components/seasonal/papel-picado";
 
 export default function HomePage() {
-  const { mundialActive, openTracker } = useMundialTheme();
   const employees = getEmployees();
   const companies = getCompanies().filter(c => !c.disabled);
   const departments = getDepartments();
@@ -71,6 +66,7 @@ export default function HomePage() {
         <section className="relative pt-32 md:pt-48 pb-20 px-4 overflow-hidden">
           {/* Subtle node/network background — organizational connection motif */}
           <HeroNetworkCanvas />
+          <HeroPapelPicado />
           <div className="container mx-auto text-center relative z-10">
             <motion.div
               initial={{ opacity: 0, y: 20 }}
@@ -142,26 +138,8 @@ export default function HomePage() {
 
             {/* Smart Search Bar — renders immediately without delay */}
             <div className="relative">
-              {/* Mundial 2026: decorative line-art soccer ball — also a secondary
-                  entry point that opens the match tracker banner */}
-              <div className="mundial-only absolute -top-14 right-2 sm:-top-16 sm:right-4 md:right-8">
-                <button
-                  type="button"
-                  onClick={openTracker}
-                  className="select-none opacity-30 hover:opacity-70 focus-visible:opacity-70 transition-opacity"
-                  style={{ color: "#1FA85C", transform: "rotate(12deg)" }}
-                  aria-label="Ver partidos de México en el Mundial 2026"
-                >
-                  <SoccerBallIcon size={44} strokeWidth={1.1} />
-                </button>
-                {/* Onboarding tooltip (mobile entry point) */}
-                <MundialOnboardingTooltip placement="hero" />
-              </div>
               <SmartSearchBar />
             </div>
-
-            {/* Modo Mundial: countdown to the World Cup 2026 opening match (auto-hides after the date) */}
-            <MundialCountdown />
 
             <motion.div 
               initial={{ opacity: 0, scale: 0.95 }}
@@ -169,13 +147,7 @@ export default function HomePage() {
               transition={{ delay: 0.2, duration: 0.6 }}
               className="flex flex-col sm:flex-row items-center justify-center gap-4 mt-6 mb-6"
             >
-              <Link
-                href="/directorio"
-                className="w-full sm:w-auto"
-                onClick={() => {
-                  if (mundialActive) fireMundialConfetti();
-                }}
-              >
+              <Link href="/directorio" className="w-full sm:w-auto">
                 <button 
                   className="w-full group flex items-center justify-center gap-3 px-8 py-4 rounded-full bg-text-primary text-bg-base tracking-widest transition-all hover:scale-105 active:scale-95 text-scale-base"
                   style={{ fontFamily: "var(--font-neuropol), var(--font-orbitron), 'Orbitron', 'Courier New', monospace" }}
