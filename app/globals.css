@@ -1753,3 +1753,8 @@ button, a, [role="button"], .clickable {
 @media (min-width: 768px) { .papel-slim svg { height: 32px; } }
 .papel-slim .papel-flag,
 .papel-static .papel-flag { animation: none; }
+
+/* Día de Muertos: calavera watermark on grid cards, marigold labels in the detail views */
+.seasonal-calavera { opacity: 0.24; }
+.light .seasonal-calavera { opacity: 0.3; }
+.theme-muertos .seasonal-label { color: #FFB347 !important; }
