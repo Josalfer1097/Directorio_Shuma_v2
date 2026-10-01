@@ -15,6 +15,7 @@ import { AdminToolbar } from "@/components/admin/admin-toolbar";
 import { PinModal } from "@/components/admin/pin-modal";
 import { AdminProvider } from "@/components/admin/admin-context";
 import { HeroNetworkCanvas } from "@/components/hero-network-canvas";
+import { HeroPapelPicado } from "@/components/seasonal/papel-picado";
 
 export default function HomePage() {
   const employees = getEmployees();
@@ -65,6 +66,7 @@ export default function HomePage() {
         <section className="relative pt-32 md:pt-48 pb-20 px-4 overflow-hidden">
           {/* Subtle node/network background — organizational connection motif */}
           <HeroNetworkCanvas />
+          <HeroPapelPicado />
           <div className="container mx-auto text-center relative z-10">
             <motion.div
               initial={{ opacity: 0, y: 20 }}

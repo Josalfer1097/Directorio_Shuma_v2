@@ -1733,3 +1733,7 @@ button, a, [role="button"], .clickable {
   --search-result-secondary: var(--muertos-text-2);
 }
 /* end of Día de Muertos palette */
+
+@keyframes papel-sway { 0%, 100% { transform: rotate(-2.5deg); } 50% { transform: rotate(2.5deg); } }
+.papel-flag { transform-box: fill-box; transform-origin: 50% 0; animation: papel-sway 4s ease-in-out infinite; }
+@media (prefers-reduced-motion: reduce) { .papel-flag { animation: none; } }
