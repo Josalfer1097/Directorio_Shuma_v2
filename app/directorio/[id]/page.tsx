@@ -27,6 +27,9 @@ import { useFavorites } from "@/lib/useFavorites";
 import { haptics } from "@/lib/haptics";
 import { getInitials } from "@/lib/utils";
 import { downloadVCard, getVCardDisplayName } from "@/lib/vcard";
+import { useSeasonalVariant } from "@/components/seasonal/seasonal-provider";
+import { MarigoldWreath } from "@/components/seasonal/marigold-wreath";
+import { PicadoBand, MarigoldZigzag } from "@/components/seasonal/picado-band";
 
 interface Props {
   params: Promise<{ id: string }>;
@@ -74,6 +77,7 @@ function EmployeeDetailContent({ id }: { id: string }) {
   const [copiedField, setCopiedField] = useState<string | null>(null);
   const [copyAllState, setCopyAllState] = useState<'idle' | 'copied'>('idle');
   const { isFavorite, toggleFavorite } = useFavorites();
+  const variant = useSeasonalVariant();
 
   const employee = getEmployeeById(id);
   if (!employee) {
@@ -287,6 +291,7 @@ function EmployeeDetailContent({ id }: { id: string }) {
           {/* Header Content */}
           <div className="relative z-[1] px-7 pt-7 pb-6 flex flex-col items-center text-center">
             {/* Avatar */}
+            <MarigoldWreath>
             <div 
               className="w-20 h-20 rounded-full flex items-center justify-center"
               style={{ 
@@ -307,6 +312,7 @@ function EmployeeDetailContent({ id }: { id: string }) {
                 )}
               </span>
             </div>
+            </MarigoldWreath>
 
             {/* Name */}
             <h2 
@@ -351,6 +357,9 @@ function EmployeeDetailContent({ id }: { id: string }) {
             </span>
           </div>
         </div>
+        {variant ? (
+          <PicadoBand color={`color-mix(in srgb, ${config.primary} 40%, #0C0E11)`} holeColor="#0C0E11" height={8} />
+        ) : null}
 
         {/* Body Section - Info Grid */}
         <div className="px-7 py-6">
@@ -358,7 +367,7 @@ function EmployeeDetailContent({ id }: { id: string }) {
             {/* Departamento */}
             <div className="pb-3" style={{ borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
               <p 
-                className="mb-1"
+                className="seasonal-label mb-1"
                 style={{ 
                   fontSize: 'var(--font-xs)', 
                   color: 'rgba(255,255,255,0.27)', 
@@ -376,7 +385,7 @@ function EmployeeDetailContent({ id }: { id: string }) {
             {/* Empresa */}
             <div className="pb-3" style={{ borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
               <p 
-                className="mb-1"
+                className="seasonal-label mb-1"
                 style={{ 
                   fontSize: 'var(--font-xs)', 
                   color: 'rgba(255,255,255,0.27)', 
@@ -394,7 +403,7 @@ function EmployeeDetailContent({ id }: { id: string }) {
             {/* Telefono */}
             <div className="pb-3" style={{ borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
               <p 
-                className="mb-1"
+                className="seasonal-label mb-1"
                 style={{ 
                   fontSize: 'var(--font-xs)', 
                   color: 'rgba(255,255,255,0.27)', 
@@ -412,7 +421,7 @@ function EmployeeDetailContent({ id }: { id: string }) {
             {/* Extension */}
             <div className="pb-3" style={{ borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
               <p 
-                className="mb-1"
+                className="seasonal-label mb-1"
                 style={{ 
                   fontSize: 'var(--font-xs)', 
                   color: 'rgba(255,255,255,0.27)', 
@@ -444,7 +453,7 @@ function EmployeeDetailContent({ id }: { id: string }) {
             {/* Sucursal - spans both columns */}
             <div className="col-span-2 pb-3" style={{ borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
               <p 
-                className="mb-1"
+                className="seasonal-label mb-1"
                 style={{ 
                   fontSize: 'var(--font-xs)', 
                   color: 'rgba(255,255,255,0.27)', 
@@ -479,7 +488,7 @@ function EmployeeDetailContent({ id }: { id: string }) {
             {/* Email - spans both columns */}
             <div className="col-span-2 pb-3" style={{ borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
               <p 
-                className="mb-1"
+                className="seasonal-label mb-1"
                 style={{ 
                   fontSize: 'var(--font-xs)', 
                   color: 'rgba(255,255,255,0.27)', 
@@ -720,6 +729,7 @@ function EmployeeDetailContent({ id }: { id: string }) {
             </div>
           </div>
         </div>
+        {variant ? <MarigoldZigzag /> : null}
       </motion.div>
 
       {/* Mobile Modal - Bottom Sheet */}
@@ -808,8 +818,9 @@ function EmployeeDetailContent({ id }: { id: string }) {
           </div>
 
           {/* Compact Header Content - Horizontal Layout */}
-          <div className="relative z-[1] px-4 py-3 flex items-center gap-3">
+          <div className={`relative z-[1] px-4 ${variant ? "py-4" : "py-3"} flex items-center gap-3`}>
             {/* Avatar - Smaller */}
+            <MarigoldWreath className="shrink-0">
             <div 
               className="w-12 h-12 rounded-full flex items-center justify-center shrink-0"
               style={{ 
@@ -830,6 +841,7 @@ function EmployeeDetailContent({ id }: { id: string }) {
                 )}
               </span>
             </div>
+            </MarigoldWreath>
 
             {/* Name & Info */}
             <div className="flex-1 min-w-0">
@@ -875,6 +887,11 @@ function EmployeeDetailContent({ id }: { id: string }) {
             </div>
           </div>
         </div>
+        {variant ? (
+          <div className="shrink-0">
+            <PicadoBand color={`color-mix(in srgb, ${config.primary} 40%, #0C0E11)`} holeColor="#0C0E11" height={8} />
+          </div>
+        ) : null}
 
         {/* Scrollable Content Area */}
         <div className="flex-1 overflow-y-auto overscroll-contain">
@@ -883,7 +900,7 @@ function EmployeeDetailContent({ id }: { id: string }) {
             <div className="grid grid-cols-2 gap-x-3 gap-y-2">
               {/* Departamento */}
               <div className="pb-1.5" style={{ borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
-                <p 
+                <p className="seasonal-label" 
                   style={{ 
                     fontSize: '10px', 
                     color: 'rgba(255,255,255,0.27)', 
@@ -901,7 +918,7 @@ function EmployeeDetailContent({ id }: { id: string }) {
 
               {/* Empresa */}
               <div className="pb-1.5" style={{ borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
-                <p 
+                <p className="seasonal-label" 
                   style={{ 
                     fontSize: '10px', 
                     color: 'rgba(255,255,255,0.27)', 
@@ -919,7 +936,7 @@ function EmployeeDetailContent({ id }: { id: string }) {
 
               {/* Telefono */}
               <div className="pb-1.5" style={{ borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
-                <p 
+                <p className="seasonal-label" 
                   style={{ 
                     fontSize: '10px', 
                     color: 'rgba(255,255,255,0.27)', 
@@ -937,7 +954,7 @@ function EmployeeDetailContent({ id }: { id: string }) {
 
               {/* Extension */}
               <div className="pb-1.5" style={{ borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
-                <p 
+                <p className="seasonal-label" 
                   style={{ 
                     fontSize: '10px', 
                     color: 'rgba(255,255,255,0.27)', 
@@ -961,7 +978,7 @@ function EmployeeDetailContent({ id }: { id: string }) {
 
               {/* Email - spans both columns */}
               <div className="col-span-2 pb-1.5" style={{ borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
-                <p 
+                <p className="seasonal-label" 
                   style={{ 
                     fontSize: '10px', 
                     color: 'rgba(255,255,255,0.27)', 
@@ -980,7 +997,7 @@ function EmployeeDetailContent({ id }: { id: string }) {
               {/* Sucursal - spans both columns */}
               {employee.location && (
                 <div className="col-span-2 pb-1.5" style={{ borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
-                  <p 
+                  <p className="seasonal-label" 
                     style={{ 
                       fontSize: '10px', 
                       color: 'rgba(255,255,255,0.27)', 
@@ -1151,6 +1168,11 @@ function EmployeeDetailContent({ id }: { id: string }) {
             </button>
           </div>
         </div>
+        {variant ? (
+          <div className="shrink-0">
+            <MarigoldZigzag />
+          </div>
+        ) : null}
       </motion.div>
     </div>
   );
