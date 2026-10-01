@@ -22,9 +22,12 @@ export const SEASONAL_WINDOWS: SeasonalWindow[] = [
 
 export function getActiveSeasonalVariant(search = ""): SeasonalVariant | null {
   // `?seasonal=full|light|off` only works in local dev and Vercel Preview.
+  const host = typeof window !== "undefined" ? window.location.hostname : "";
   const canOverride =
     process.env.NODE_ENV === "development" ||
-    process.env.NEXT_PUBLIC_VERCEL_ENV === "preview";
+    process.env.NEXT_PUBLIC_VERCEL_ENV === "preview" ||
+    host === "localhost" ||
+    host.endsWith(".vercel.app");
   if (canOverride) {
     const o = new URLSearchParams(search).get("seasonal");
     if (o === "full" || o === "light") return o;
