@@ -529,7 +529,7 @@ function QuioscoContent() {
             fontFamily: "var(--font-neuropol), var(--font-orbitron), monospace",
             fontSize: "1.5rem",
             fontWeight: 900,
-            background: pal.brandGradient,
+            backgroundImage: pal.brandGradient,
             backgroundSize: "200% auto",
             WebkitBackgroundClip: "text",
             WebkitTextFillColor: "transparent",
