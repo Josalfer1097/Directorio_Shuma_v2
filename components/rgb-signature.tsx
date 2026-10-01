@@ -3,7 +3,7 @@
 
 
 const SIGNATURE_TEXT = "DESIGNED & POWERED BY SHUMA SISTEMAS IT";
-const VERSION = "v4.1.0";
+const VERSION = "v4.2.0";
 
 export function RgbSignature() {
   return (
